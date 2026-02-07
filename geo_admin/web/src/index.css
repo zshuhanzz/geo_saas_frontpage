@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-600;
+}
+
+/* Glass card effect */
+.glass-card {
+  @apply bg-dark-900/50 backdrop-blur-xl border border-dark-700/50 rounded-2xl;
+}
+
+/* Status badges */
+.status-pending {
+  @apply bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+}
+
+.status-running {
+  @apply bg-blue-500/20 text-blue-400 border border-blue-500/30;
+}
+
+.status-completed {
+  @apply bg-green-500/20 text-green-400 border border-green-500/30;
+}
+
+.status-failed {
+  @apply bg-red-500/20 text-red-400 border border-red-500/30;
+}
+
+/* Table styles */
+.admin-table {
+  @apply w-full text-left;
+}
+
+.admin-table th {
+  @apply px-4 py-3 text-xs font-medium text-dark-400 uppercase tracking-wider border-b border-dark-700 bg-dark-900/80 backdrop-blur-sm;
+}
+
+.admin-table td {
+  @apply px-4 py-3 text-sm text-dark-200 border-b border-dark-800;
+}
+
+.admin-table tr:hover td {
+  @apply bg-dark-800/50;
+}
+
+/* Sticky column support */
+.admin-table th.sticky-col,
+.admin-table td.sticky-col {
+  @apply sticky left-0 z-10 bg-dark-900;
+}
+
+.admin-table tr:hover td.sticky-col {
+  @apply bg-dark-800;
+}
+
+/* Scrollable table wrapper */
+.table-scroll-wrapper {
+  @apply overflow-x-auto relative;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scroll shadow indicators */
+.table-scroll-container {
+  @apply relative;
+}
+
+.table-scroll-container::before,
+.table-scroll-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.table-scroll-container::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(17, 17, 27, 0.9), transparent);
+}
+
+.table-scroll-container::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(17, 17, 27, 0.9), transparent);
+}
+
+.table-scroll-container.scroll-right::after {
+  opacity: 1;
+}
+
+.table-scroll-container.scroll-left::before {
+  opacity: 1;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg shadow-primary-900/30 hover:shadow-primary-800/40;
+}
+
+.btn-secondary {
+  @apply px-4 py-2 bg-dark-800 hover:bg-dark-700 text-dark-200 font-medium rounded-lg border border-dark-700 transition-all duration-200;
+}
+
+/* Input styles */
+.input-field {
+  @apply w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-200;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-900 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-dark-600 rounded-full;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-dark-500;
+}
+
+/* Horizontal scrollbar for tables */
+.table-scroll-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-track {
+  @apply bg-dark-800 rounded-full;
+  margin: 0 8px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+  @apply bg-primary-600/50 rounded-full;
+  border: none;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary-500/70;
+}
