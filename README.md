@@ -52,13 +52,13 @@
 │           ▼                    ▼                      ▼                │
 │   ┌────────────────────────────────────────────────────────────────┐   │
 │   │                   PostgreSQL (Cloud SQL)                       │   │
-│   │ requests ──▶ tasks ──▶ results ──▶ mentions / citations        │   │
-│   └───────────────────────────┬────────────────────────────────────┘   │
-│                               │ READ Unanalyzed Results                │
-│                               ▼                                        │
-│                     ┌────────────────────┐                             │
-│                     │    GEO Analyzer    │                             │
-│                     │  (Cloud Run Job)   │                             │
+│   │ requests ──▶ tasks ──▶ results                                 │   │
+│   └───────────────────────────┬─────────────────────▲──────────────┘   │
+│                               │ READ                │ WRITE            │
+│                               ▼                     │                  │
+│                     ┌────────────────────┐          │                  │
+│                     │    GEO Analyzer    │──────────┘                  │
+│                     │  (Cloud Run Job)   │ mentions / citations        │
 │                     └────────────────────┘                             │
 └────────────────────────────────────────────────────────────────────────┘
 ```
@@ -114,6 +114,10 @@ GEO_Demo/
 │   │   └── core/           # 配置与数据库
 │   ├── terraform/          # GCP 基础设施配置
 │   └── alembic/            # 数据库迁移
+│
+├── geo_analyzer/           # 🧠 数据分析引擎
+│   ├── src/                # Core Logic
+│   └── terraform/          # Cloud Run Job Config
 │
 └── geo_admin/              # 🖥️ 管理后台
     ├── api/                # FastAPI 后端
