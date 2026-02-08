@@ -230,9 +230,9 @@ export PROJECT_ID="your-gcp-project-id"
 export REGION="us-central1"
 
 # 版本号 (每次发布时更新这里)
-export COLLECTOR_VERSION="v8"
+export COLLECTOR_VERSION="v9"
 export ADMIN_API_VERSION="v7"
-export ADMIN_WEB_VERSION="v14"
+export ADMIN_WEB_VERSION="v15"
 export ANALYZER_VERSION="v6"
 
 # 确保 GCP 配置正确

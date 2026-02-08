@@ -6,7 +6,9 @@ function StatusBadge({ status }) {
     const styles = {
         'draft': 'bg-dark-600 text-dark-300',
         'analyzing': 'status-running',
+        'analyzing': 'status-running',
         'completed': 'status-completed',
+        'new_data': 'bg-primary-900/50 text-primary-300 border border-primary-500/30',
     };
 
     return (
@@ -297,7 +299,7 @@ export default function ReportsPage() {
                                             {report.client_name}
                                         </td>
                                         <td className="px-4 py-4">
-                                            <StatusBadge status={report.status} />
+                                            <StatusBadge status={report.status === 'completed' && hasPending ? 'new_data' : report.status} />
                                         </td>
                                         <td className="px-4 py-4">
                                             {status ? (
@@ -327,14 +329,14 @@ export default function ReportsPage() {
                                                 {/* Analyze Button */}
                                                 <button
                                                     onClick={() => handleAnalyze(report.id)}
-                                                    disabled={report.status === 'completed' || isAnalyzing || (status && status.total_results === 0)}
+                                                    disabled={isAnalyzing || (status && status.total_results === 0) || (!hasPending && report.status === 'completed')}
                                                     className={`h-8 px-3 text-xs font-medium rounded-lg transition-colors flex items-center justify-center border border-transparent ${isAnalyzing
                                                         ? 'bg-dark-700 text-dark-300 cursor-wait'
-                                                        : (report.status === 'completed' || (status && status.total_results === 0))
+                                                        : (!hasPending && report.status === 'completed') || (status && status.total_results === 0)
                                                             ? 'bg-dark-700 text-dark-500 cursor-not-allowed'
                                                             : 'bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-500/20'
                                                         }`}
-                                                    title={report.status === 'completed' ? 'Analysis completed' : 'Run analysis'}
+                                                    title={!hasPending && report.status === 'completed' ? 'Analysis completed' : 'Run analysis'}
                                                 >
                                                     {isAnalyzing ? (
                                                         <>
@@ -342,7 +344,7 @@ export default function ReportsPage() {
                                                             Analyzing
                                                         </>
                                                     ) : (
-                                                        'Analyze'
+                                                        hasPending && report.status === 'completed' ? 'Update' : 'Analyze'
                                                     )}
                                                 </button>
 

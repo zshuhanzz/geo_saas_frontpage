@@ -11,7 +11,7 @@ Features:
 - Idempotent via unique constraint on (task_id, call_index)
 
 Flow:
-    Pub/Sub (geo-cloro-callbacks) → This Service → PostgreSQL (geo_results)
+from src.core.database import database, geo_results, geo_tasks, geo_requests, geo_reports
 """
 import base64
 import json
@@ -20,7 +20,7 @@ import time
 from fastapi import FastAPI, Request, HTTPException
 from sqlalchemy import insert, update, select, func
 from sqlalchemy.exc import IntegrityError
-from src.core.database import database, geo_results, geo_tasks, geo_requests
+from src.core.database import database, geo_results, geo_tasks, geo_requests, geo_reports
 from src.services.unpackers.factory import UnpackerFactory
 
 logging.basicConfig(
@@ -180,6 +180,20 @@ async def process_ingestion(task_id: str, call_index: int, payload: dict, task_m
                 .where(geo_tasks.c.task_id == task_id)
                 .values(completed_count=geo_tasks.c.completed_count + 1)
             )
+
+            # [INGESTOR-S4.1] Reset Report Status if needed
+            # If report is 'completed', it implies previous analysis is done.
+            # New data means it's no longer 'completed' in terms of coverage.
+            if task_meta and task_meta.get("report_id"):
+                report_id = task_meta.get("report_id")
+                # Optimistically update to 'analyzing' if currently 'completed'
+                # This reflects that the report is in a state where analysis is pending/ongoing
+                await database.execute(
+                    update(geo_reports)
+                    .where(geo_reports.c.id == report_id)
+                    .where(geo_reports.c.status == "completed")
+                    .values(status="analyzing")
+                )
         
         logger.info(f"[INGESTOR-S4] geo_results 写入成功 | task_id={task_id} | call_index={call_index}")
         
