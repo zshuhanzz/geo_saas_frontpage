@@ -73,9 +73,7 @@ function App() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-6">
                                 <Link to="/" className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-                                        <span className="text-white font-bold text-sm">G</span>
-                                    </div>
+                                    <img src="/logo.png" alt="AnswerX Logo" className="h-8 w-auto" />
                                     <span className="text-xl font-semibold text-white">AnswerX GEO Admin</span>
                                 </Link>
 

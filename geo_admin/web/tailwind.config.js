@@ -8,18 +8,18 @@ export default {
     theme: {
         extend: {
             colors: {
-                // Custom dark theme colors inspired by Profound
+                // AnswerX Brand Green Colors (from logo)
                 primary: {
-                    50: '#f0f5ff',
-                    100: '#e0ebff',
-                    200: '#c7d9ff',
-                    300: '#a3bfff',
-                    400: '#7a9cff',
-                    500: '#5b78ff',
-                    600: '#4a5cf5',
-                    700: '#3d48d9',
-                    800: '#3340af',
-                    900: '#2e3a8a',
+                    50: '#ecfdf5',
+                    100: '#d1fae5',
+                    200: '#a7f3d0',
+                    300: '#6ee7b7',
+                    400: '#34d399',
+                    500: '#2EE89E',   // Logo bright green
+                    600: '#3AB575',   // Logo dark green
+                    700: '#059669',
+                    800: '#047857',
+                    900: '#065f46',
                 },
                 dark: {
                     50: '#f7f7f8',

@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles */
+/* ========================================
+   AnswerX GEO Admin - Design System
+   Brand Colors: #2EE89E (bright) / #3AB575 (dark)
+   ======================================== */
+
+/* Base styles */
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -13,9 +18,13 @@ body {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-600;
 }
 
-/* Glass card effect */
+/* Glass card effect with subtle green glow on hover */
 .glass-card {
-  @apply bg-dark-900/50 backdrop-blur-xl border border-dark-700/50 rounded-2xl;
+  @apply bg-dark-900/50 backdrop-blur-xl border border-dark-700/50 rounded-2xl transition-all duration-300;
+}
+
+.glass-card:hover {
+  @apply border-primary-600/30 shadow-lg shadow-primary-900/10;
 }
 
 /* Status badges */
@@ -28,7 +37,7 @@ body {
 }
 
 .status-completed {
-  @apply bg-green-500/20 text-green-400 border border-green-500/30;
+  @apply bg-primary-500/20 text-primary-400 border border-primary-500/30;
 }
 
 .status-failed {
@@ -45,11 +54,25 @@ body {
 }
 
 .admin-table td {
-  @apply px-4 py-3 text-sm text-dark-200 border-b border-dark-800;
+  @apply px-4 py-3 text-sm text-dark-200 border-b border-dark-800 transition-all duration-200;
 }
 
-.admin-table tr:hover td {
+.admin-table tr {
+  @apply relative;
+}
+
+/* Table row hover with left accent */
+.admin-table tbody tr:hover td {
   @apply bg-dark-800/50;
+}
+
+.admin-table tbody tr:hover td:first-child {
+  @apply relative;
+}
+
+.admin-table tbody tr:hover td:first-child::before {
+  content: '';
+  @apply absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary-400 to-primary-600;
 }
 
 /* Sticky column support */
@@ -105,18 +128,83 @@ body {
   opacity: 1;
 }
 
-/* Button styles */
+/* Primary Button - Brand gradient */
 .btn-primary {
-  @apply px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg shadow-primary-900/30 hover:shadow-primary-800/40;
+  @apply px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-500 
+         hover:from-primary-500 hover:to-primary-400 
+         text-dark-900 font-semibold rounded-lg 
+         transition-all duration-300 
+         shadow-lg shadow-primary-900/30 
+         hover:shadow-xl hover:shadow-primary-800/40
+         hover:-translate-y-0.5
+         active:translate-y-0;
 }
 
+/* Secondary Button */
 .btn-secondary {
-  @apply px-4 py-2 bg-dark-800 hover:bg-dark-700 text-dark-200 font-medium rounded-lg border border-dark-700 transition-all duration-200;
+  @apply px-4 py-2 bg-dark-800 hover:bg-dark-700 
+         text-dark-200 hover:text-white
+         font-medium rounded-lg 
+         border border-dark-700 hover:border-primary-600/50
+         transition-all duration-300;
 }
 
-/* Input styles */
+/* Ghost Button */
+.btn-ghost {
+  @apply px-4 py-2 bg-transparent hover:bg-primary-500/10
+         text-dark-400 hover:text-primary-400
+         font-medium rounded-lg 
+         transition-all duration-300;
+}
+
+/* Input styles with green focus */
 .input-field {
-  @apply w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-200;
+  @apply w-full px-4 py-2.5 
+         bg-dark-900 border border-dark-700 rounded-lg 
+         text-white placeholder-dark-500 
+         focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 
+         transition-all duration-300;
+}
+
+/* Select styles */
+.select-field {
+  @apply w-full px-4 py-2.5 
+         bg-dark-900 border border-dark-700 rounded-lg 
+         text-white 
+         focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 
+         transition-all duration-300
+         cursor-pointer;
+}
+
+/* Card with hover lift effect */
+.card-hover {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary-900/5;
+}
+
+/* Data badge */
+.data-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+         bg-dark-800 text-dark-300 border border-dark-700;
+}
+
+/* Metric card */
+.metric-card {
+  @apply glass-card p-6 relative overflow-hidden;
+}
+
+.metric-card::before {
+  content: '';
+  @apply absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary-500/10 to-transparent rounded-bl-full;
+}
+
+/* Nav link active state */
+.nav-link-active {
+  @apply bg-primary-600/20 text-primary-400 relative;
+}
+
+.nav-link-active::before {
+  content: '';
+  @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-0.5 bg-gradient-to-r from-transparent via-primary-500 to-transparent;
 }
 
 /* Scrollbar */
@@ -130,13 +218,9 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-dark-600 rounded-full;
+  @apply bg-dark-600 rounded-full hover:bg-dark-500;
   border: 2px solid transparent;
   background-clip: content-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-dark-500;
 }
 
 /* Horizontal scrollbar for tables */
@@ -150,10 +234,43 @@ body {
 }
 
 .table-scroll-wrapper::-webkit-scrollbar-thumb {
-  @apply bg-primary-600/50 rounded-full;
+  @apply bg-primary-600/50 rounded-full hover:bg-primary-500/70;
   border: none;
 }
 
-.table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary-500/70;
+/* Loading spinner */
+.spinner {
+  @apply animate-spin rounded-full border-2 border-dark-700 border-t-primary-500;
 }
+
+/* Pulse animation for live indicators */
+.pulse-dot {
+  @apply relative;
+}
+
+.pulse-dot::before {
+  content: '';
+  @apply absolute inset-0 rounded-full bg-primary-500 animate-ping opacity-75;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Stagger children animation */
+.stagger-children > * {
+  @apply opacity-0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }

@@ -22,8 +22,8 @@ export default function LoginPage() {
             <div className="glass-card p-8 max-w-md w-full mx-4">
                 <div className="text-center mb-8">
                     {/* Logo */}
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <span className="text-white font-bold text-2xl">G</span>
+                    <div className="flex justify-center mb-4">
+                        <img src="/logo.png" alt="AnswerX Logo" className="h-16 w-auto" />
                     </div>
                     <h1 className="text-2xl font-bold text-white">AnswerX GEO Admin</h1>
                     <p className="text-dark-400 mt-2">内部管理后台</p>

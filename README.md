@@ -1,6 +1,10 @@
 # AnswerX GEO
 
 <p align="center">
+  <img src="logo.png" alt="AnswerX Logo" width="120" />
+</p>
+
+<p align="center">
   <strong>高吞吐量 · 异步 · 事件驱动</strong><br>
   <em>Generative Engine Optimization (GEO) 数据采集与分析平台</em>
 </p>
@@ -195,6 +199,11 @@ npm install && npm run dev
 export PROJECT_ID="your-gcp-project-id"
 export REGION="us-central1"
 
+# 版本号 (每次发布时更新这里)
+export COLLECTOR_VERSION="v6"
+export ADMIN_API_VERSION="v3"
+export ADMIN_WEB_VERSION="v8"
+
 # 确保 GCP 配置正确
 gcloud config set project $PROJECT_ID
 gcloud auth application-default set-quota-project $PROJECT_ID
@@ -205,10 +214,11 @@ gcloud auth application-default set-quota-project $PROJECT_ID
 cd /path/to/GEO_Demo/geo_collector
 
 gcloud builds submit \
-  --tag $REGION-docker.pkg.dev/$PROJECT_ID/answer-x-geo-repo/geo-collector:v5 .
+  --tag $REGION-docker.pkg.dev/$PROJECT_ID/answer-x-geo-repo/geo-collector:$COLLECTOR_VERSION .
 
 # ------------------------------------------------------
 # 2. 部署 GEO Collector (Terraform)
+# 注意: 需先更新 terraform.tfvars 中的 image_tag
 # ------------------------------------------------------
 cd terraform
 terraform init
@@ -221,16 +231,17 @@ terraform apply   # 确认后执行
 cd /path/to/GEO_Demo/geo_admin
 
 gcloud builds submit ./api \
-  --tag $REGION-docker.pkg.dev/$PROJECT_ID/geo-admin-repo/geo-admin-api:v3
+  --tag $REGION-docker.pkg.dev/$PROJECT_ID/geo-admin-repo/geo-admin-api:$ADMIN_API_VERSION
 
 # ------------------------------------------------------
 # 4. 构建 GEO Admin Web 镜像
 # ------------------------------------------------------
 gcloud builds submit ./web \
-  --tag $REGION-docker.pkg.dev/$PROJECT_ID/geo-admin-repo/geo-admin-web:v7
+  --tag $REGION-docker.pkg.dev/$PROJECT_ID/geo-admin-repo/geo-admin-web:$ADMIN_WEB_VERSION
 
 # ------------------------------------------------------
 # 5. 部署 GEO Admin (Terraform)
+# 注意: 需先更新 terraform.tfvars 中的 api_image_tag 和 web_image_tag
 # ------------------------------------------------------
 cd terraform
 terraform init

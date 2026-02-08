@@ -128,74 +128,100 @@ class GeminiClient:
         intent: str,
         n: int
     ) -> str:
-        """Build user prompt with intent-specific examples and guidance"""
+        """Build user prompt with intent-specific examples and guidance
         
-        product_name = product or topic or "product"
+        Field usage per intent:
+        - Solution Discovery: product, topic (NO client_name)
+        - Competitive Evaluation: client_name, peers, product
+        - Specifics Inquiry: client_name, product, topic
+        """
+        
+        # Use product or topic for category-level prompts
+        product_category = product or topic or "product"
+        # Use client_name + product for specific product references
+        specific_product = f"{client_name} {product}" if client_name and product else (product or client_name or "product")
         
         # Intent-specific prompt patterns and examples
         intent_guidance = {
             "Solution Discovery": f"""
-Intent Type: Solution Discovery
-Users are looking for solutions and recommendations. Generate prompts that:
-- Use patterns like "Best X for Y", "What is X", "How to X", "Does X"
-- Focus on user needs, features, and decision-making
-- Include authoritative inquiry and category-level questions
-- DO NOT mention any competitor brands, focus only on the product category and the focus brand
+Intent Type: Solution Discovery (垂类最佳 & 咨询权威)
+Users are looking for solutions and recommendations in a product category.
 
-Example Prompt Patterns:
-- "Best {product_name} for complex home environments"
-- "Best {product_name} for 2,000 sq. ft. home with mostly carpet?"
-- "Which {product_name} brand has the best object avoidance?"
-- "What are the top 3 most reliable {product_name} brands in 2025?"
-- "Best {product_name} under $1,000"
-- "How to select a {product_name} for home?"
-- "What are the most important features for today's best {product_name}"
-- "Is the auto emptying feature worth the extra money for {product_name}?"
-- "How much suction for a {product_name} is enough?"
-- "Is LiDAR better than camera-based navigation for {product_name}?"
+Generate prompts that:
+- Use patterns like "Best X for Y", "What is X", "How to X", "Which X"
+- Focus on product category, features, and decision-making criteria
+- Include authoritative inquiry and category-level questions
+- DO NOT mention any specific brand names (neither client nor competitors)
+- Focus on the product category: {product_category}
+{f'- May reference the topic: {topic}' if topic else ''}
+
+Example Prompt Patterns (Best X for Y):
+- "Best {product_category} for complex home environments"
+- "Best {product_category} for 2,000 sq. ft. home with mostly carpet?"
+- "Which {product_category} brand has the best object avoidance?"
+- "What are the top 3 most reliable {product_category} brands in 2025?"
+- "Best {product_category} under $1,000"
+
+Example Prompt Patterns (What is X, How to X, Does X):
+- "How to select a {product_category} for home?"
+- "What are the most important features for today's best {product_category}"
+- "Is the auto emptying feature worth the extra money?"
+- "What makes one {product_category} 'smart'?"
+- "How much suction for a {product_category} is enough?"
+- "Is LiDAR better than camera-based navigation?"
+- "Explain the difference between 'suction power' (Pa) and actual cleaning performance."
 """,
             "Competitive Evaluation": f"""
-Intent Type: Competitive Evaluation
-Users are comparing different products/brands. Generate prompts that:
+Intent Type: Competitive Evaluation (优劣对比 & 替代方案)
+Users are comparing different products/brands.
+
+Generate prompts that:
 - Use patterns like "X vs Y", "Alternatives to X", comparison queries
 - Focus on competitive advantages and differentiation
 - Include price-tier comparisons and market leadership questions
-- MUST include competitor brand comparisons
+- MUST mention both the focus brand ({client_name}) and competitors ({peers or 'competitors'})
+- May reference product type: {product_category}
 
-Example Prompt Patterns:
-- "{product_name} comparison of {client_name} vs {peers or 'competitor'}"
-- "Should I get a {client_name}, a {peers or 'competitor'}, or stick with another brand?"
+Example Prompt Patterns (X vs Y):
+- "{product_category} comparison of {client_name} vs {peers or 'competitor'}"
+- "Should I get a {client_name}, a {peers or 'competitor'}, or stick with a {peers.split(',')[0].strip() if peers and ',' in peers else 'other brand'}?"
 - "Are the $1,500 flagship models really that much better than the $500 ones?"
-- "Best mid-range {product_name} under $600: {client_name} or {peers or 'competitor'}?"
-- "Is {peers or 'competitor'} still the market leader, or has {client_name} overtaken them?"
-- "{product_name} alternatives to {peers or 'competitor'}"
-- "{client_name} vs {peers or 'competitor'}: which is better for pet hair?"
+- "Best mid-range {product_category} under $600: {client_name} or {peers or 'competitor'}?"
+- "Is {peers.split(',')[0].strip() if peers else 'competitor'} still the market leader, or has {client_name} overtaken them?"
+
+Example Prompt Patterns (Alternatives to X):
+- "{product_category} alternatives to {peers.split(',')[0].strip() if peers else 'competitor'}"
+- "What are good alternatives to {peers or 'competitor'}?"
 """,
             "Specifics Inquiry": f"""
-Intent Type: Specifics Inquiry  
-Users are asking about specific product details, often near purchase. Generate prompts that:
-- Use patterns like "Does X", "What is the price for X", specific feature queries
-- Focus on product specifications, compatibility, pricing
-- Include model-specific questions and technical details
-- DO NOT mention any competitor brands
+Intent Type: Specifics Inquiry (临近购买)
+Users are asking about specific product details, often near purchase decision.
 
-Example Prompt Patterns (mix of brand-specific and product-category questions):
-- "Does {product_name} work in the dark?"
-- "Does {product_name} support Apple HomeKit?"
-- "What is the price for {product_name}?"
-- "How long does {product_name} battery last?"
-- "{product_name} specifications and features"
-- "Is {product_name} worth buying in 2025?"
-- "What colors are available for {product_name}?"
-- "Does {product_name} have self-emptying feature?"
-- "{client_name} official price"
-- "Where to buy {client_name} {product_name}?"
+Generate prompts that:
+- Use patterns like "Does X", "What is the price for X", specific feature queries
+- Focus on product specifications, compatibility, pricing, availability
+- Include model-specific questions and technical details
+- MUST mention the specific product: {specific_product}
+- DO NOT mention any competitor brands
+{f'- May reference the topic: {topic}' if topic else ''}
+
+Example Prompt Patterns:
+- "Does {specific_product} work in the dark?"
+- "Does {specific_product} support Apple HomeKit?"
+- "What is the price for {specific_product}?"
+- "How long does {specific_product} battery last?"
+- "{specific_product} specifications and features"
+- "Is {specific_product} worth buying in 2025?"
+- "What colors are available for {specific_product}?"
+- "Does {specific_product} have self-emptying feature?"
+- "Where to buy {specific_product}?"
+- "{specific_product} official price"
 """
         }
         
         guidance = intent_guidance.get(intent, intent_guidance["Solution Discovery"])
         
-        # Build the complete prompt
+        # Build the complete prompt with context-aware field usage
         parts = [
             f"You are a GEO (Generative Engine Optimization) expert.",
             f"Generate {n} unique, natural search queries that real users would type into AI search engines.",
@@ -203,21 +229,34 @@ Example Prompt Patterns (mix of brand-specific and product-category questions):
             guidance,
             "",
             "Business Context:",
-            f"- Focus Client/Brand: {client_name}",
         ]
         
-        # Only include peers for Competitive Evaluation intent
-        if peers and intent == "Competitive Evaluation":
-            parts.append(f"- Competitor Brands: {peers}")
-            parts.append("  (You MUST include these competitors in your comparison prompts)")
-        elif intent != "Competitive Evaluation":
-            parts.append("- Competitor Brands: (DO NOT mention any competitors, focus on the product category only)")
-        
-        if topic:
-            parts.append(f"- Product Category: {topic}")
-        
-        if product:
-            parts.append(f"- Product Type: {product}")
+        # Add fields based on intent type
+        if intent == "Solution Discovery":
+            # Solution Discovery: product/topic only, NO client_name
+            if topic:
+                parts.append(f"- Product Category/Topic: {topic}")
+            if product:
+                parts.append(f"- Product Type: {product}")
+            parts.append("- Note: DO NOT mention any brand names, focus on the product category only")
+            
+        elif intent == "Competitive Evaluation":
+            # Competitive Evaluation: client_name + peers + product
+            parts.append(f"- Focus Client/Brand: {client_name}")
+            if peers:
+                parts.append(f"- Competitor Brands: {peers}")
+                parts.append("  (You MUST include these competitors in your comparison prompts)")
+            if product:
+                parts.append(f"- Product Type: {product}")
+                
+        else:  # Specifics Inquiry
+            # Specifics Inquiry: client_name + product + topic
+            parts.append(f"- Focus Client/Brand: {client_name}")
+            if product:
+                parts.append(f"- Specific Product: {product}")
+            if topic:
+                parts.append(f"- Topic/Category: {topic}")
+            parts.append("- Note: DO NOT mention any competitor brands")
         
         if target_user:
             user_desc = json.dumps(target_user, ensure_ascii=False) if isinstance(target_user, dict) else str(target_user)
@@ -232,10 +271,12 @@ Example Prompt Patterns (mix of brand-specific and product-category questions):
         ])
         
         # Add intent-specific requirements
-        if intent == "Competitive Evaluation":
+        if intent == "Solution Discovery":
+            parts.append("4. Focus on product category - NO brand names allowed")
+        elif intent == "Competitive Evaluation":
             parts.append("4. Include competitor brand names in comparison prompts")
-        else:
-            parts.append("4. DO NOT mention any competitor brands - focus on product category and focus brand ONLY")
+        else:  # Specifics Inquiry
+            parts.append("4. Focus on the specific product - NO competitor brands")
         
         parts.extend([
             f"5. Generate exactly {n} prompts",
