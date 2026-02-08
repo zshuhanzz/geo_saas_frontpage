@@ -231,8 +231,8 @@ export default function ReportDetailPage() {
                     <button
                         onClick={() => setActiveTab('mentions')}
                         className={`py-3 border-b-2 transition-colors ${activeTab === 'mentions'
-                                ? 'border-primary-500 text-white'
-                                : 'border-transparent text-dark-400 hover:text-white'
+                            ? 'border-primary-500 text-white'
+                            : 'border-transparent text-dark-400 hover:text-white'
                             }`}
                     >
                         Company Mentions
@@ -245,8 +245,8 @@ export default function ReportDetailPage() {
                     <button
                         onClick={() => setActiveTab('citations')}
                         className={`py-3 border-b-2 transition-colors ${activeTab === 'citations'
-                                ? 'border-primary-500 text-white'
-                                : 'border-transparent text-dark-400 hover:text-white'
+                            ? 'border-primary-500 text-white'
+                            : 'border-transparent text-dark-400 hover:text-white'
                             }`}
                     >
                         Citations
@@ -278,43 +278,72 @@ export default function ReportDetailPage() {
                                 No company mentions found
                             </div>
                         ) : (
-                            <>
-                                <table className="w-full text-sm">
-                                    <thead className="bg-dark-800/50">
-                                        <tr>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Company</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Position</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Type</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Platform</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Intent</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Topic</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Product</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-dark-700">
-                                        {mentions.map((m, idx) => (
-                                            <tr key={m.id || idx} className="hover:bg-dark-800/30">
-                                                <td className="px-3 py-2 text-white font-medium">{m.company_name}</td>
-                                                <td className="px-3 py-2 text-dark-300">#{m.mention_position}</td>
-                                                <td className="px-3 py-2">
-                                                    {m.is_client && <span className="text-green-400">Client</span>}
-                                                    {m.is_peer && <span className="text-yellow-400">Peer</span>}
-                                                    {!m.is_client && !m.is_peer && <span className="text-dark-500">Other</span>}
-                                                </td>
-                                                <td className="px-3 py-2 text-dark-300">{m.platform}</td>
-                                                <td className="px-3 py-2 text-dark-300">{m.intent}</td>
-                                                <td className="px-3 py-2 text-dark-300">{m.topic}</td>
-                                                <td className="px-3 py-2 text-dark-300">{m.product}</td>
+                            <div className="table-scroll-container" id="mentionsScrollContainer">
+                                <div
+                                    className="table-scroll-wrapper"
+                                    onScroll={(e) => {
+                                        const container = document.getElementById('mentionsScrollContainer');
+                                        const { scrollLeft, scrollWidth, clientWidth } = e.target;
+                                        const canScrollLeft = scrollLeft > 0;
+                                        const canScrollRight = scrollLeft < scrollWidth - clientWidth - 1;
+                                        container.classList.toggle('scroll-left', canScrollLeft);
+                                        container.classList.toggle('scroll-right', canScrollRight);
+                                    }}
+                                    ref={(el) => {
+                                        if (el) {
+                                            const container = document.getElementById('mentionsScrollContainer');
+                                            const canScrollRight = el.scrollWidth > el.clientWidth;
+                                            container?.classList.toggle('scroll-right', canScrollRight);
+                                        }
+                                    }}
+                                >
+                                    <table className="admin-table min-w-max">
+                                        <thead>
+                                            <tr>
+                                                <th className="sticky-col">Company</th>
+                                                <th>Position</th>
+                                                <th>Type</th>
+                                                <th>Platform</th>
+                                                <th>Intent</th>
+                                                <th>Topic</th>
+                                                <th>Product</th>
+                                                <th>Request ID</th>
+                                                <th>Task ID</th>
+                                                <th>Result ID</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                                <Pagination
-                                    page={mentionsPage}
-                                    pages={mentionsPagination.pages}
-                                    onPageChange={setMentionsPage}
-                                />
-                            </>
+                                        </thead>
+                                        <tbody>
+                                            {mentions.map((m, idx) => (
+                                                <tr key={m.id || idx}>
+                                                    <td className="sticky-col font-medium text-white">{m.company_name}</td>
+                                                    <td className="text-dark-300">#{m.mention_position}</td>
+                                                    <td>
+                                                        {m.is_client && <span className="text-green-400">Client</span>}
+                                                        {m.is_peer && <span className="text-yellow-400">Peer</span>}
+                                                        {!m.is_client && !m.is_peer && <span className="text-dark-500">Other</span>}
+                                                    </td>
+                                                    <td className="text-dark-300">
+                                                        <span className="px-2 py-0.5 bg-dark-800 rounded text-xs">{m.platform}</span>
+                                                    </td>
+                                                    <td className="text-dark-300 text-sm">{m.intent}</td>
+                                                    <td className="text-dark-300 text-sm whitespace-nowrap">{m.topic}</td>
+                                                    <td className="text-dark-300 text-sm whitespace-nowrap">{m.product}</td>
+                                                    <td className="text-dark-500 text-xs font-mono">{m.request_id}</td>
+                                                    <td className="text-dark-500 text-xs font-mono">{m.task_id}</td>
+                                                    <td className="text-dark-500 text-xs font-mono">{m.result_id}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="p-4 border-t border-dark-700">
+                                    <Pagination
+                                        page={mentionsPage}
+                                        pages={mentionsPagination.pages}
+                                        onPageChange={setMentionsPage}
+                                    />
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -338,57 +367,88 @@ export default function ReportDetailPage() {
                                 No citations found
                             </div>
                         ) : (
-                            <>
-                                <table className="w-full text-sm">
-                                    <thead className="bg-dark-800/50">
-                                        <tr>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Domain</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Category</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Pill</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Platform</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">Intent</th>
-                                            <th className="px-3 py-2 text-left text-xs font-medium text-dark-400 uppercase">URL</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-dark-700">
-                                        {citations.map((c, idx) => (
-                                            <tr key={c.id || idx} className="hover:bg-dark-800/30">
-                                                <td className="px-3 py-2 text-white font-medium">{c.source_domain}</td>
-                                                <td className="px-3 py-2">
-                                                    <span className={c.domain_category === 'Owned' ? 'text-green-400' : 'text-dark-300'}>
-                                                        {c.domain_category}
-                                                    </span>
-                                                </td>
-                                                <td className="px-3 py-2">
-                                                    {c.is_citation_pill ? (
-                                                        <span className="text-primary-400">Yes</span>
-                                                    ) : (
-                                                        <span className="text-dark-500">No</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-3 py-2 text-dark-300">{c.platform}</td>
-                                                <td className="px-3 py-2 text-dark-300">{c.intent}</td>
-                                                <td className="px-3 py-2">
-                                                    <a
-                                                        href={c.source_url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-primary-400 hover:text-primary-300 truncate block max-w-xs"
-                                                        title={c.source_url}
-                                                    >
-                                                        {c.source_url?.slice(0, 40)}...
-                                                    </a>
-                                                </td>
+                            <div className="table-scroll-container" id="citationsScrollContainer">
+                                <div
+                                    className="table-scroll-wrapper"
+                                    onScroll={(e) => {
+                                        const container = document.getElementById('citationsScrollContainer');
+                                        const { scrollLeft, scrollWidth, clientWidth } = e.target;
+                                        const canScrollLeft = scrollLeft > 0;
+                                        const canScrollRight = scrollLeft < scrollWidth - clientWidth - 1;
+                                        container.classList.toggle('scroll-left', canScrollLeft);
+                                        container.classList.toggle('scroll-right', canScrollRight);
+                                    }}
+                                    ref={(el) => {
+                                        if (el) {
+                                            const container = document.getElementById('citationsScrollContainer');
+                                            const canScrollRight = el.scrollWidth > el.clientWidth;
+                                            container?.classList.toggle('scroll-right', canScrollRight);
+                                        }
+                                    }}
+                                >
+                                    <table className="admin-table min-w-max">
+                                        <thead>
+                                            <tr>
+                                                <th className="sticky-col">Domain</th>
+                                                <th>Category</th>
+                                                <th>Pill</th>
+                                                <th>Position</th>
+                                                <th>Platform</th>
+                                                <th>Intent</th>
+                                                <th>URL</th>
+                                                <th>Request ID</th>
+                                                <th>Task ID</th>
+                                                <th>Result ID</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                                <Pagination
-                                    page={citationsPage}
-                                    pages={citationsPagination.pages}
-                                    onPageChange={setCitationsPage}
-                                />
-                            </>
+                                        </thead>
+                                        <tbody>
+                                            {citations.map((c, idx) => (
+                                                <tr key={c.id || idx}>
+                                                    <td className="sticky-col font-medium text-white">{c.source_domain}</td>
+                                                    <td>
+                                                        <span className={c.domain_category === 'Owned' ? 'text-green-400' : 'text-dark-300'}>
+                                                            {c.domain_category}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        {c.is_citation_pill ? (
+                                                            <span className="text-primary-400">Yes</span>
+                                                        ) : (
+                                                            <span className="text-dark-500">No</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="text-dark-300">#{c.source_position}</td>
+                                                    <td className="text-dark-300">
+                                                        <span className="px-2 py-0.5 bg-dark-800 rounded text-xs">{c.platform}</span>
+                                                    </td>
+                                                    <td className="text-dark-300 text-sm">{c.intent}</td>
+                                                    <td>
+                                                        <a
+                                                            href={c.source_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-primary-400 hover:text-primary-300 truncate block max-w-xs"
+                                                            title={c.source_url}
+                                                        >
+                                                            {c.source_url?.slice(0, 30)}...
+                                                        </a>
+                                                    </td>
+                                                    <td className="text-dark-500 text-xs font-mono">{c.request_id}</td>
+                                                    <td className="text-dark-500 text-xs font-mono">{c.task_id}</td>
+                                                    <td className="text-dark-500 text-xs font-mono">{c.result_id}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="p-4 border-t border-dark-700">
+                                    <Pagination
+                                        page={citationsPage}
+                                        pages={citationsPagination.pages}
+                                        onPageChange={setCitationsPage}
+                                    />
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>

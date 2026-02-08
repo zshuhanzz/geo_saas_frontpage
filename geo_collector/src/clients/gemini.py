@@ -62,6 +62,9 @@ class GeminiClient:
         """
         self._ensure_initialized()
         
+        if isinstance(peers, list):
+            peers = ", ".join(peers)
+            
         # Only pass peers when intent is Competitive Evaluation
         effective_peers = peers if intent == "Competitive Evaluation" else None
         

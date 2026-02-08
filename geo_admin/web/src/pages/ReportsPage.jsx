@@ -145,6 +145,18 @@ export default function ReportsPage() {
         }
     }
 
+    async function refreshProgress(reportId) {
+        try {
+            const status = await getAnalysisStatus(reportId);
+            setAnalysisStatus(prev => ({
+                ...prev,
+                [reportId]: status
+            }));
+        } catch (err) {
+            console.error('Failed to refresh progress:', err);
+        }
+    }
+
     function canAnalyze(reportId) {
         const status = analysisStatus[reportId];
         return status && status.pending_results > 0;
@@ -255,7 +267,10 @@ export default function ReportsPage() {
                                     Client
                                 </th>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase tracking-wider">
-                                    Analysis Status
+                                    Status
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase tracking-wider">
+                                    Analysis Progress
                                 </th>
                                 <th className="px-4 py-3 text-right text-xs font-medium text-dark-400 uppercase tracking-wider">
                                     Actions
@@ -282,59 +297,71 @@ export default function ReportsPage() {
                                             {report.client_name}
                                         </td>
                                         <td className="px-4 py-4">
+                                            <StatusBadge status={report.status} />
+                                        </td>
+                                        <td className="px-4 py-4">
                                             {status ? (
-                                                <div className="text-sm">
+                                                <div className="flex items-center text-sm">
                                                     <span className="text-dark-300">
                                                         {status.analyzed_results} / {status.total_results} analyzed
                                                     </span>
-                                                    {status.pending_results > 0 && (
-                                                        <span className="ml-2 text-yellow-400">
-                                                            ({status.pending_results} pending)
-                                                        </span>
-                                                    )}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            refreshProgress(report.id);
+                                                        }}
+                                                        className="ml-2 p-1 text-dark-500 hover:text-primary-400 rounded transition-colors"
+                                                        title="Refresh progress"
+                                                    >
+                                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                             ) : (
                                                 <span className="text-dark-500">-</span>
                                             )}
                                         </td>
                                         <td className="px-4 py-4 text-right">
-                                            <div className="flex justify-end gap-3">
+                                            <div className="flex justify-end gap-2">
                                                 {/* Analyze Button */}
                                                 <button
                                                     onClick={() => handleAnalyze(report.id)}
-                                                    disabled={isAnalyzing || !hasPending}
-                                                    className={`text-sm px-3 py-1 rounded-lg transition-colors ${isAnalyzing
-                                                            ? 'bg-green-900/50 text-green-300 cursor-wait'
-                                                            : hasPending
-                                                                ? 'bg-green-600 hover:bg-green-500 text-white'
-                                                                : 'bg-dark-700 text-dark-500 cursor-not-allowed'
+                                                    disabled={report.status === 'completed' || isAnalyzing || (status && status.total_results === 0)}
+                                                    className={`h-8 px-3 text-xs font-medium rounded-lg transition-colors flex items-center justify-center border border-transparent ${isAnalyzing
+                                                        ? 'bg-dark-700 text-dark-300 cursor-wait'
+                                                        : (report.status === 'completed' || (status && status.total_results === 0))
+                                                            ? 'bg-dark-700 text-dark-500 cursor-not-allowed'
+                                                            : 'bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-500/20'
                                                         }`}
-                                                    title={!hasPending ? 'No pending results to analyze' : ''}
+                                                    title={report.status === 'completed' ? 'Analysis completed' : 'Run analysis'}
                                                 >
                                                     {isAnalyzing ? (
-                                                        <span className="flex items-center gap-2">
-                                                            <span className="animate-spin h-3 w-3 border-2 border-white/30 border-t-white rounded-full"></span>
-                                                            Analyzing...
-                                                        </span>
+                                                        <>
+                                                            <span className="animate-spin h-3 w-3 border-2 border-white/30 border-t-white rounded-full mr-2"></span>
+                                                            Analyzing
+                                                        </>
                                                     ) : (
                                                         'Analyze'
                                                     )}
                                                 </button>
 
                                                 {/* View Results Link */}
-                                                {status && status.analyzed_results > 0 && (
-                                                    <Link
-                                                        to={`/reports/${report.id}`}
-                                                        className="text-primary-400 hover:text-primary-300 text-sm"
-                                                    >
-                                                        View Results
-                                                    </Link>
-                                                )}
+                                                <Link
+                                                    to={`/reports/${report.id}`}
+                                                    className={`h-8 px-3 text-xs font-medium rounded-lg transition-colors flex items-center justify-center border ${status && status.analyzed_results > 0
+                                                        ? 'bg-dark-700 hover:bg-dark-600 text-white border-dark-600'
+                                                        : 'bg-dark-800 text-dark-500 border-transparent cursor-not-allowed'
+                                                        }`}
+                                                    style={{ pointerEvents: status && status.analyzed_results > 0 ? 'auto' : 'none' }}
+                                                >
+                                                    Results
+                                                </Link>
 
                                                 {/* View Requests */}
                                                 <Link
                                                     to={`/requests?report_id=${report.id}`}
-                                                    className="text-dark-400 hover:text-dark-300 text-sm"
+                                                    className="h-8 px-3 text-xs font-medium rounded-lg transition-colors flex items-center justify-center bg-dark-700 hover:bg-dark-600 text-white border border-dark-600"
                                                 >
                                                     Requests
                                                 </Link>
@@ -342,7 +369,7 @@ export default function ReportsPage() {
                                                 {/* Delete */}
                                                 <button
                                                     onClick={() => handleDeleteReport(report.id)}
-                                                    className="text-red-400 hover:text-red-300 text-sm"
+                                                    className="h-8 px-3 text-xs font-medium rounded-lg transition-colors flex items-center justify-center bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20"
                                                 >
                                                     Delete
                                                 </button>

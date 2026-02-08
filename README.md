@@ -100,6 +100,16 @@ Request (业务输入) → Task (调用实例) → Result (采集结果)
 
 支持 `N prompts × M calls` 的灵活配置，一次业务请求可生成多个多样化 Prompt，每个 Prompt 可发起多次采集以获取更多样本。
 
+### 5. 分批处理 & 断点续传 (Batch Processing & Resume)
+
+```
+分批读取 (Batch Fetch) → 增量提交 (Commit) → 自动完成 (Auto-Complete)
+```
+
+针对大规模数据分析任务，Analyzer 采用分批处理模式（默认 100条/批）。
+- **内存优化**: 避免一次性加载大量数据导致的 OOM。
+- **断点续传**: 每次循环自动跳过已分析记录 (`analyzed_at IS NOT NULL`)。若任务因超时（Cloud Run 60分钟限制）被中断，只需重新触发，即可从上次中断处继续执行，无需重跑。
+
 ---
 
 ## 📦 项目结构
@@ -220,10 +230,10 @@ export PROJECT_ID="your-gcp-project-id"
 export REGION="us-central1"
 
 # 版本号 (每次发布时更新这里)
-export COLLECTOR_VERSION="v7"
+export COLLECTOR_VERSION="v8"
 export ADMIN_API_VERSION="v7"
-export ADMIN_WEB_VERSION="v11"
-export ANALYZER_VERSION="v5"
+export ADMIN_WEB_VERSION="v14"
+export ANALYZER_VERSION="v6"
 
 # 确保 GCP 配置正确
 gcloud config set project $PROJECT_ID
@@ -252,13 +262,13 @@ terraform apply   # 确认后执行
 cd /path/to/GEO_Demo/geo_admin
 
 gcloud builds submit ./api \
-  --tag $REGION-docker.pkg.dev/$PROJECT_ID/geo-admin-repo/geo-admin-api:$ADMIN_API_VERSION
+  --tag $REGION-docker.pkg.dev/$PROJECT_ID/geo-admin-repo/geo-admin-api:$ADMIN_API_VERSION .
 
 # ------------------------------------------------------
 # 4. 构建 GEO Admin Web 镜像
 # ------------------------------------------------------
 gcloud builds submit ./web \
-  --tag $REGION-docker.pkg.dev/$PROJECT_ID/geo-admin-repo/geo-admin-web:$ADMIN_WEB_VERSION
+  --tag $REGION-docker.pkg.dev/$PROJECT_ID/geo-admin-repo/geo-admin-web:$ADMIN_WEB_VERSION .
 
 # ------------------------------------------------------
 # 5. 部署 GEO Admin (Terraform)

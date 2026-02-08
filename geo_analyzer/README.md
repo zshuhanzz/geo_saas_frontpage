@@ -73,6 +73,22 @@ pytest tests/
     *   更新 `geo_results.analyzed_at` 时间戳。
 4.  **状态更新**: 若某 Report 下的所有 Result 都已分析，更新 `geo_reports.status = 'completed'`。
 
+### 5. 分批处理 & 断点续传 (Batch Processing & Resume)
+
+Analyzer 针对大规模数据（如 10w+ Results）进行了深度优化：
+
+1.  **分批循环 (Batch Loop)**:
+    *   主进程采用 `while True` 循环。
+    *   每次仅从 DB 读取 **100 条** 未分析记录 (`LIMIT 100`)。
+2.  **原子提交 (Atomic Commit)**:
+    *   每处理完 100 条数据，立即执行 `conn.commit()`。
+    *   确保即使 Job 在第 N 批超时被杀，前 N-1 批的数据已安全入库。
+3.  **自动续传 (Auto Resume)**:
+    *   Job 启动时查询 `analyzed_at IS NULL`。
+    *   天然支持断点续传，无需人工干预。
+4.  **智能状态管理**:
+    *   仅当所有 Results 都被标记为已分析后，Report 状态才更新为 `completed`。
+
 ### 架构图
 
 ```
