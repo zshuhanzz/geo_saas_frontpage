@@ -189,3 +189,7 @@ cd terraform && terraform apply
 | GET | /api/requests/{id} | 请求详情 |
 | GET | /api/requests/{id}/tasks | 任务列表 |
 | GET | /api/tasks/{id}/results | 结果列表 |
+| POST | /api/reports/{id}/analyze | 触发分析任务 |
+| GET | /api/analysis/status/{id} | 分析状态 |
+| GET | /api/analysis/mentions | 公司提及分析 |
+| GET | /api/analysis/citations | 引用来源分析 |

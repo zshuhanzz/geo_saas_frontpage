@@ -87,9 +87,16 @@ class PromptExpanderService:
                 tasks_to_insert.append({
                     "task_id": task_id,
                     "request_id": request_id,
-                    "batch_id": request["batch_id"],
+                    # Report 关联
+                    "report_id": request["report_id"],
+                    "report_name": request["report_name"],
+                    # Client 信息
+                    "client_id": request["client_id"],
                     "client_name": request["client_name"],
-                    "peers": request["peers"],
+                    "peers": request["peers"] or [],
+                    "owned_domains": request["owned_domains"] or [],
+                    # 请求参数
+                    "batch_id": request["batch_id"],
                     "topic": request["topic"],
                     "product": request["product"],
                     "country": request["country"],
@@ -97,6 +104,7 @@ class PromptExpanderService:
                     "intent": request["intent"],
                     "target_user": request["target_user"],
                     "calls_per_prompt": request["calls_per_prompt"],
+                    # Prompt 信息
                     "prompt_text": prompt_text,
                     "prompt_index": i,
                     "status": "PENDING"

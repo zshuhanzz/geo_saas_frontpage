@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStats, triggerExpander } from '../api/client';
+import { getStats } from '../api/client';
 
-function StatCard({ title, value, icon, color }) {
+function StatCard({ title, value, icon, color, subtitle }) {
     return (
         <div className="glass-card p-6">
             <div className="flex items-center justify-between">
                 <div>
                     <p className="text-dark-400 text-sm font-medium">{title}</p>
                     <p className={`text-3xl font-bold mt-1 ${color}`}>{value}</p>
+                    {subtitle && <p className="text-dark-500 text-xs mt-1">{subtitle}</p>}
                 </div>
                 <div className={`text-4xl ${color} opacity-50`}>{icon}</div>
             </div>
@@ -19,8 +20,6 @@ function StatCard({ title, value, icon, color }) {
 export default function Dashboard() {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [triggering, setTriggering] = useState(false);
-    const [message, setMessage] = useState(null);
 
     useEffect(() => {
         loadStats();
@@ -34,21 +33,6 @@ export default function Dashboard() {
             console.error('Failed to load stats:', err);
         } finally {
             setLoading(false);
-        }
-    }
-
-    async function handleTrigger() {
-        setTriggering(true);
-        setMessage(null);
-        try {
-            const result = await triggerExpander();
-            setMessage({ type: 'success', text: result.message || 'Expander triggered successfully!' });
-            // Refresh stats after trigger
-            loadStats();
-        } catch (err) {
-            setMessage({ type: 'error', text: err.message });
-        } finally {
-            setTriggering(false);
         }
     }
 
@@ -66,40 +50,37 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-                    <p className="text-dark-400 mt-1">GEO Collector pipeline overview</p>
+                    <p className="text-dark-400 mt-1">GEO Platform overview</p>
                 </div>
-                <div className="flex gap-3">
-                    <Link to="/requests/new" className="btn-secondary">
-                        + New Request
-                    </Link>
-                    <button
-                        onClick={handleTrigger}
-                        disabled={triggering || (stats?.requests?.pending === 0)}
-                        className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                        {triggering ? (
-                            <>
-                                <span className="animate-spin">⏳</span>
-                                Running...
-                            </>
-                        ) : (
-                            <>▶ Run Pipeline</>
-                        )}
-                    </button>
-                </div>
+                <Link to="/reports" className="btn-primary">
+                    + New Report
+                </Link>
             </div>
 
-            {/* Message */}
-            {message && (
-                <div className={`p-4 rounded-lg ${message.type === 'success'
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                    }`}>
-                    {message.text}
-                </div>
-            )}
+            {/* Stats Grid - Row 1: Clients & Reports */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatCard
+                    title="Clients"
+                    value={stats?.clients || 0}
+                    icon="🏢"
+                    color="text-purple-400"
+                />
+                <StatCard
+                    title="Reports"
+                    value={stats?.reports?.total || 0}
+                    icon="📊"
+                    color="text-cyan-400"
+                    subtitle={stats?.reports?.analyzing > 0 ? `${stats.reports.analyzing} analyzing` : null}
+                />
+                <StatCard
+                    title="Completed Reports"
+                    value={stats?.reports?.completed || 0}
+                    icon="✅"
+                    color="text-green-400"
+                />
+            </div>
 
-            {/* Stats Grid */}
+            {/* Stats Grid - Row 2: Pipeline Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <StatCard
                     title="Total Requests"
@@ -122,46 +103,57 @@ export default function Dashboard() {
                 <StatCard
                     title="Results"
                     value={stats?.results || 0}
-                    icon="✅"
+                    icon="📈"
                     color="text-green-400"
                 />
             </div>
 
-            {/* Quick Links */}
+            {/* Quick Links - Following recommended flow */}
             <div className="glass-card p-6">
                 <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Link
+                        to="/clients"
+                        className="p-4 bg-dark-800 rounded-lg hover:bg-dark-700 transition-colors group"
+                    >
+                        <div className="text-2xl mb-2">🏢</div>
+                        <h3 className="font-medium text-white group-hover:text-primary-400 transition-colors">
+                            1. Manage Clients
+                        </h3>
+                        <p className="text-dark-400 text-sm mt-1">Add clients, peers & domains</p>
+                    </Link>
+
+                    <Link
+                        to="/reports"
+                        className="p-4 bg-dark-800 rounded-lg hover:bg-dark-700 transition-colors group"
+                    >
+                        <div className="text-2xl mb-2">📊</div>
+                        <h3 className="font-medium text-white group-hover:text-primary-400 transition-colors">
+                            2. Create Reports
+                        </h3>
+                        <p className="text-dark-400 text-sm mt-1">Set up analysis reports</p>
+                    </Link>
+
                     <Link
                         to="/requests"
                         className="p-4 bg-dark-800 rounded-lg hover:bg-dark-700 transition-colors group"
                     >
                         <div className="text-2xl mb-2">📋</div>
                         <h3 className="font-medium text-white group-hover:text-primary-400 transition-colors">
-                            View All Requests
+                            3. Collect Data
                         </h3>
-                        <p className="text-dark-400 text-sm mt-1">Manage and monitor requests</p>
+                        <p className="text-dark-400 text-sm mt-1">Create requests & run pipeline</p>
                     </Link>
 
                     <Link
-                        to="/requests/new"
+                        to="/reports"
                         className="p-4 bg-dark-800 rounded-lg hover:bg-dark-700 transition-colors group"
                     >
-                        <div className="text-2xl mb-2">➕</div>
+                        <div className="text-2xl mb-2">🔬</div>
                         <h3 className="font-medium text-white group-hover:text-primary-400 transition-colors">
-                            Create Request
+                            4. Run Analysis
                         </h3>
-                        <p className="text-dark-400 text-sm mt-1">Add a new GEO request</p>
-                    </Link>
-
-                    <Link
-                        to="/requests?status=PENDING"
-                        className="p-4 bg-dark-800 rounded-lg hover:bg-dark-700 transition-colors group"
-                    >
-                        <div className="text-2xl mb-2">⏳</div>
-                        <h3 className="font-medium text-white group-hover:text-primary-400 transition-colors">
-                            Pending Requests
-                        </h3>
-                        <p className="text-dark-400 text-sm mt-1">View requests awaiting processing</p>
+                        <p className="text-dark-400 text-sm mt-1">Trigger analyzer for reports</p>
                     </Link>
                 </div>
             </div>

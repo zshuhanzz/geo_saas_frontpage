@@ -1,15 +1,23 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createRequest } from '../api/client';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { createRequest, getClients, getClient, getReports } from '../api/client';
 
 export default function NewRequest() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    // Data for dropdowns
+    const [clients, setClients] = useState([]);
+    const [availablePeers, setAvailablePeers] = useState([]);
+    const [reports, setReports] = useState([]);
+    const [loadingData, setLoadingData] = useState(true);
+
     const [form, setForm] = useState({
-        client_name: '',
-        peers: '',
+        client_id: '',
+        peers: [],
+        report_id: searchParams.get('report_id') || '',
         topic: '',
         product: '',
         country: 'US',
@@ -19,6 +27,55 @@ export default function NewRequest() {
         calls_per_prompt: '10',
     });
 
+    // Load clients and reports on mount
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    async function loadData() {
+        setLoadingData(true);
+        try {
+            const [clientsData, reportsData] = await Promise.all([
+                getClients(),
+                getReports()
+            ]);
+            setClients(clientsData);
+            setReports(reportsData);
+
+            // If report_id from URL, pre-select client from report
+            const reportIdFromUrl = searchParams.get('report_id');
+            if (reportIdFromUrl) {
+                const report = reportsData.find(r => r.id === reportIdFromUrl);
+                if (report && report.client_id) {
+                    setForm(prev => ({ ...prev, client_id: report.client_id }));
+                    // Fetch client peers
+                    const client = clientsData.find(c => c.id === report.client_id);
+                    if (client) {
+                        setAvailablePeers(client.peers);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Failed to load data:', err);
+        } finally {
+            setLoadingData(false);
+        }
+    }
+
+    // Update available peers when client changes
+    async function handleClientChange(clientId) {
+        setForm(prev => ({ ...prev, client_id: clientId, peers: [] }));
+
+        if (clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                setAvailablePeers(client.peers);
+            }
+        } else {
+            setAvailablePeers([]);
+        }
+    }
+
     function handleChange(e) {
         const { name, value } = e.target;
         setForm(prev => ({
@@ -27,10 +84,34 @@ export default function NewRequest() {
         }));
     }
 
+    function togglePeer(peer) {
+        setForm(prev => ({
+            ...prev,
+            peers: prev.peers.includes(peer)
+                ? prev.peers.filter(p => p !== peer)
+                : [...prev.peers, peer]
+        }));
+    }
+
+    function selectAllPeers() {
+        setForm(prev => ({ ...prev, peers: [...availablePeers] }));
+    }
+
+    function clearPeers() {
+        setForm(prev => ({ ...prev, peers: [] }));
+    }
+
     // Parse number fields for submission
     function getSubmitData() {
         return {
-            ...form,
+            client_id: form.client_id,
+            peers: form.peers,
+            report_id: form.report_id || null,
+            topic: form.topic || null,
+            product: form.product || null,
+            country: form.country,
+            platform: form.platform,
+            intent: form.intent,
             prompts_per_request: parseInt(form.prompts_per_request) || 5,
             calls_per_prompt: parseInt(form.calls_per_prompt) || 10,
         };
@@ -39,8 +120,8 @@ export default function NewRequest() {
     async function handleSubmit(e) {
         e.preventDefault();
 
-        if (!form.client_name.trim()) {
-            setError('Client name is required');
+        if (!form.client_id) {
+            setError('Please select a client');
             return;
         }
 
@@ -57,6 +138,14 @@ export default function NewRequest() {
         }
     }
 
+    if (loadingData) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-2xl mx-auto">
             <h1 className="text-2xl font-bold text-white mb-6">Create New Request</h1>
@@ -69,35 +158,102 @@ export default function NewRequest() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Client Name */}
+                    {/* Client Selection */}
                     <div>
                         <label className="block text-sm font-medium text-dark-300 mb-2">
-                            Client Name *
+                            Client *
                         </label>
-                        <input
-                            type="text"
-                            name="client_name"
-                            value={form.client_name}
-                            onChange={handleChange}
-                            placeholder="e.g., RoboRock"
+                        <select
+                            value={form.client_id}
+                            onChange={(e) => handleClientChange(e.target.value)}
                             className="input-field"
                             required
-                        />
+                        >
+                            <option value="">Select a client...</option>
+                            {clients.map((client) => (
+                                <option key={client.id} value={client.id}>
+                                    {client.name}
+                                </option>
+                            ))}
+                        </select>
+                        {clients.length === 0 && (
+                            <p className="text-xs text-dark-400 mt-1">
+                                No clients available. <a href="/clients" className="text-primary-400 hover:underline">Create one first</a>
+                            </p>
+                        )}
                     </div>
 
-                    {/* Peers */}
+                    {/* Report Association */}
                     <div>
                         <label className="block text-sm font-medium text-dark-300 mb-2">
-                            Competitors
+                            Report (Optional)
                         </label>
-                        <input
-                            type="text"
-                            name="peers"
-                            value={form.peers}
+                        <select
+                            name="report_id"
+                            value={form.report_id}
                             onChange={handleChange}
-                            placeholder="e.g., Eufy, iRobot"
                             className="input-field"
-                        />
+                        >
+                            <option value="">No report (standalone)</option>
+                            {reports.filter(r => !form.client_id || r.client_id === form.client_id).map((report) => (
+                                <option key={report.id} value={report.id}>
+                                    {report.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Peers Selection */}
+                    <div className="md:col-span-2">
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="block text-sm font-medium text-dark-300">
+                                Competitors (Peers)
+                            </label>
+                            {availablePeers.length > 0 && (
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={selectAllPeers}
+                                        className="text-xs text-primary-400 hover:text-primary-300"
+                                    >
+                                        Select All
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={clearPeers}
+                                        className="text-xs text-dark-400 hover:text-white"
+                                    >
+                                        Clear
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        {form.client_id ? (
+                            availablePeers.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {availablePeers.map((peer) => (
+                                        <button
+                                            key={peer}
+                                            type="button"
+                                            onClick={() => togglePeer(peer)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${form.peers.includes(peer)
+                                                    ? 'bg-primary-600 text-white'
+                                                    : 'bg-dark-700 text-dark-300 hover:bg-dark-600'
+                                                }`}
+                                        >
+                                            {peer}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-dark-400 text-sm">
+                                    No peers configured for this client.{' '}
+                                    <a href="/clients" className="text-primary-400 hover:underline">Add peers</a>
+                                </p>
+                            )
+                        ) : (
+                            <p className="text-dark-400 text-sm">Select a client first</p>
+                        )}
                     </div>
 
                     {/* Topic */}
@@ -239,7 +395,7 @@ export default function NewRequest() {
                     </button>
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || !form.client_id}
                         className="btn-primary disabled:opacity-50"
                     >
                         {loading ? 'Creating...' : 'Create Request'}

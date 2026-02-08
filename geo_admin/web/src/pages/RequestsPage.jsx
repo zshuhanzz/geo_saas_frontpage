@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { getRequests } from '../api/client';
+import { getRequests, triggerExpander } from '../api/client';
 
 function StatusBadge({ status }) {
     const styles = {
@@ -23,6 +23,8 @@ export default function RequestsPage() {
     const [requests, setRequests] = useState([]);
     const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
     const [loading, setLoading] = useState(true);
+    const [triggering, setTriggering] = useState(false);
+    const [message, setMessage] = useState(null);
 
     const currentPage = parseInt(searchParams.get('page') || '1');
     const statusFilter = searchParams.get('status') || '';
@@ -44,11 +46,28 @@ export default function RequestsPage() {
         }
     }
 
+    async function handleTrigger() {
+        setTriggering(true);
+        setMessage(null);
+        try {
+            const result = await triggerExpander();
+            setMessage({ type: 'success', text: result.message || 'Pipeline triggered successfully!' });
+            loadRequests();
+        } catch (err) {
+            setMessage({ type: 'error', text: err.message });
+        } finally {
+            setTriggering(false);
+        }
+    }
+
     function setPage(page) {
         const params = new URLSearchParams(searchParams);
         params.set('page', page.toString());
         setSearchParams(params);
     }
+
+    // Count pending requests
+    const hasPending = requests.some(r => r.status === 'PENDING');
 
     return (
         <div className="space-y-6">
@@ -60,10 +79,36 @@ export default function RequestsPage() {
                         {pagination.total} total requests
                     </p>
                 </div>
-                <Link to="/requests/new" className="btn-primary">
-                    + New Request
-                </Link>
+                <div className="flex gap-3">
+                    <Link to="/requests/new" className="btn-secondary">
+                        + New Request
+                    </Link>
+                    <button
+                        onClick={handleTrigger}
+                        disabled={triggering || !hasPending}
+                        className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                        {triggering ? (
+                            <>
+                                <span className="animate-spin">⏳</span>
+                                Running...
+                            </>
+                        ) : (
+                            <>▶ Run Pipeline</>
+                        )}
+                    </button>
+                </div>
             </div>
+
+            {/* Message */}
+            {message && (
+                <div className={`p-4 rounded-lg ${message.type === 'success'
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                    : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                    }`}>
+                    {message.text}
+                </div>
+            )}
 
             {/* Filters */}
             <div className="flex gap-2">

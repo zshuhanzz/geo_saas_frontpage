@@ -7,6 +7,9 @@ import NewRequest from './pages/NewRequest';
 import TaskDetail from './pages/TaskDetail';
 import ResultDetail from './pages/ResultDetail';
 import LoginPage from './pages/LoginPage';
+import ClientsPage from './pages/ClientsPage';
+import ReportsPage from './pages/ReportsPage';
+import ReportDetailPage from './pages/ReportDetailPage';
 
 function NavLink({ to, children }) {
     const location = useLocation();
@@ -79,6 +82,8 @@ function App() {
 
                                 <nav className="flex items-center gap-2">
                                     <NavLink to="/">Dashboard</NavLink>
+                                    <NavLink to="/clients">Clients</NavLink>
+                                    <NavLink to="/reports">Reports</NavLink>
                                     <NavLink to="/requests">Requests</NavLink>
                                 </nav>
                             </div>
@@ -92,6 +97,9 @@ function App() {
                 <main className="max-w-7xl mx-auto px-6 py-8">
                     <Routes>
                         <Route path="/" element={<Dashboard />} />
+                        <Route path="/clients" element={<ClientsPage />} />
+                        <Route path="/reports" element={<ReportsPage />} />
+                        <Route path="/reports/:id" element={<ReportDetailPage />} />
                         <Route path="/requests" element={<RequestsPage />} />
                         <Route path="/requests/new" element={<NewRequest />} />
                         <Route path="/requests/:id" element={<RequestDetail />} />

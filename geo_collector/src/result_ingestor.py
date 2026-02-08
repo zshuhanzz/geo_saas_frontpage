@@ -131,6 +131,7 @@ async def process_ingestion(task_id: str, call_index: int, payload: dict, task_m
         async with database.transaction():
             insert_values = {
                 "task_id": task_id,
+                "request_id": task_meta.get("request_id") if task_meta else None,
                 "cloro_task_id": cloro_task_id,
                 "call_index": call_index,
                 "cloro_response": payload,
@@ -149,13 +150,20 @@ async def process_ingestion(task_id: str, call_index: int, payload: dict, task_m
                 "citation_pills": unpacked_data.get("citation_pills"),
             }
             
-            # Task metadata
+            # Task metadata (from geo_tasks)
             if task_meta:
                 insert_values.update({
+                    # Report 关联
+                    "report_id": task_meta.get("report_id"),
+                    "report_name": task_meta.get("report_name"),
+                    # Client 信息
+                    "client_id": task_meta.get("client_id"),
+                    "client_name": task_meta.get("client_name"),
+                    "peers": task_meta.get("peers") or [],
+                    "owned_domains": task_meta.get("owned_domains") or [],
+                    # 请求参数
                     "platform": task_meta.get("platform"),
                     "batch_id": task_meta.get("batch_id"),
-                    "client_name": task_meta.get("client_name"),
-                    "peers": task_meta.get("peers"),
                     "topic": task_meta.get("topic"),
                     "product": task_meta.get("product"),
                     "country": task_meta.get("country"),

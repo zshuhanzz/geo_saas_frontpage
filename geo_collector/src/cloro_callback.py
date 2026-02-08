@@ -86,10 +86,18 @@ async def receive_cloro_callback(
         row = await database.fetch_one(query)
         if row:
             task_meta = {
+                # Request/Report 关联
+                "request_id": str(row["request_id"]) if row["request_id"] else None,
+                "report_id": str(row["report_id"]) if row["report_id"] else None,
+                "report_name": row["report_name"],
+                # Client 信息
+                "client_id": str(row["client_id"]) if row["client_id"] else None,
+                "client_name": row["client_name"],
+                "peers": row["peers"] or [],
+                "owned_domains": row["owned_domains"] or [],
+                # 请求参数
                 "platform": row["platform"],
                 "batch_id": row["batch_id"],
-                "client_name": row["client_name"],
-                "peers": row["peers"],
                 "topic": row["topic"],
                 "product": row["product"],
                 "country": row["country"],

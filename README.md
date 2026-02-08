@@ -33,17 +33,16 @@
 │                           GEO Admin UI                                 │
 │                     (React + Google OAuth)                             │
 └─────────────────────────────────┬──────────────────────────────────────┘
-                                  │ REST API
+                                  │ REST API / Trigger Analysis
                                   ▼
 ┌────────────────────────────────────────────────────────────────────────┐
 │                          GEO Admin API                                 │
 │                     (FastAPI + Cloud SQL)                              │
 └─────────────────────────────────┬──────────────────────────────────────┘
-                                  │ CREATE geo_requests
+                                  │ CREATE geo_requests / TRIGGER analyzer
                                   ▼
 ┌────────────────────────────────────────────────────────────────────────┐
 │                      GEO Collector Pipeline                            │
-│                                                                        │
 │   ┌────────────────┐   ┌────────────────┐   ┌────────────────────┐     │
 │   │    Prompt      │   │     Cloro      │   │    Callback +      │     │
 │   │    Expander    │──▶│   Dispatcher   │──▶│  Result Ingestor   │     │
@@ -53,8 +52,14 @@
 │           ▼                    ▼                      ▼                │
 │   ┌────────────────────────────────────────────────────────────────┐   │
 │   │                   PostgreSQL (Cloud SQL)                       │   │
-│   │           geo_requests ──▶ geo_tasks ──▶ geo_results           │   │
-│   └────────────────────────────────────────────────────────────────┘   │
+│   │ requests ──▶ tasks ──▶ results ──▶ mentions / citations        │   │
+│   └───────────────────────────┬────────────────────────────────────┘   │
+│                               │ READ Unanalyzed Results                │
+│                               ▼                                        │
+│                     ┌────────────────────┐                             │
+│                     │    GEO Analyzer    │                             │
+│                     │  (Cloud Run Job)   │                             │
+│                     └────────────────────┘                             │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -126,6 +131,7 @@ GEO_Demo/
 | **Cloro Dispatcher** | Cloud Run Service | 将 Prompt 发送至 Cloro API，触发 AI 引擎采集 |
 | **Cloro Callback** | Cloud Run Service | 接收 Cloro 异步回调，推送至 Pub/Sub |
 | **Result Ingestor** | Cloud Run Service | 消费 Pub/Sub 消息，解包并入库 |
+| **GEO Analyzer** | Cloud Run Job | 批处理分析引擎，提取结构化数据 |
 | **GEO Admin API** | Cloud Run Service | 管理后台 REST API |
 | **GEO Admin Web** | Cloud Run Service | React 可视化界面 |
 
@@ -173,16 +179,26 @@ cd geo_admin/web
 npm install && npm run dev
 ```
 
+### 3. GEO Analyzer (分析引擎)
+
+```bash
+cd geo_analyzer
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+# 运行分析
+python main.py
+```
+
 ---
 
 ## 📚 文档索引
 
 | 文档 | 说明 |
 |------|------|
-| [geo_collector/README.md](geo_collector/README.md) | Collector 快速开始与日志格式 |
-| [geo_collector/CODE_ASSISTANT.md](geo_collector/CODE_ASSISTANT.md) | 技术设计文档 (架构、Schema、模块) |
+| [geo_collector/README.md](geo_collector/README.md) | Collector 架构设计与快速开始 |
 | [geo_collector/DEPLOY.md](geo_collector/DEPLOY.md) | GCP 部署完整指南 |
 | [geo_admin/README.md](geo_admin/README.md) | Admin 本地开发与云端部署 |
+| [geo_analyzer/README.md](geo_analyzer/README.md) | Analyzer 架构与本地运行 |
 
 ---
 
@@ -200,9 +216,10 @@ export PROJECT_ID="your-gcp-project-id"
 export REGION="us-central1"
 
 # 版本号 (每次发布时更新这里)
-export COLLECTOR_VERSION="v6"
-export ADMIN_API_VERSION="v3"
-export ADMIN_WEB_VERSION="v8"
+export COLLECTOR_VERSION="v7"
+export ADMIN_API_VERSION="v7"
+export ADMIN_WEB_VERSION="v11"
+export ANALYZER_VERSION="v5"
 
 # 确保 GCP 配置正确
 gcloud config set project $PROJECT_ID
@@ -248,10 +265,28 @@ terraform init
 terraform plan    # 先预览变更
 terraform apply   # 确认后执行
 
+# ------------------------------------------------------
+# 6. 构建 GEO Analyzer 镜像 (新模块)
+# ------------------------------------------------------
+cd /path/to/GEO_Demo/geo_analyzer
+
+gcloud builds submit \
+  --tag $REGION-docker.pkg.dev/$PROJECT_ID/geo-analyzer-repo/geo-analyzer:$ANALYZER_VERSION .
+
+# ------------------------------------------------------
+# 7. 部署 GEO Analyzer (Terraform)
+# 注意: 需先更新 terraform.tfvars 中的 image_tag
+# ------------------------------------------------------
+cd terraform
+terraform init
+terraform plan    # 先预览变更
+terraform apply   # 确认后执行
+
 # ======================================================
 # 完成！查看部署状态
 # ======================================================
 gcloud run services list --filter="geo-" --format="table(name,region,status)"
+gcloud run jobs list --filter="geo-" --format="table(name,region,status)"
 ```
 
 > **注意**: 
@@ -268,5 +303,6 @@ Private / Internal Use Only
 ---
 
 <p align="center">
-  <em>最后更新: 2026-02-07</em>
+  <em>最后更新: 2026-02-08</em>
 </p>
+

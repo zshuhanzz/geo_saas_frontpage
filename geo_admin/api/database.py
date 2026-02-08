@@ -1,15 +1,15 @@
 """
-Database connection and table definitions.
+Database connection and table definitions for geo_admin API.
 
-Reuses the same schema as geo_collector but with a read-focused connection.
+Mirrors the geo_collector schema for read/write operations.
 """
 import os
 from databases import Database
 from sqlalchemy import (
     Column, String, Integer, Text, DateTime, MetaData, Table,
-    ForeignKey, func
+    ForeignKey, Boolean, func
 )
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
 
 # Database URL from environment
 DATABASE_URL = os.environ.get(
@@ -20,72 +20,151 @@ DATABASE_URL = os.environ.get(
 database = Database(DATABASE_URL, min_size=1, max_size=5)
 metadata = MetaData()
 
-# --- Table Definitions (mirror geo_collector schema) ---
+# ============================================================================
+# 1. geo_clients - 客户主表
+# ============================================================================
+geo_clients = Table(
+    "geo_clients",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("name", Text, nullable=False, unique=True),
+    Column("created_at", DateTime, server_default=func.now()),
+    Column("updated_at", DateTime, server_default=func.now()),
+)
 
+# ============================================================================
+# 2. geo_client_peers - 客户竞对关系表
+# ============================================================================
+geo_client_peers = Table(
+    "geo_client_peers",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("client_id", UUID, ForeignKey("geo_clients.id"), nullable=False),
+    Column("peer_name", Text, nullable=False),
+    Column("created_at", DateTime, server_default=func.now()),
+)
+
+# ============================================================================
+# 3. geo_client_domains - 客户域名表
+# ============================================================================
+geo_client_domains = Table(
+    "geo_client_domains",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("client_id", UUID, ForeignKey("geo_clients.id"), nullable=False),
+    Column("domain", Text, nullable=False),
+    Column("is_primary", Boolean, server_default="false"),
+    Column("created_at", DateTime, server_default=func.now()),
+)
+
+# ============================================================================
+# 4. geo_reports - 分析报告表
+# ============================================================================
+geo_reports = Table(
+    "geo_reports",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("name", Text, nullable=False),
+    Column("client_id", UUID, ForeignKey("geo_clients.id")),
+    Column("client_name", Text, nullable=False),
+    Column("peers", ARRAY(Text)),
+    Column("owned_domains", ARRAY(Text)),
+    Column("status", Text, server_default="draft"),
+    Column("created_at", DateTime, server_default=func.now()),
+    Column("updated_at", DateTime, server_default=func.now()),
+)
+
+# ============================================================================
+# 5. geo_requests - 请求表 (宽表)
+# ============================================================================
 geo_requests = Table(
     "geo_requests",
     metadata,
     Column("request_id", UUID, primary_key=True),
-    Column("batch_id", String(100)),
-    Column("client_name", String(255), nullable=False),
-    Column("peers", Text),
-    Column("topic", String(255)),
-    Column("product", String(255)),
-    Column("country", String(10), default="US"),
-    Column("platform", String(50), default="chatgpt"),
-    Column("intent", String(100)),
+    
+    # Report 关联
+    Column("report_id", UUID, ForeignKey("geo_reports.id")),
+    Column("report_name", Text),
+    
+    # Client 信息
+    Column("client_id", UUID, ForeignKey("geo_clients.id")),
+    Column("client_name", Text, nullable=False),
+    Column("peers", ARRAY(Text)),
+    Column("owned_domains", ARRAY(Text)),
+    
+    # 请求参数
+    Column("batch_id", Text),
+    Column("topic", Text),
+    Column("product", Text),
+    Column("country", Text, server_default="US"),
+    Column("platform", Text, nullable=False),
+    Column("intent", Text),
     Column("target_user", JSONB),
-    Column("prompts_per_request", Integer, default=20),
-    Column("calls_per_prompt", Integer, default=3),
-    Column("status", String(50), default="PENDING"),
+    
+    Column("prompts_per_request", Integer, server_default="20"),
+    Column("calls_per_prompt", Integer, server_default="100"),
+    
+    Column("status", Text, server_default="PENDING"),
     Column("created_at", DateTime, server_default=func.now()),
-    Column("updated_at", DateTime, server_default=func.now(), onupdate=func.now()),
+    Column("updated_at", DateTime, server_default=func.now()),
 )
 
+# ============================================================================
+# 6. geo_tasks - 任务表 (宽表)
+# ============================================================================
 geo_tasks = Table(
     "geo_tasks",
     metadata,
     Column("task_id", UUID, primary_key=True),
     Column("request_id", UUID, ForeignKey("geo_requests.request_id")),
-    Column("batch_id", String(100)),
-    Column("client_name", String(255)),
-    Column("peers", Text),
-    Column("topic", String(255)),
-    Column("product", String(255)),
-    Column("country", String(10)),
-    Column("platform", String(50)),
-    Column("intent", String(100)),
+    
+    # Report 关联
+    Column("report_id", UUID),
+    Column("report_name", Text),
+    
+    # Client 信息
+    Column("client_id", UUID),
+    Column("client_name", Text),
+    Column("peers", ARRAY(Text)),
+    Column("owned_domains", ARRAY(Text)),
+    
+    # 请求参数
+    Column("batch_id", Text),
+    Column("topic", Text),
+    Column("product", Text),
+    Column("country", Text),
+    Column("platform", Text),
+    Column("intent", Text),
     Column("target_user", JSONB),
+    Column("calls_per_prompt", Integer),
+    
     Column("prompt_text", Text, nullable=False),
     Column("prompt_index", Integer),
-    Column("calls_per_prompt", Integer, default=3),
-    Column("dispatched_count", Integer, default=0),
-    Column("completed_count", Integer, default=0),
-    Column("status", String(50), default="PENDING"),
+    
+    Column("dispatched_count", Integer, server_default="0"),
+    Column("completed_count", Integer, server_default="0"),
+    Column("status", Text, server_default="PENDING"),
     Column("created_at", DateTime, server_default=func.now()),
-    Column("updated_at", DateTime, server_default=func.now(), onupdate=func.now()),
+    Column("updated_at", DateTime, server_default=func.now()),
 )
 
+# ============================================================================
+# 7. geo_results - 结果表 (超宽表)
+# ============================================================================
 geo_results = Table(
     "geo_results",
     metadata,
     Column("result_id", Integer, primary_key=True, autoincrement=True),
     Column("task_id", UUID, ForeignKey("geo_tasks.task_id")),
-    Column("cloro_task_id", String(100)),
-    Column("call_index", Integer, default=1),
-    Column("platform", String(50)),
-    Column("batch_id", String(100)),
-    Column("client_name", String(255)),
-    Column("peers", Text),
-    Column("topic", String(255)),
-    Column("product", String(255)),
-    Column("country", String(10)),
-    Column("intent", String(100)),
-    Column("prompt_text", Text),
-    Column("target_user", JSONB),
+    Column("request_id", UUID),
+    
+    Column("cloro_task_id", Text),
+    Column("call_index", Integer),
     Column("cloro_response", JSONB),
     Column("http_status_code", Integer),
     Column("latency_ms", Integer),
+    
+    # Unpacked Fields
     Column("text", Text),
     Column("html", Text),
     Column("markdown", Text),
@@ -95,5 +174,82 @@ geo_results = Table(
     Column("entities", JSONB),
     Column("search_queries", JSONB),
     Column("citation_pills", JSONB),
+    
+    # Report 关联
+    Column("report_id", UUID),
+    Column("report_name", Text),
+    
+    # Client 信息
+    Column("client_id", UUID),
+    Column("client_name", Text),
+    Column("peers", ARRAY(Text)),
+    Column("owned_domains", ARRAY(Text)),
+    
+    # 请求参数
+    Column("batch_id", Text),
+    Column("topic", Text),
+    Column("product", Text),
+    Column("country", Text),
+    Column("platform", Text),
+    Column("intent", Text),
+    Column("prompt_text", Text),
+    Column("target_user", JSONB),
+    
     Column("ingested_at", DateTime, server_default=func.now()),
+    Column("analyzed_at", DateTime),
 )
+
+# ============================================================================
+# 8. geo_company_mentions - 公司提及表 (Analyzer output)
+# ============================================================================
+geo_company_mentions = Table(
+    "geo_company_mentions",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("report_id", UUID),
+    Column("request_id", UUID),
+    Column("task_id", UUID),
+    Column("result_id", Integer),
+    Column("client_id", UUID),
+    Column("company_name", Text),
+    Column("mention_position", Integer),
+    Column("is_client", Boolean),
+    Column("is_peer", Boolean),
+    Column("client_name", Text),
+    Column("platform", Text),
+    Column("intent", Text),
+    Column("topic", Text),
+    Column("product", Text),
+    Column("country", Text),
+    Column("executed_at", DateTime),
+    Column("created_at", DateTime, server_default=func.now()),
+)
+
+# ============================================================================
+# 9. geo_citations - 引用来源表 (Analyzer output)
+# ============================================================================
+geo_citations = Table(
+    "geo_citations",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("report_id", UUID),
+    Column("request_id", UUID),
+    Column("task_id", UUID),
+    Column("result_id", Integer),
+    Column("client_id", UUID),
+    Column("source_url", Text),
+    Column("source_domain", Text),
+    Column("source_position", Integer),
+    Column("source_label", Text),
+    Column("domain_category", Text),
+    Column("is_citation_pill", Boolean),
+    Column("client_name", Text),
+    Column("platform", Text),
+    Column("intent", Text),
+    Column("topic", Text),
+    Column("product", Text),
+    Column("country", Text),
+    Column("executed_at", DateTime),
+    Column("created_at", DateTime, server_default=func.now()),
+)
+

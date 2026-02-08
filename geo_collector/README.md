@@ -1,4 +1,3 @@
-
 # GEO Collector
 
 GEO Collector 是一个高吞吐量、异步、基于事件驱动的 GEO (Generative Engine Optimization) 数据采集引擎。它负责从各大 AI 搜索引擎（如 ChatGPT, Gemini, Perplexity）采集数据并持久化存储。
@@ -64,39 +63,156 @@ pytest tests/
 
 ---
 
-## 📦 系统架构
+## 🏗️ 系统架构 (System Architecture)
 
-本项目设计为部署在 Google Cloud Run 上，分为四个核心组件：
+### 核心设计原则
 
-### 1. Prompt Expander (Cloud Run Job)
-从 `geo_requests` 读取待处理任务，调用 Gemini 生成多样化 Prompt，写入 `geo_tasks`。
+| 原则 | 描述 |
+|------|------|
+| **ELT 架构** | 先抓取、原样存储、后解析。Collector 只负责搬运数据，严禁在抓取阶段解析深层字段 |
+| **策略模式** | 针对多平台特性，动态选择 API Endpoint 和 JSON 解包器，不硬编码 |
+| **异步与削峰** | 发送端使用 asyncio 高并发，接收端采用 Pub/Sub 解耦，防止数据库过载 |
+| **无服务器优先** | 完全适配 Cloud Run + Cloud SQL，实现自动扩缩容和按需计费 |
+| **三层数据模型** | Request → Task → Result 层级关系，支持 N prompts × M calls 的灵活配置 |
 
-*   **入口**: `src.expander`
-*   **命令**: `python -m src.expander`
+### 架构图
 
-### 2. Cloro Dispatcher (Cloud Run Service)
-被 Pub/Sub (geo-tasks-pending) 触发，读取 `geo_tasks` 并调用 Cloro API。
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              GEO Collector Pipeline                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌──────────┐     ┌───────────────┐     ┌──────────────┐                   │
+│   │ geo_admin│────▶│  geo_requests │     │   Gemini AI  │                   │
+│   │  (UI)    │     │   (PENDING)   │     │  (Prompt Gen)│                   │
+│   └──────────┘     └───────┬───────┘     └──────┬───────┘                   │
+│                            │                     │                          │
+│                            ▼                     ▼                          │
+│                    ┌───────────────────────────────────┐                    │
+│                    │      Prompt Expander (Job)        │                    │
+│                    │  1. Read PENDING requests         │                    │
+│                    │  2. Generate N prompts via LLM    │                    │
+│                    │  3. Create N geo_tasks            │                    │
+│                    └───────────────┬───────────────────┘                    │
+│                                    │                                        │
+│                                    ▼                                        │
+│                    ┌───────────────────────────────────┐                    │
+│                    │      Cloro Dispatcher (Job)       │                    │
+│                    │  1. Read PENDING tasks            │                    │
+│                    │  2. Call Cloro API × M times      │                    │
+│                    │  3. Update task status            │                    │
+│                    └───────────────┬───────────────────┘                    │
+│                                    │                                        │
+│                                    ▼                                        │
+│   ┌────────────────────────────────────────────────────────────────────┐    │
+│   │                         Cloro.dev API                              │    │
+│   │  /v1/monitor/chatgpt  │  /v1/monitor/gemini  │  /v1/monitor/aimode │    │
+│   └────────────────────────────────┬───────────────────────────────────┘    │
+│                                    │ Webhook Callback                       │
+│                                    ▼                                        │
+│                    ┌───────────────────────────────────┐                    │
+│                    │    Cloro Callback (Service)       │                    │
+│                    │  1. Receive JSON payload          │                    │
+│                    │  2. Query task metadata           │                    │
+│                    │  3. Publish to Pub/Sub            │                    │
+│                    └───────────────┬───────────────────┘                    │
+│                                    │                                        │
+│                                    ▼                                        │
+│                    ┌───────────────────────────────────┐                    │
+│                    │        Cloud Pub/Sub              │                    │
+│                    │    Topic: geo-raw-responses       │                    │
+│                    └───────────────┬───────────────────┘                    │
+│                                    │ Push Subscription                      │
+│                                    ▼                                        │
+│                    ┌───────────────────────────────────┐                    │
+│                    │     Result Ingestor (Service)     │                    │
+│                    │  1. Consume Pub/Sub messages      │                    │
+│                    │  2. Unpack JSON (Strategy)        │                    │
+│                    │  3. INSERT into geo_results       │                    │
+│                    │  4. UPDATE task completed_count   │                    │
+│                    └───────────────┬───────────────────┘                    │
+│                                    │                                        │
+│                                    ▼                                        │
+│   ┌────────────────────────────────────────────────────────────────────┐    │
+│   │                        PostgreSQL (Cloud SQL)                      │    │
+│   │  geo_requests  ──1:N──▶  geo_tasks  ──1:M──▶  geo_results          │    │
+│   └────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
-*   **入口**: `src.cloro_dispatcher:app`
-*   **命令**: `uvicorn src.cloro_dispatcher:app --host 0.0.0.0 --port 8080`
+### 运行流程详解
 
-### 3. Cloro Callback (Cloud Run Service)
-接收 Cloro 的异步回调，查询元数据后推送到 Pub/Sub。
+1.  **业务输入 (Request Creation)**: 用户在 Admin 后台创建请求，定义产品、平台、国家等参数。
+2.  **Prompt 扩展 (Prompt Expansion)**: `expander.py` (Job) 读取请求，调用 Gemini 生成多样化 Prompt，写入 `geo_tasks`。
+3.  **任务分发 (Task Dispatch)**: `cloro_dispatcher.py` (Job) 读取任务，调用 Cloro API 进行采集。
+4.  **回调接收 (Webhook Callback)**: `cloro_callback.py` (Service) 接收 Cloro 的异步 webhook 回调，推送到 Pub/Sub。
+5.  **数据入库 (Result Ingestion)**: `result_ingestor.py` (Service) 消费 Pub/Sub 消息，解包 JSON 并存入 `geo_results` 表。
 
-*   **入口**: `src.cloro_callback:app`
-*   **命令**: `uvicorn src.cloro_callback:app --host 0.0.0.0 --port 8080`
+---
 
-### 4. Result Ingestor (Cloud Run Service)
-消费 Pub/Sub 消息，解包 JSON 并写入 `geo_results`。
+## 💾 数据库 Schema
 
-*   **入口**: `src.result_ingestor:app`
-*   **命令**: `uvicorn src.result_ingestor:app --host 0.0.0.0 --port 8080`
+### 三层数据模型
 
-### Docker 构建
+```
+geo_requests (业务输入层) 1:N geo_tasks (调用实例层) 1:M geo_results (结果层)
+```
 
-```bash
-# 在 geo_collector 目录下
-docker build -t geo-collector .
+### 表结构定义
+
+#### 1. geo_requests (业务输入)
+| 列名 | 类型 | 说明 |
+|------|------|------|
+| `request_id` | UUID (PK) | 主键 |
+| `client_name` | VARCHAR | 客户名称 |
+| `product` | VARCHAR | 产品名称 |
+| `platform` | VARCHAR | 平台 (chatgpt/gemini/aimode) |
+| `country` | VARCHAR | 国家代码 |
+| `prompts_per_request` | INT | 生成 Prompt 数量 (N) |
+| `calls_per_prompt` | INT | 每 Prompt 调用次数 (M) |
+| `status` | VARCHAR | PENDING → EXPANDED → COMPLETED |
+
+#### 2. geo_tasks (调用实例)
+| 列名 | 类型 | 说明 |
+|------|------|------|
+| `task_id` | UUID (PK) | 主键，也是 idempotencyKey |
+| `request_id` | UUID (FK) | 关联 geo_requests |
+| `prompt_text` | TEXT | Gemini 生成的 Prompt |
+| `calls_per_prompt` | INT | 该 task 的调用次数 (M) |
+| `completed_count` | INT | 已完成次数 |
+| `status` | VARCHAR | PENDING → DISPATCHING → COMPLETED |
+
+#### 3. geo_results (结果层 - 宽表)
+| 列名 | 类型 | 说明 |
+|------|------|------|
+| `result_id` | SERIAL (PK) | 主键 |
+| `task_id` | UUID (FK) | 关联 geo_tasks |
+| `call_index` | INT | 调用序号 (1~M) |
+| `text` | TEXT | AI 回答文本 |
+| `sources` | JSONB | 引用源列表 |
+| `shopping_cards` | JSONB | 购物卡片 |
+| `cloro_response` | JSONB | 原始完整 JSON |
+
+---
+
+## 📂 代码结构
+
+```
+geo_collector/
+├── Dockerfile                  # 多阶段构建
+├── requirements.txt            # Python 依赖
+├── alembic/                    # 数据库迁移
+├── terraform/                  # 基础设施配置
+├── src/
+│   ├── core/                   # 配置与数据库
+│   ├── clients/                # 外部服务客户端 (Cloro, Gemini, Pub/Sub)
+│   ├── services/
+│   │   └── unpackers/          # 解包器模块 (策略模式)
+│   ├── expander.py             # [Job] Prompt Expander
+│   ├── cloro_dispatcher.py     # [Job] Cloro Dispatcher
+│   ├── cloro_callback.py       # [Service] Webhook 接收器
+│   └── result_ingestor.py      # [Service] 结果入库 Worker
 ```
 
 ---
@@ -112,29 +228,21 @@ docker build -t geo-collector .
 | `cloro_dispatcher.py` | `[DISPATCHER-S0~S5]` | `[DISPATCHER-S4] Cloro 调用成功 \| call=1/3` |
 | `cloro_callback.py` | `[CALLBACK-S0~S3]` | `[CALLBACK-S2] 元数据已加载 \| task_id=xxx` |
 | `result_ingestor.py` | `[INGESTOR-S0~S6]` | `[INGESTOR-S4] geo_results 写入成功` |
-| `cloro.py` | `[CLORO-S1~S2]` | `[CLORO-S2] 发送成功 \| cloro_id=xxx` |
-| `gemini.py` | `[GEMINI-S0~S3]` | `[GEMINI-S3] 解析完成 \| generated=20` |
-
-**Cloud Logging 搜索示例**：
-```
-# 搜索特定模块
-textPayload:"[DISPATCHER"
-
-# 搜索特定 task
-textPayload:"task_id=your-task-id"
-
-# 搜索错误
-textPayload:"ERR]"
-```
 
 ---
 
-## 📚 详细文档
+## ☁️ 部署 (Deployment)
 
-更多关于架构设计、数据库 Schema 和模块说明，请参阅 [技术设计文档 (CODE_ASSISTANT.md)](CODE_ASSISTANT.md)。
+详细部署指南请参考项目根目录的 README.md 或 [DEPLOY.md](DEPLOY.md)。
 
-部署指南请参阅 [DEPLOY.md](DEPLOY.md)。
+```bash
+# Docker 构建
+docker build -t geo-collector .
+
+# Terraform 部署
+cd terraform
+terraform apply
+```
 
 ---
-
-*最后更新: 2026-02-07*
+*Last Updated: 2026-02-09*
