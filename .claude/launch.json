@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "admin-web-claude",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "geo_admin/web", "run", "dev", "--", "--mode", "claude"],
+      "port": 6174
+    },
+    {
+      "name": "saas-web-claude",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "geo_saas/web", "run", "dev", "--", "--mode", "claude"],
+      "port": 6173
+    }
+  ]
+}

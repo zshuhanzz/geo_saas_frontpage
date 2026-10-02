@@ -42,13 +42,18 @@ resource "google_cloud_run_v2_service" "cloro_callback" {
   name     = "geo-cloro-callback"
   location = var.region
   ingress  = "INGRESS_TRAFFIC_ALL"
-  
+
   deletion_protection = false
 
   template {
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 10
+    }
+
     containers {
       image = var.image_tag
-      
+
       command = ["uvicorn"]
       args    = ["src.cloro_callback:app", "--host", "0.0.0.0", "--port", "8080"]
 
@@ -89,11 +94,20 @@ resource "google_cloud_run_v2_service" "cloro_callback" {
         value = var.region
       }
       env {
+        name  = "GCP_REGION_GLOBAL"
+        value = "global"
+      }
+      env {
         name  = "GEMINI_MODEL_ID"
         value = var.gemini_model_id
       }
+
+      volume_mounts {
+        name       = "cloudsql"
+        mount_path = "/cloudsql"
+      }
     }
-    
+
     volumes {
       name = "cloudsql"
       cloud_sql_instance {
@@ -115,13 +129,18 @@ resource "google_cloud_run_service_iam_member" "cloro_callback_public" {
 resource "google_cloud_run_v2_service" "result_ingestor" {
   name     = "geo-result-ingestor"
   location = var.region
-  
+
   deletion_protection = false
 
   template {
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 10
+    }
+
     containers {
       image = var.image_tag
-      
+
       command = ["uvicorn"]
       args    = ["src.result_ingestor:app", "--host", "0.0.0.0", "--port", "8080"]
 
@@ -165,8 +184,13 @@ resource "google_cloud_run_v2_service" "result_ingestor" {
         name  = "GEMINI_MODEL_ID"
         value = var.gemini_model_id
       }
+
+      volume_mounts {
+        name       = "cloudsql"
+        mount_path = "/cloudsql"
+      }
     }
-    
+
     volumes {
       name = "cloudsql"
       cloud_sql_instance {
@@ -190,7 +214,7 @@ resource "google_pubsub_subscription" "callbacks_to_ingestor" {
 
   push_config {
     push_endpoint = "${google_cloud_run_v2_service.result_ingestor.uri}/ingest/result"
-    
+
     oidc_token {
       service_account_email = google_service_account.pubsub_invoker.email
     }
@@ -203,13 +227,18 @@ resource "google_pubsub_subscription" "callbacks_to_ingestor" {
 resource "google_cloud_run_v2_service" "cloro_dispatcher" {
   name     = "geo-cloro-dispatcher"
   location = var.region
-  
+
   deletion_protection = false
 
   template {
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 20
+    }
+
     containers {
       image = var.image_tag
-      
+
       command = ["uvicorn"]
       args    = ["src.cloro_dispatcher:app", "--host", "0.0.0.0", "--port", "8080"]
 
@@ -253,8 +282,13 @@ resource "google_cloud_run_v2_service" "cloro_dispatcher" {
         name  = "GEMINI_MODEL_ID"
         value = var.gemini_model_id
       }
+
+      volume_mounts {
+        name       = "cloudsql"
+        mount_path = "/cloudsql"
+      }
     }
-    
+
     volumes {
       name = "cloudsql"
       cloud_sql_instance {
@@ -278,14 +312,14 @@ resource "google_pubsub_subscription" "tasks_to_dispatcher" {
 
   push_config {
     push_endpoint = "${google_cloud_run_v2_service.cloro_dispatcher.uri}/dispatch/task"
-    
+
     oidc_token {
       service_account_email = google_service_account.pubsub_invoker.email
     }
   }
 
   ack_deadline_seconds = 600
-  
+
   retry_policy {
     minimum_backoff = "10s"
     maximum_backoff = "600s"
@@ -296,14 +330,16 @@ resource "google_pubsub_subscription" "tasks_to_dispatcher" {
 resource "google_cloud_run_v2_job" "prompt_expander" {
   name     = "geo-prompt-expander"
   location = var.region
-  
+
   deletion_protection = false
 
   template {
     template {
+      timeout     = "10800s" # 3 hours for large multi-topic, multi-platform campaigns
+      max_retries = 1
       containers {
         image = var.image_tag
-        
+
         command = ["python"]
         args    = ["-m", "src.expander"]
 
@@ -351,33 +387,19 @@ resource "google_cloud_run_v2_job" "prompt_expander" {
           name  = "GEMINI_MODEL_ID"
           value = var.gemini_model_id
         }
+
+        volume_mounts {
+          name       = "cloudsql"
+          mount_path = "/cloudsql"
+        }
       }
-      
+
       volumes {
         name = "cloudsql"
         cloud_sql_instance {
           instances = [var.db_instance_connection_name]
         }
       }
-    }
-  }
-}
-
-# --- 7. Cloud Scheduler (optional: trigger Expander periodically) ---
-resource "google_cloud_scheduler_job" "expander_cron" {
-  name             = "geo-expander-cron"
-  region           = var.region
-  schedule         = "*/10 * * * *"
-  time_zone        = "UTC"
-  attempt_deadline = "320s"
-  paused           = true  # Default paused, manual trigger only
-
-  http_target {
-    http_method = "POST"
-    uri         = "https://${var.region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${var.project_id}/jobs/${google_cloud_run_v2_job.prompt_expander.name}:run"
-
-    oauth_token {
-      service_account_email = google_service_account.pubsub_invoker.email
     }
   }
 }

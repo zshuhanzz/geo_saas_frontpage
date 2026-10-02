@@ -1,0 +1,46 @@
+{
+  "__doc": "OnboardingWizard: welcome copy, business-shape branches (Own / OEM / Both / Skip), shadow-brand intake step, onboarding tooltips.",
+  "welcomeTitle": "Welcome to AnswerX GEO",
+  "welcomeDescription": "Before we start tracking, we'd like to quickly learn how <1>{{clientName}}</1> is structured.",
+  "question": "How does your brand appear in the market?",
+  "branches": {
+    "ownTitle": "Own brand",
+    "ownDesc": "AI directly mentions our brand name (e.g. Xiaomi, Huawei, Roborock).",
+    "oemTitle": "OEM / private-label supplier",
+    "oemDesc": "Our product is sold under a reseller's / retail platform's brand.",
+    "bothTitle": "Both",
+    "bothDesc": "Own brand + also sold through resellers.",
+    "skipTitle": "Configure later",
+    "skipDesc": "Take a look around first, come back to settings later."
+  },
+  "oemStep": {
+    "prompt": "Let's start by entering the first shadow brand your product is sold under — you can add more later.",
+    "shadowBrandName": "Shadow brand name",
+    "shadowBrandPlaceholder": "e.g. a channel brand / Amazon / JD Self-operated",
+    "alias": "Common aliases (optional)",
+    "aliasPlaceholder": "e.g. RC",
+    "nextBadge": "Next",
+    "nextHint": "Afterwards you can go to the <1>Peers</1> tab to add competing SKUs sold on the same channel — this step is optional and you can come back anytime."
+  },
+  "actions": {
+    "skip": "Skip",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish"
+  },
+  "toasts": {
+    "shadowBrandSaveFailed": "Failed to save the shadow brand, but onboarding is complete — you can add it manually in Settings: {{message}}",
+    "success": "Welcome to AnswerX GEO",
+    "completeFailed": "Error finishing onboarding",
+    "unknownError": "Unknown error"
+  },
+  "tooltips": {
+    "onboardingOwn": "AI will mention your brand name directly. Typical customers: Roborock, Xiaomi — brands with their own site and consumer recognition.",
+    "onboardingOem": "Your product is not sold to end customers under your company name but under a reseller's / distributor's brand (typical case: ODM manufacturers selling via Amazon / Walmart / channel brands).",
+    "onboardingBoth": "You own a brand and also sell through third-party platforms like Amazon / Walmart — you need to track both your own brand and the channel dimension.",
+    "onboardingSkip": "Skip onboarding and enter the system. You can finish brand and topic configuration in Settings at any time; onboarding won't appear again automatically.",
+    "onboardingBusinessShape": "Pick the option that best describes how your brand shows up in the market — the data definitions and recommendations adapt accordingly. You can change this anytime in Settings.",
+    "onboardingShadowBrandName": "The brand name your product is visibly sold under on this channel (the exact name that appears in AI answers, e.g. Amazon Basics, Rough Country).",
+    "onboardingShadowAlias": "Common abbreviations or alternate spellings for this shadow brand (e.g. RC, AMZ). Add any form AI answers might use."
+  }
+}

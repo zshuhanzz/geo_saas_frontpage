@@ -1,0 +1,1047 @@
+{
+  "__doc": "Insights pages (Visibility / Citations / Sentiment / Prompts / Fanouts / ChannelAnalysis) + Insights main layout (filter bar / tabs / header) + VisibilityDashboard / OpportunityAnalysisModal / TemplateConfigModal.",
+  "metricSort": {
+    "activateAscending": "Sort {{label}} ascending",
+    "activateDescending": "Sort {{label}} descending",
+    "currentUnsorted": "Currently unsorted.",
+    "currentAscending": "Currently sorted ascending.",
+    "currentDescending": "Currently sorted descending.",
+    "groupMetric": "Group {{label}}",
+    "matrixBrandMentions": "Nested brand mentions",
+    "matrixBrandRank": "Nested brand rank",
+    "matrixGroupPrompts": "Group prompt count",
+    "matrixGroups": "Group mentions",
+    "matrixPrompts": "Prompt mentions",
+    "promptMetric": "Prompt {{label}}",
+    "incompletePromptMetrics": "Metric sorting is unavailable until the complete Prompt metric set is loaded."
+  },
+  "page": {
+    "title": "Answer Engine Insights",
+    "subtitle": "Analyze brand presence across AI platforms.",
+    "brandSettings": "Brand Settings & Peers"
+  },
+  "tabs": {
+    "visibility": "Visibility",
+    "prompts": "Prompt",
+    "fanouts": "Query Fanout",
+    "channelAnalysis": "Channel Analysis"
+  },
+  "filters": {
+    "datePreset": {
+      "2d": "Last 2 Days",
+      "7d": "Last 7 Days",
+      "14d": "Last 14 Days",
+      "28d": "Last 28 Days",
+      "90d": "Last 90 Days",
+      "custom": "Custom Range"
+    },
+    "dateRange": {
+      "apply": "Apply",
+      "start": "Start",
+      "end": "End"
+    },
+    "vsPrevious": "vs.",
+    "previousPeriod": "Previous Period",
+    "currentPeriod": "Current Period",
+    "interval": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    },
+    "topics": {
+      "button": "Topics",
+      "selectAll": "Select All"
+    },
+    "platforms": {
+      "button": "Platforms",
+      "selectAll": "Select All"
+    },
+    "countries": {
+      "button": "Countries",
+      "selectAll": "Select All"
+    },
+    "only": "Only",
+    "promptTypes": {
+      "button": "Prompt Type",
+      "selectAll": "Select All"
+    },
+    "viewBy": {
+      "placeholder": "View by",
+      "brand": "Brand",
+      "topic": "Topic",
+      "product": "Product",
+      "cross": "Cross"
+    },
+    "reset": "Reset"
+  },
+  "viewBy": {
+    "label": "View by",
+    "brand": "Brand",
+    "product": "Product",
+    "topic": "Topic",
+    "cross": "Cross"
+  },
+  "dimensionLabel": {
+    "brand": "Brand",
+    "product": "Product",
+    "topic": "Topic"
+  },
+  "fanouts": {
+    "title": "Query Fanouts",
+    "comingSoon": "Coming soon..."
+  },
+  "visibility": {
+    "sectionScore": {
+      "title": "Visibility Score",
+      "subtitleBrand": "Percentage of AI responses that mention your brand.",
+      "subtitleProduct": "Share of eligible AI responses that mention at least one own product.",
+      "subtitleTopic": "Own mention share per tracked topic across AI responses (aggregated by topic).",
+      "scoreLabel": "Visibility Score",
+      "scoreLabelProduct": "Product Visibility Score",
+      "scoreTooltip": "Your brand's mention rate across all AI responses in the selected date range. Calculated as (queries mentioning your brand / total queries) × 100%.",
+      "scoreTooltipProduct": "Eligible AI responses mentioning at least one own product divided by all eligible AI responses under the same filters. Product visibility and product SOV use different denominators.",
+      "competitiveSwitch": "Competitive Comparison",
+      "emptyState": "No visibility data for this period.",
+      "rankTitle": "{{dim}} Rank",
+      "rankHeader": "Visibility Score",
+      "rankLabel": "Rank",
+      "rankBrandLabel": "Brand",
+      "rankOwnBadge": "Own",
+      "expand": "Expand",
+      "emptyRanking": "No data."
+    },
+    "sectionSov": {
+      "title": "Share of Voice",
+      "subtitleBrand": "How mentions are distributed among your brand and competitors.",
+      "subtitleProduct": "SOV comparison across own products in AI responses.",
+      "subtitleTopic": "SOV comparison across tracked topics in AI responses.",
+      "sovLabel": "Share of Voice",
+      "sovTooltip": "Distribution of brand mentions across all AI responses. Shows your brand's share compared to competitors in the selected date range.",
+      "leadingProductLabel": "Leading Product Share",
+      "leadingProductTooltip": "The share of all own-product mentions contributed by the most-mentioned own product. The donut shows the mention share across products.",
+      "emptyState": "No SOV data for this period.",
+      "rankTitle": "SOV Rank · {{dim}}",
+      "rankHeader": "Mentions"
+    },
+    "sectionPosition": {
+      "title": "Average Position",
+      "subtitle": "Average ranking of your brand in AI-generated answers (lower is better).",
+      "positionLabel": "Average Position",
+      "positionTooltip": "Average ranking position when your brand is mentioned in AI responses. #1 means your brand appears first.",
+      "emptyState": "No position data for this period.",
+      "rankTitle": "Position Rank",
+      "rankHeader": "Avg Position"
+    },
+    "chartMode": {
+      "button": "Chart Config",
+      "line": "Line Chart",
+      "bar": "Bar Chart",
+      "table": "Table View"
+    },
+    "chartLegend": {
+      "current": "Current",
+      "previous": "Previous"
+    },
+    "chartTable": {
+      "date": "Date",
+      "score": "Score",
+      "ownMentions": "Mentioned",
+      "totalMentions": "Total Query",
+      "productMentionedResponses": "Responses with Product",
+      "eligibleResponses": "Eligible Responses"
+    },
+    "fullRankingDialog": {
+      "title": "Full Ranking",
+      "description": "Complete ranking of all brands in this period."
+    },
+    "topicRanking": {
+      "byTopic": "Topic",
+      "byProduct": "Product",
+      "titleByTopic": "Visibility Rank by Topic",
+      "titleByProduct": "Visibility Rank by Product",
+      "subtitleTopic": "Your brand's rank compared to competitors across each monitored topic. Click to expand prompts.",
+      "subtitleProduct": "Your brand's rank compared to competitors across each product. Click to expand prompts.",
+      "columnTopic": "Topic",
+      "columnProduct": "Product",
+      "groupPromptCount": "Prompts",
+      "groupMentions": "Group mentions",
+      "promptMentions": "Prompt mentions",
+      "columnBrand": "Brand",
+      "columnBrandRank": "Brand rank",
+      "columnBrandMentions": "Brand mentions",
+      "brandRowsBelow": "Brand metrics are listed below",
+      "groupBrandRow": "Group brand",
+      "promptBrandRow": "Prompt brand",
+      "promptsCount": "{{count}} prompts",
+      "viewFullPrompt": "View full",
+      "fullPromptTitle": "Full Prompt",
+      "fullPromptDescription": "Full prompt text for the expanded row.",
+      "loading": "Loading ranking matrix...",
+      "loadingPrompts": "Loading prompts...",
+      "promptPageRange": "{{start}}-{{end}} / {{total}}",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "citations": {
+    "loadFailed": "Citation data could not be loaded. Please retry.",
+    "sectionShare": {
+      "title": "Citation Share",
+      "subtitle": "How often your owned domains are cited in AI-generated answers.",
+      "yourShare": "Your Domain Share",
+      "yourShareTooltip": "Percentage of all AI citations that point to your owned domains. Calculated as (your domain citations / total citations) × 100% across the selected date range.",
+      "totalCitations": "Total Citations",
+      "totalCitationsTooltip": "Total number of source citations (URLs) found across all AI responses in the selected date range.",
+      "emptyState": "No citation data for this period.",
+      "citationRank": "Citation Rank",
+      "columnDomain": "Domain",
+      "columnShare": "Share",
+      "ownBadge": "Own",
+      "emptyDomains": "No domain data.",
+      "expand": "Expand"
+    },
+    "sectionCategories": {
+      "title": "Citation Categories",
+      "subtitle": "Breakdown of citation sources by type across the selected time period."
+    },
+    "sectionDomains": {
+      "title": "Most Cited Domains",
+      "subtitle": "Complete list of all domains cited in AI-generated responses.",
+      "searchPlaceholder": "Search domains...",
+      "count": "{{count}} domains",
+      "columnHash": "#",
+      "columnDomain": "Domain",
+      "columnCategory": "Category",
+      "columnCitations": "Citations",
+      "columnShare": "Share %",
+      "columnChange": "Change"
+    },
+    "sectionPages": {
+      "title": "Most Cited Pages",
+      "subtitle": "Individual pages most frequently cited in AI-generated responses.",
+      "searchPlaceholder": "Search pages...",
+      "count": "{{count}} pages",
+      "columnPageUrl": "Page URL",
+      "columnCategory": "Category",
+      "columnCitations": "Citations",
+      "columnShare": "Share %",
+      "columnChange": "Change"
+    },
+    "pagination": {
+      "range": "{{start}}-{{end}} / {{total}}",
+      "rangeMore": "{{start}}-{{end}} / {{total}}+",
+      "loading": "Loading...",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "fullDialog": {
+      "title": "Full Citation Ranking",
+      "description": "Complete list of all cited domains ranked by share."
+    }
+  },
+  "sentiment": {
+    "loadFailed": "Sentiment data could not be loaded. Please retry.",
+    "filterTitle": "Filter",
+    "filterAll": "All",
+    "filterPositive": "Positive",
+    "filterMixedNeutral": "Mixed / Neutral",
+    "filterNegative": "Negative",
+    "insufficientEvidence": "Insufficient Evidence",
+    "insufficientEvidenceSummary": "{{count}} insufficient-evidence responses excluded from sentiment rates",
+    "ratedResponses": "Rated responses: {{count}}",
+    "overallSentiment": "Overall Sentiment",
+    "aiSentimentOverview": "AI Sentiment Overview",
+    "aiSentimentSubtitle": "· How AI platforms feel about your brand",
+    "trend": "Sentiment Trend",
+    "comparePrevious": "Compare Previous",
+    "vsPrev": "vs prev",
+    "chartLine": "Line",
+    "chartBar": "Bar",
+    "positiveCurrent": "Positive (Current)",
+    "positivePrevious": "Positive (Previous)",
+    "noTrendData": "No trend data for this period.",
+    "noThemesData": "No sentiment themes are available yet. Check again after Analyzer completes.",
+    "noThemeResults": "No results are available for this theme.",
+    "showMoreThemes": "Show {{count}} more",
+    "positivePctLabel": "{{pct}}% Positive",
+    "mixedNeutralPctLabel": "{{pct}}% Mixed / Neutral",
+    "negativePctLabel": "{{pct}}% Negative",
+    "topPositiveThemes": "Top Positive Themes",
+    "topNegativeThemes": "Top Negative Themes",
+    "themesTitle": "Sentiment Themes",
+    "themesSubtitle": "Recurring topics extracted from AI responses. Click a row to expand.",
+    "table": {
+      "theme": "Theme",
+      "sentiment": "Sentiment",
+      "occurrences": "Occurrences",
+      "change": "Change"
+    },
+    "sectionOverall": {
+      "subtitle": "AI's overall sentiment toward your brand."
+    },
+    "driversPositive": "Positive Drivers",
+    "driversNegative": "Negative Drivers",
+    "emptyState": "No sentiment data for this period.",
+    "responseSheetTitle": "Response Detail",
+    "responseSheetDesc": "Full AI response with citations",
+    "responseLoadFailed": "Could not load response details.",
+    "queryLabel": "Query",
+    "searchQueriesLabel": "Search Queries",
+    "searchQueriesNotRequested": "Search Queries were not requested for this collection.",
+    "searchQueriesUpstreamUnavailable": "This ChatGPT response format did not provide internal search queries.",
+    "aiResponseLabel": "AI Response",
+    "noResponseText": "No response text available.",
+    "citationsLabel": "Citations ({{count}})"
+  },
+  "prompts": {
+    "columns": {
+      "rank": "Rank",
+      "score": "Score",
+      "avgPos": "Avg Pos",
+      "citations": "Citations"
+    },
+    "filters": {
+      "searchPlaceholder": "Search prompts...",
+      "allTopics": "All Topics",
+      "allProducts": "All Products",
+      "allPlatforms": "All Platforms",
+      "allCountries": "All Countries",
+      "allPrompts": "All Prompts",
+      "groupByPlaceholder": "Group By",
+      "intent": {
+        "button": "Intent",
+        "ariaLabel": "Filter Prompts by Intent",
+        "selectedCount": "Intent ({{count}})",
+        "activeGroup": "Active Intents",
+        "unconfiguredGroup": "Historical / Unconfigured Intents",
+        "unconfiguredBlank": "Unconfigured Intent",
+        "loadFailed": "Intent options could not be loaded. The Prompt list is still available.",
+        "empty": "No Intent options are available.",
+        "clearSelection": "Clear Intent filter"
+      }
+    },
+    "groupBy": {
+      "none": "None",
+      "topic": "By Topic",
+      "product": "By Product",
+      "country": "By Country"
+    },
+    "fallback": {
+      "noProduct": "No Product",
+      "noCountry": "No Country"
+    },
+    "export": {
+      "headerTopic": "Topic",
+      "headerProduct": "Product",
+      "headerPrompt": "Prompt Text",
+      "headerPlatform": "Platform",
+      "headerCountry": "Country",
+      "headerLanguage": "Language",
+      "headerIntent": "Intent",
+      "headerMentions": "Mentions",
+      "headerAvgPosition": "Avg Position",
+      "headerCitations": "Citations"
+    },
+    "pageTitle": "Prompts",
+    "pageDescription": "Manage and analyze the prompt variations for your brand topics.",
+    "manageButton": "Manage Prompts Pool",
+    "loadingPrompts": "Loading Prompts...",
+    "pleaseSelectWorkspace": "Please select a Workspace.",
+    "failedToLoad": "Failed to load data: {{error}}",
+    "columnsButton": "Columns",
+    "toggleColumns": "Toggle Columns",
+    "exportCSV": "Export CSV",
+    "import": {
+      "entry": "Import CSV",
+      "title": "Import Prompts",
+      "description": "Preview and validate a workspace-scoped CSV before creating Prompt variants.",
+      "workspace": "Workspace: {{workspace}}",
+      "tabs": {
+        "import": "Import CSV",
+        "allowed": "Allowed Values"
+      },
+      "template": {
+        "download": "Download Template",
+        "viewAllowed": "View Allowed Values",
+        "noTopic": "This Workspace has no Topic yet. The downloaded template contains headers only; create a Topic before importing."
+      },
+      "file": {
+        "drop": "Choose a CSV file or drag it here",
+        "limits": "UTF-8 CSV · up to 10 MB · 2,000 input rows · 20,000 expanded variants",
+        "size": "{{size}} KB",
+        "remove": "Remove"
+      },
+      "preview": {
+        "loading": "Parsing and validating the CSV...",
+        "empty": "No input rows are available for preview.",
+        "missingValue": "Missing Prompt",
+        "variants": "Show {{count}} expanded variants",
+        "page": "Page {{page}} of {{count}}",
+        "noIssues": "No errors or warnings",
+        "columns": {
+          "row": "Row",
+          "normalized": "Normalized Input",
+          "expanded": "Expanded",
+          "action": "Action",
+          "feedback": "Errors / Warnings"
+        }
+      },
+      "actions": {
+        "create": "Create",
+        "skip": "Skip",
+        "conflict": "Conflict",
+        "invalid": "Invalid"
+      },
+      "summary": {
+        "inputRows": "Input Rows",
+        "expanded": "Expanded Variants",
+        "create": "Create",
+        "skip": "Skip",
+        "conflict": "Conflict",
+        "invalid": "Invalid",
+        "quota": "Quota"
+      },
+      "stale": {
+        "message": "Workspace configuration, quota, or existing Prompt data changed after the previous Preview.",
+        "toast": "The Preview was refreshed. Review it before confirming again.",
+        "review": "The server returned a refreshed Preview. Review the new counts and rows before continuing.",
+        "confirm": "I Reviewed the New Preview"
+      },
+      "commit": {
+        "button": "Commit Import",
+        "confirmTitle": "Confirm Prompt Import",
+        "confirmDescription": "Create {{count}} Prompt variants in this Workspace? Existing exact matches will be skipped."
+      },
+      "result": {
+        "title": "Import Complete",
+        "description": "{{count}} Prompt variants were created in one import batch.",
+        "batch": "Batch ID",
+        "created": "Created",
+        "skipped": "Skipped Existing",
+        "reverted": "Reverted · {{count}} Prompts deleted",
+        "undo": "Undo Import",
+        "undoSuccess": "Import reverted. {{count}} Prompts were deleted."
+      },
+      "undo": {
+        "title": "Undo Prompt Import",
+        "description": "Only Prompts created by this import batch will be deleted.",
+        "cascadeWarning": "If these Prompts already produced results, Undo will also cascade-delete their task, result, mention, citation, and sentiment facts.",
+        "confirm": "Undo This Import"
+      },
+      "allowed": {
+        "searchPlaceholder": "Search type, canonical value, label, or parent Topic...",
+        "download": "Download Allowed Values CSV",
+        "canonicalHint": "Use the canonical Value exactly as shown in the import CSV. Labels are display-only.",
+        "empty": "No Allowed Values match the current search.",
+        "parentTopic": "Topic: {{topic}}",
+        "copyValue": "Copy canonical value {{value}}",
+        "copySuccess": "Copied {{value}}",
+        "copyFailed": "The canonical value could not be copied.",
+        "types": {
+          "topic": "Topics",
+          "product": "Products",
+          "platform": "AI Platforms",
+          "country": "Countries",
+          "language": "Languages",
+          "intent": "Intents",
+          "other": "{{type}}"
+        }
+      },
+      "errors": {
+        "allowedValues": "Allowed Values could not be loaded.",
+        "preview": "The CSV could not be previewed.",
+        "commit": "The import could not be committed.",
+        "undo": "The import could not be reverted.",
+        "download": "The CSV could not be downloaded."
+      },
+      "issues": {
+        "requestFailed": "The request could not be completed.",
+        "fileTooLarge": "The CSV is too large ({{actual}} bytes). The maximum is {{allowed}} bytes.",
+        "encodingInvalid": "The CSV must use UTF-8 encoding.",
+        "headersInvalid": "The CSV headers or their order do not match the import template.",
+        "csvMalformed": "The CSV format is invalid. Check quoting, delimiters, and row structure.",
+        "rowLimitExceeded": "The CSV contains {{actual}} input rows. The maximum is {{allowed}} rows.",
+        "emptyCsv": "The CSV must contain at least one non-empty data row.",
+        "rowVariantLimitExceeded": "One CSV row expands to {{actual}} variants. The per-row maximum is {{allowed}}.",
+        "variantLimitExceeded": "The CSV expands to {{actual}} variants. The per-import maximum is {{allowed}}.",
+        "extraColumns": "Row {{row}} contains extra columns. Quote comma-separated values inside one cell.",
+        "customerMismatch": "Customer Name '{{value}}' does not exactly match this Workspace ('{{expected}}').",
+        "topicRequired": "Topic is required.",
+        "topicNotAllowed": "Topic '{{value}}' is not active in this Workspace.",
+        "topicAmbiguous": "Topic '{{value}}' matches multiple active Topics. Rename the duplicates before importing.",
+        "productNotAllowed": "Product '{{value}}' is not active under the selected Topic.",
+        "promptRequired": "Prompt is required on row {{row}}.",
+        "promptPlaceholder": "Replace the sample Prompt placeholder on row {{row}} before Preview.",
+        "intentRequired": "Intent is required.",
+        "intentNotAllowed": "Intent '{{value}}' is not an active Global Config value.",
+        "platformRequired": "At least one AI Platform is required.",
+        "platformNotAllowed": "AI Platform '{{value}}' is not allowed for this Workspace.",
+        "countryRequired": "At least one Country is required.",
+        "countryNotAllowed": "Country '{{value}}' is not allowed for this Workspace.",
+        "fullWidthDelimiter": "Use only half-width comma, semicolon, or pipe separators in multi-value cells.",
+        "languageRequired": "Language is required.",
+        "languageNotAllowed": "Language '{{value}}' is not allowed for this Workspace.",
+        "languageMultiple": "Language must contain exactly one value per row.",
+        "fileDuplicate": "This row overlaps variants first declared on row(s) {{rows}}.",
+        "platformCountryUnsupported": "At least one AI Platform and Country combination in this row is unsupported.",
+        "fileMetadataConflict": "CSV rows define the same physical Prompt variant with different Product or Intent metadata.",
+        "metadataConflict": "An existing physical Prompt variant has different Product or Intent metadata.",
+        "promptExistsInOtherTopic": "The same normalized Prompt exists in {{count}} other Topic(s). This is allowed.",
+        "inactiveVariantRemainsInactive": "A matching inactive Prompt variant already exists and will remain inactive.",
+        "quotaExceeded": "This import would use {{actual}} Prompt quota. The Workspace limit is {{allowed}}.",
+        "workspaceNotFound": "This Workspace is unavailable or you no longer have access.",
+        "manifestRequired": "The Preview manifest is missing. Run Preview again.",
+        "previewStateRequired": "The Preview state is missing. Run Preview again.",
+        "previewStale": "The Preview is stale. Review the refreshed Preview before committing.",
+        "previewNotCommittable": "Resolve all invalid rows and conflicts before committing.",
+        "undoConfirmationRequired": "Explicit confirmation is required to undo this import.",
+        "batchNotFound": "This import batch is unavailable in the current Workspace.",
+        "batchReverting": "This import batch is already being reverted. Wait and try again.",
+        "unknown": "The import returned an unrecognized validation error (code: {{code}})."
+      }
+    },
+    "promptCount": "{{count}} prompts",
+    "promptCountRows": "({{count}} rows)",
+    "tableColumns": {
+      "product": "Product",
+      "platforms": "Platforms",
+      "countries": "Countries",
+      "visibilityScore": "Visibility Score",
+      "visibilityRank": "Visibility Rank",
+      "brandRank": "Brand Rank",
+      "mentioned": "Mentioned",
+      "totalQuery": "Total Query",
+      "avgPos": "Avg Pos",
+      "promptPlain": "Prompt",
+      "groupPrompt": "Group / Prompt"
+    },
+    "emptyGroup": {
+      "noActive": "No active prompts in this group.",
+      "initWithAI": "Initialize with AI Brainstorming"
+    },
+    "emptyTable": "No prompts match the current filters.",
+    "analysis": {
+      "typeLabel": "{{type}} Analysis",
+      "backAllTopics": "All Topics",
+      "backAllProducts": "All Products",
+      "backAllCountries": "All Countries",
+      "backAllPrompts": "All Prompts",
+      "viewGroupAnalysis": "View {{groupLabel}} Analysis",
+      "viewPromptAnalysis": "View Prompt Analysis",
+      "groupLabelTopic": "Topic",
+      "groupLabelProduct": "Product",
+      "groupLabelCountry": "Country"
+    },
+    "drilldown": {
+      "back": "Back to Prompts",
+      "context": "Topic: {{topic}} · Product: {{product}}",
+      "domainLoadFailed": "This metric could not be loaded. The other metrics remain available.",
+      "emptyIntersection": "This drilldown target is outside the current global Topic filter. Adjust the filters and try again.",
+      "sections": {
+        "visibility": "Visibility",
+        "citation": "Citation",
+        "sentiment": "Sentiment"
+      },
+      "targetType": {
+        "topic": "Topic Analysis",
+        "product": "Product Analysis",
+        "prompt": "Prompt Analysis"
+      },
+      "targetUnavailable": "This drilldown target is unavailable, was deleted, or does not belong to the current Workspace."
+    },
+    "table": {
+      "groupPrompt": "Group / Prompt",
+      "prompt": "Prompt",
+      "viewPromptAnalysis": "View Prompt Analysis"
+    }
+  },
+  "promptEditor": {
+    "pageTitle": "Prompt Editor",
+    "pleaseSelectWorkspace": "Please select a Workspace.",
+    "back": "Back",
+    "quotaUsed": "{{used}} / {{quota}} prompts used",
+    "sidebarTitle": "Topics & Products",
+    "allTopics": "All Topics",
+    "addProduct": "Add Product",
+    "addTopic": "Add Topic",
+    "productPlaceholder": "Product name...",
+    "topicPlaceholder": "Topic name...",
+    "tabs": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "filterTopicAll": "Topic",
+    "filterPlatformAll": "Platform",
+    "batchUpload": "Batch Upload",
+    "exportBtn": "Export",
+    "addPromptBtn": "Add Prompt",
+    "generate": "Generate",
+    "saveAllChanges": "Save All Changes",
+    "loading": "Loading...",
+    "searchCountries": "Search countries...",
+    "searchPlatforms": "Search platforms...",
+    "columns": {
+      "promptText": "Prompt Text",
+      "topic": "Topic",
+      "product": "Product",
+      "country": "Country",
+      "language": "Language",
+      "platform": "Platform",
+      "intent": "Intent"
+    },
+    "intentConfig": {
+      "loading": "Loading available Intents...",
+      "loadFailed": "Available Intents could not be loaded. Historical Prompts remain visible, but create, duplicate, and variant expansion are paused.",
+      "noActive": "No active Intents are configured. Historical Prompts remain visible, but create, duplicate, and variant expansion are paused.",
+      "unavailable": "Available Intents are not ready, so Prompts cannot be created or duplicated yet.",
+      "missingIntent": "Select an active Intent before saving.",
+      "inactiveIntent": "This Prompt uses a historical or unconfigured Intent. Select an active Intent for the new Prompt.",
+      "selectActiveLabel": "Select an active Intent",
+      "selectActivePlaceholder": "Select active Intent",
+      "blankValue": "Blank Intent",
+      "needsActiveSelection": "Active Intent required"
+    },
+    "workspaceState": {
+      "stale": "The Workspace changed or its data is reloading. This action was cancelled to prevent writing to the wrong Workspace."
+    },
+    "cleanup": {
+      "modeTitle": "Workspace Cleanup mode",
+      "modeDescription": "{{count}} physical Prompt rows remain in this Workspace. Cleanup runs serial batches and can be resumed safely.",
+      "open": "Start guided cleanup",
+      "workspaceUnavailable": "The requested Workspace is not available to this account. Cleanup has not started.",
+      "dialogTitle": "Delete all Workspace Prompts",
+      "dialogDescription": "This cleanup removes every physical Prompt row and its dependent analysis data from {{workspace}}.",
+      "physicalRows": "Physical Prompt rows currently loaded",
+      "batchExplanation": "The system refreshes the tenant-scoped Prompt IDs, then deletes them in serial batches of 25. It stops on the first error and can resume from a fresh fetch.",
+      "confirmation": "I understand that all Prompts and their dependent task, result, citation, mention, and sentiment data in this Workspace will be permanently deleted.",
+      "total": "Total",
+      "deleted": "Deleted",
+      "remaining": "Remaining",
+      "start": "Delete all Prompts",
+      "resume": "Resume cleanup",
+      "failedMessage": "Cleanup stopped: {{message}}. Resolve the error, then resume to fetch the remaining Prompt IDs again.",
+      "partialDelete": "The server deleted fewer Prompt rows than requested.",
+      "concurrentPrompts": "New Prompt rows appeared while cleanup was running.",
+      "remainingAfterRefresh": "Prompt rows are still present after refresh. Resume cleanup to fetch and delete the current tenant-scoped rows.",
+      "completeMessage": "Prompt cleanup is complete. Return to Admin, refresh deletion readiness, and continue with Topic cleanup.",
+      "staleWorkspace": "The Workspace changed or another cleanup request is already running.",
+      "status": {
+        "idle": "Ready",
+        "running": "Cleanup in progress",
+        "complete": "Prompt cleanup complete",
+        "failed": "Cleanup stopped"
+      }
+    },
+    "newBadge": "NEW",
+    "selectPlaceholder": "Select...",
+    "enterPrompt": "Enter prompt text...",
+    "noInStatus": "No prompts found in this status.",
+    "rowActions": {
+      "duplicate": "Duplicate",
+      "pause": "Pause",
+      "activate": "Activate",
+      "deleteAll": "Delete All",
+      "deleteConfirmMessage": "Delete all variants of this prompt?",
+      "deleteConfirmTitle": "Delete Prompt",
+      "cannotRemoveLastPlatform": "Cannot remove the last platform.",
+      "cannotRemoveLastCountry": "Cannot remove the last country.",
+      "removeCountryVariantsTitle": "Remove Country Variants",
+      "removeCountryVariantsMessage": "Remove {{count}} Prompt variants for country {{country}}?",
+      "removePlatformVariantsTitle": "Remove Platform Variants",
+      "removePlatformVariantsMessage": "Remove {{count}} Prompt variants for platform {{platform}}?"
+    },
+    "bulkActions": {
+      "duplicate": "Duplicate",
+      "disable": "Disable",
+      "activate": "Activate",
+      "editCountries": "Edit Countries",
+      "editPlatforms": "Edit Platforms",
+      "delete": "Delete",
+      "promptsSelected_one": "{{count}} prompt selected",
+      "promptsSelected_other": "{{count}} prompts selected",
+      "clear": "Clear"
+    },
+    "configuration": "Configuration",
+    "multiSelect": {
+      "placeholder": "Select...",
+      "searchLabel": "Search {{label}}...",
+      "noResults": "No results found.",
+      "nSelected": "{{count}} selected"
+    },
+    "toasts": {
+      "error": "Error: {{message}}",
+      "addTopicError": "Failed to add Topic: {{message}}",
+      "addProductError": "Failed to add Product: {{message}}",
+      "duplicateError": "Error duplicating: {{message}}",
+      "bulkDuplicateError": "Bulk duplicate error: {{message}}",
+      "bulkDisableError": "Bulk disable error: {{message}}",
+      "bulkDeleteConfirmMessage_one": "Delete {{count}} selected prompt?",
+      "bulkDeleteConfirmMessage_other": "Delete {{count}} selected prompts?",
+      "bulkDeleteConfirmTitle": "Delete Prompts",
+      "bulkDeleting_one": "Deleting {{count}} prompt...",
+      "bulkDeleting_other": "Deleting {{count}} prompts...",
+      "bulkDeleted": "Deleted successfully",
+      "bulkDeleteError": "Bulk delete error: {{message}}",
+      "bulkDeleteTooLarge": "Select at most {{max}} physical Prompt rows for an ordinary bulk delete. Use Workspace Cleanup mode to remove more.",
+      "bulkEditError": "Bulk edit error: {{message}}",
+      "saveError": "Error saving: {{message}}",
+      "brainstormError": "Brainstorm error: {{message}}",
+      "saveBrainstormError": "Error saving prompts: {{message}}",
+      "quotaExceeded": "Quota exceeded: {{existing}} existing + {{new_count}} new = {{total}}, but quota is {{quota}}.",
+      "needTopic": "Please select at least one Topic.",
+      "needPlatform": "Please select at least one platform.",
+      "needCountry": "Please select at least one country.",
+      "needLanguage": "Please select a language."
+    },
+    "brainstorm": {
+      "dialogTitle": "AI Concept Brainstorming",
+      "topicsSelected_one": "({{count}} topic selected)",
+      "topicsSelected_other": "({{count}} topics selected)",
+      "noTopicsCreated": "No topics created. Add topics in Brand Settings first.",
+      "promptsPerProduct": "Prompts per Product",
+      "promptsPerProductHint": "Will generate {{count}} unique prompt texts per product. Each prompt is saved for all selected platforms × countries, but only counts as 1 prompt quota.",
+      "countries": "Countries",
+      "language": "Language",
+      "targetPlatforms": "Target Platforms",
+      "noneConfigured": "(none configured for this client)",
+      "noCountriesAvailable": "No countries available",
+      "selectCountries": "Select countries...",
+      "noLanguagesAvailable": "No languages available",
+      "selectLanguage": "Select language",
+      "noPlatformsAvailable": "No platforms available",
+      "selectPlatforms": "Select platforms...",
+      "generatingInParallel": "Generating prompts in parallel across selected combinations...",
+      "promptsGenerated": "{{count}} Prompts Generated",
+      "selectAll": "Select All",
+      "clear": "Clear",
+      "saveSelected": "Save {{count}} Selected",
+      "labelPlatforms": "Platforms",
+      "labelCountries": "Countries",
+      "candidateIntentLabel": "Candidate Prompt Intent",
+      "selectActiveIntent": "Select active Intent",
+      "blankIntent": "Blank Intent",
+      "intentNeedsSelection": "Active Intent required"
+    }
+  },
+  "channelAnalysis": {
+    "pageTitle": "Channel Analysis",
+    "crossDimensionLabel": "Cross dimension",
+    "chart1Title": "Shadow channel × own product co-occurrence",
+    "chart2Title": "Shadow channel product distribution",
+    "chart3Title": "Own product multi-channel comparison",
+    "chart4Title": "Channel citation distribution",
+    "dims": {
+      "brand": {
+        "pairLabel": "Shadow channel × own brand co-occurrence",
+        "pairSubtitle": "Number of AI responses mentioning both a shadow channel brand and an own brand, ordered by pair.",
+        "distributionTitle": "Shadow channel own-brand distribution",
+        "distributionSubtitle": "Stacked comparison of own-brand co-occurrence counts under each shadow channel brand.",
+        "reverseTitle": "Own brand multi-channel comparison",
+        "reverseSubtitle": "Co-occurrence counts for each own brand across different shadow channels."
+      },
+      "product": {
+        "pairLabel": "Shadow channel × own product co-occurrence",
+        "pairSubtitle": "Number of AI responses mentioning both a shadow channel brand and an own product, ordered by pair.",
+        "distributionTitle": "Shadow channel product distribution",
+        "distributionSubtitle": "Stacked comparison of own-product mention counts under each shadow channel brand.",
+        "reverseTitle": "Own product multi-channel comparison",
+        "reverseSubtitle": "Mention counts for each own product across different shadow channels."
+      },
+      "topic": {
+        "pairLabel": "Shadow channel × topic distribution",
+        "pairSubtitle": "Mention counts per shadow channel brand across tracked topics, ordered by pair.",
+        "distributionTitle": "Shadow channel topic distribution",
+        "distributionSubtitle": "Stacked comparison of topic mention counts under each shadow channel brand.",
+        "reverseTitle": "Topic multi-channel comparison",
+        "reverseSubtitle": "Mention counts for each topic across different shadow channels."
+      }
+    },
+    "citationTitle": "Channel citation distribution",
+    "citationSubtitle": "Distribution of AI citation sources by citation_role category (own / peer / shadow / other).",
+    "emptyCooccurrenceTitle": "No co-occurrence data yet",
+    "emptyCooccurrenceDescBrand": "This fills in when AI responses mention both a shadow channel brand and an own brand in the same answer. Wait for the next collection run.",
+    "emptyCooccurrenceDescProduct": "This fills in when AI responses mention both a shadow channel brand and an own product in the same answer. Wait for the next collection run.",
+    "emptyCooccurrenceDescTopic": "This fills in when AI responses mention both a shadow channel brand and a tracked topic in the same answer. Wait for the next collection run.",
+    "emptyMissingShadowBrand": "This workspace has no enabled shadow channel brand. Configure one to generate channel cross-analysis data in future runs.",
+    "emptyMissingOwnProduct": "This workspace has no enabled own product. Add products under a tracked topic first.",
+    "emptyMissingOwnBrand": "This workspace has no enabled own brand.",
+    "emptyMissingTopic": "This workspace has no tracked topic.",
+    "emptyNoAnalyzedProductMentions": "Product configuration exists, but the selected period has no analyzed product-mention facts yet. Future Collector and Analyzer runs after this fix will appear here.",
+    "emptyRequestFailed": "The cross-analysis request failed. Please try again later.",
+    "emptyDistributionTitle": "No distribution data yet",
+    "emptyDistributionDesc": "Configure shadow channel brands and their tracked topics / products in Brand Settings, and the per-channel breakdown will appear here.",
+    "emptyReverseTitle": "No reverse distribution data yet",
+    "emptyReverseDesc": "Once a target dimension is co-mentioned across multiple shadow channels, the breakdown across channels will appear side-by-side here.",
+    "emptyCitationTitle": "No citation data yet",
+    "emptyCitationDesc": "Once AI responses start producing classifiable citations, the own / peer / shadow / other split will appear here.",
+    "ctaBrandSettings": "Open Brand Settings",
+    "ctaCitations": "View Citation",
+    "tooltips": {
+      "viewByDimension": "Switch the data aggregation dimension: Brand / Topic / Product. On the Channel Analysis page, these represent \"channel × brand\", \"channel × topic\", \"channel × product\" cross views; on other pages, they aggregate Visibility / Citation / Sentiment metrics by brand, topic, or product. The Product dimension only appears when products have been configured under a tracked topic.",
+      "channelCooccurrence": "The number of times a single AI answer mentions both a shadow channel brand and one of your own products. This is the core metric for OEM / reseller sales modes — it reflects your product's visibility in the channel context.",
+      "channelOtherProducts": "Other products AI recommends on the shadow channel (not yours). Broken down into: channel's own brand line / channel reselling others. Helps you assess the competitive landscape on this channel.",
+      "citationRole": "Citation source types: your own website / your product pages on shadow channels / other pages on shadow channels / standalone peer sites / third-party media reviews.",
+      "peerVoiceShare": "Share-of-voice comparison across all brands marked as peers, including brands that are also your shadow channels (e.g. Rough Country, when it's both a channel and a peer, is included)."
+    }
+  },
+  "opportunityModal": {
+    "title": "Opportunity Discovery",
+    "description": "Diagnose how your brand performs in AI search and uncover content-optimization opportunities.",
+    "methodology": {
+      "quadrantTitle": "Topic Quadrant Mapping",
+      "quadrantDesc": "Classify topics into strong / weak / untapped / emerging quadrants based on brand coverage, AI citation patterns, and trend direction.",
+      "opportunityTitle": "Content Opportunity Mining",
+      "opportunityDesc": "Surface content optimization directions from citation data, scored by priority, to find the highest-leverage entry points.",
+      "graphTitle": "Platform–AI Engine Citation Graph",
+      "graphDesc": "Map which AI engines cite each publishing platform, revealing the citation paths between platforms and engines."
+    },
+    "dateRange": "Analysis time range",
+    "dateRangeOption": "{{days}} days",
+    "platformFilter": "AI platform filter",
+    "platformFilterHint": "(none selected = all)",
+    "submit": "Start Analysis",
+    "taskName": "Opportunity Discovery - {{date}}",
+    "toastSuccess": "Analysis task created",
+    "toastFailed": "Failed to create"
+  },
+  "templateModal": {
+    "analysisPipeline": "Analysis Pipeline",
+    "anthonyWorkLog": "Anthony Work Log",
+    "viewGeneratedSql": "View generated SQL ({{count}} queries)",
+    "dataCharts": "Data Charts",
+    "insightReport": "Insight Report",
+    "qualityReview": "Quality Review",
+    "qualityDataAccuracy": "Data Accuracy",
+    "qualityConsistency": "Logic Consistency",
+    "qualityCompleteness": "Completeness",
+    "qualityOverall": "Overall Score",
+    "issuesFound": "Issues found:",
+    "reportCompleteMsg": "✓ Insight report generation complete",
+    "errorMsg": "❌ Error: {{message}}",
+    "unknownError": "Unknown error",
+    "launchFailedMsg": "❌ Launch failed: {{message}}",
+    "loadingProgress": "Loading task progress...",
+    "restoreComplete": "✓ Report generation complete",
+    "initMsg": "Initializing analysis task...",
+    "runtimeSettings": {
+      "modelLabel": "Generation model:",
+      "enableCron": "Run on schedule (Cloud Scheduler)",
+      "cronPlaceholder": "e.g. 0 9 * * 1",
+      "cronHint": "Scheduled tasks run in the background; every run is recorded in history. Cron example: <1>0 9 * * 1</1> every Monday 9 AM."
+    },
+    "header": {
+      "agentRole": "GEO Analyst",
+      "agentGreeting": "Hello! I'm Anthony, your GEO Analyst. Let's configure this report together, and I'll help you analyze the data and generate insights."
+    },
+    "domains": {
+      "visibility": "Visibility",
+      "citation": "Citation",
+      "sentiment": "Sentiment"
+    },
+    "actions": {
+      "save": "Save as Task",
+      "saving": "Saving...",
+      "run": "Run Analysis",
+      "viewReportDetails": "View Report Details",
+      "exportHtml": "Export HTML",
+      "runInBackgroundClose": "Run in Background & Close",
+      "close": "Close",
+      "reconfigure": "Reconfigure"
+    },
+    "toast": {
+      "saveSuccess": "Saved as task",
+      "saveFailed": "Template save failed: {{message}}"
+    },
+    "taskNameSuffixCron": " (Cron Scheduled)",
+    "taskNameSuffixSaved": " (Saved Task)"
+  },
+  "tooltips": {
+    "viewByDimension": "Switch the data aggregation dimension: Brand / Topic / Product. On the Channel Analysis page, these represent \"channel × brand\", \"channel × topic\", \"channel × product\" cross views; on other pages, they aggregate Visibility / Citation / Sentiment metrics by brand, topic, or product. The Product dimension only appears when products have been configured under a tracked topic.",
+    "channelCooccurrence": "The number of times a single AI answer mentions both a shadow channel brand and one of your own products. This is the core metric for OEM / reseller sales modes — it reflects your product's visibility in the channel context.",
+    "channelOtherProducts": "Other products AI recommends on the shadow channel (not yours). Broken down into: channel's own brand line / channel reselling others. Helps you assess the competitive landscape on this channel.",
+    "citationRole": "Citation source types: your own website / your product pages on shadow channels / other pages on shadow channels / standalone peer sites / third-party media reviews.",
+    "peerVoiceShare": "Share-of-voice comparison across all brands marked as peers, including brands that are also your shadow channels (e.g. Rough Country, when it's both a channel and a peer, is included)."
+  },
+  "viewBy_deprecated_keep_for_compat": {
+    "label": "View by",
+    "brand": "Brand",
+    "product": "Product",
+    "topic": "Topic",
+    "cross": "Cross"
+  },
+  "citationPage": {
+    "tabs": {
+      "monitor": "Citation Monitor",
+      "publishedPages": "Published Pages"
+    }
+  },
+  "publishedPages": {
+    "title": "Published Pages",
+    "subtitle": "Manage published URLs and track how they appear in AI citations.",
+    "empty": "No published pages yet.",
+    "actions": {
+      "downloadTemplate": "Download Template",
+      "importCsv": "Import CSV",
+      "new": "New Page",
+      "detail": "View details",
+      "edit": "Edit",
+      "disable": "Disable",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "filters": {
+      "search": "Search URL, title, channel, or topic...",
+      "status": "Publish Status",
+      "allStatuses": "All Publish Statuses",
+      "channel": "Channel",
+      "allChannels": "All Channels",
+      "topic": "Topic",
+      "allTopics": "All Topics"
+    },
+    "table": {
+      "page": "Page",
+      "publishedAt": "Published At",
+      "topics": "Topics",
+      "channel": "Channel",
+      "status": "Publish / Review Status",
+      "actions": "Actions"
+    },
+    "pagination": {
+      "summary": "{{total}} total, page {{page}} / {{pages}}",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "form": {
+      "createTitle": "New Published Page",
+      "editTitle": "Edit Published Page",
+      "description": "Title, published URL, publish date, channel, and publish status are required. The system automatically generates a normalized URL for citation matching.",
+      "fields": {
+        "title": "Title",
+        "url": "Published URL",
+        "normalizedUrlPreview": "Normalized URL (system generated)",
+        "normalizedUrlEmpty": "Enter a published URL to preview the normalized matching key.",
+        "selectDate": "Select date",
+        "publishedAt": "Published At",
+        "channel": "Channel",
+        "reviewStatus": "Review Status",
+        "publishStatus": "Publish Status",
+        "owner": "Owner",
+        "draftDocUrl": "Draft Doc URL (Feishu)",
+        "topics": "Linked Topics",
+        "notes": "Notes",
+        "active": "Enable tracking"
+      }
+    },
+    "detail": {
+      "title": "Published Page Details",
+      "description": "Basic information and tracking configuration for this published page."
+    },
+    "import": {
+      "title": "CSV Import Preview",
+      "description": "Review validation results before committing. Each import supports up to 100 rows. review_status must be one of not_submitted / in_review / approved / changes_requested / rejected; publish_status must be one of draft / scheduled / published / offline.",
+      "total": "Rows",
+      "create": "Create",
+      "update": "Update",
+      "invalid": "Invalid",
+      "row": "Row",
+      "action": "Action",
+      "errors": "Errors",
+      "commit": "Commit Import"
+    },
+    "confirm": {
+      "disableTitle": "Disable Published Page",
+      "disableMessage": "Disable \"{{title}}\"? It will no longer be tracked by default.",
+      "deleteTitle": "Delete Published Page",
+      "deleteMessage": "Delete \"{{title}}\"? Historical citation data will not be deleted."
+    },
+    "toasts": {
+      "loadFailed": "Failed to load: {{message}}",
+      "requiredFields": "Please fill in title, published URL, publish date, channel, and publish status.",
+      "saved": "Published page saved.",
+      "saveFailed": "Save failed: {{message}}",
+      "disabled": "Published page disabled.",
+      "deleted": "Published page deleted.",
+      "templateFailed": "Template download failed: {{message}}",
+      "previewFailed": "CSV preview failed: {{message}}",
+      "importFailed": "Import failed: {{message}}",
+      "imported": "Import complete: {{create}} created, {{update}} updated."
+    },
+    "reviewStatuses": {
+      "not_submitted": "Not submitted",
+      "in_review": "In review",
+      "approved": "Approved",
+      "changes_requested": "Changes requested",
+      "rejected": "Rejected"
+    },
+    "publishStatuses": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "published": "Published",
+      "offline": "Offline"
+    }
+  },
+  "publishedTracking": {
+    "title": "Published URL Tracking",
+    "subtitle": "Track published pages against AI citation performance for the current filters.",
+    "tooltip": "Managed topics describe the intended ownership of a published page. Dashboard topic filters use the prompts that actually triggered citations to this page. If a page appears under multiple topics, it indicates cross-topic reach.",
+    "empty": "No published page tracking data yet. Add pages in Published Pages or adjust the current filters.",
+    "unknownCategory": "Uncategorized",
+    "managedTopicBadge": "Managed: {{topic}}",
+    "triggeredTopicBadge": "Triggered: {{topic}}",
+    "table": {
+      "rank": "#",
+      "page": "Page",
+      "channel": "Channel",
+      "category": "Category",
+      "citations": "Citations",
+      "share": "Share",
+      "change": "Change",
+      "latest": "Latest",
+      "actions": "Actions"
+    },
+    "actions": {
+      "detail": "View details"
+    },
+    "variants": {
+      "title": "Tracked URL Variants",
+      "description": "Known tracking-parameter variants are included automatically. Include or exclude applies to the Match Key, so raw URLs sharing that key are counted together.",
+      "button": "URL variants",
+      "pending": "Pending review",
+      "pendingCount": "{{count}} pending",
+      "exact": "Original URL",
+      "automatic": "System matched",
+      "confirmed": "Included",
+      "rejected": "Excluded",
+      "citations": "{{count}} citations",
+      "matchKey": "Match key: {{value}}",
+      "confirm": "Include in tracking",
+      "reject": "Exclude",
+      "restore": "Include again",
+      "empty": "No URL variants in the current filter range.",
+      "loadFailed": "URL variants could not be loaded. Please retry.",
+      "updateFailed": "The URL tracking status could not be updated. Please retry."
+    },
+    "detail": {
+      "title": "Published Page Details",
+      "description": "Citation detail under the current filters.",
+      "citations": "Citations",
+      "share": "Citation Share",
+      "rank": "Rank",
+      "latest": "Latest Citation",
+      "topics": "Topics",
+      "platforms": "Platforms",
+      "countries": "Countries",
+      "prompts": "Triggering Prompts",
+      "promptCitations": "{{count}} citations",
+      "responses": "AI Responses & Citation Context",
+      "topicFilter": "Topic filter",
+      "platformFilter": "Platform filter",
+      "countryFilter": "Country filter",
+      "allTopics": "All topics",
+      "allPlatforms": "All platforms",
+      "allCountries": "All countries",
+      "empty": "No detail data."
+    }
+  }
+}

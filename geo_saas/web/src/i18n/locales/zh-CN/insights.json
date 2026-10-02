@@ -1,0 +1,1047 @@
+{
+  "__doc": "Insights 系列页（Visibility / Citations / Sentiment / Prompts / Fanouts / ChannelAnalysis）+ Insights 主 Layout（filter bar / tabs / header）+ VisibilityDashboard / OpportunityAnalysisModal / TemplateConfigModal 组件。",
+  "metricSort": {
+    "activateAscending": "按{{label}}升序排列",
+    "activateDescending": "按{{label}}降序排列",
+    "currentUnsorted": "当前未排序。",
+    "currentAscending": "当前按升序排列。",
+    "currentDescending": "当前按降序排列。",
+    "groupMetric": "分组{{label}}",
+    "matrixBrandMentions": "内层品牌提及数",
+    "matrixBrandRank": "内层品牌排名",
+    "matrixGroupPrompts": "分组 Prompt 数",
+    "matrixGroups": "分组提及数",
+    "matrixPrompts": "Prompt 提及数",
+    "promptMetric": "Prompt {{label}}",
+    "incompletePromptMetrics": "完整 Prompt 指标尚未加载，暂不可进行指标排序。"
+  },
+  "page": {
+    "title": "答案引擎洞察",
+    "subtitle": "分析品牌在各 AI 平台上的表现。",
+    "brandSettings": "品牌设置与 Peer"
+  },
+  "tabs": {
+    "visibility": "可见度",
+    "prompts": "Prompt",
+    "fanouts": "Query Fanout",
+    "channelAnalysis": "渠道分析"
+  },
+  "filters": {
+    "datePreset": {
+      "2d": "近 2 天",
+      "7d": "近 7 天",
+      "14d": "近 14 天",
+      "28d": "近 28 天",
+      "90d": "近 90 天",
+      "custom": "自定义区间"
+    },
+    "dateRange": {
+      "apply": "应用",
+      "start": "开始",
+      "end": "结束"
+    },
+    "vsPrevious": "对比",
+    "previousPeriod": "上一周期",
+    "currentPeriod": "当前周期",
+    "interval": {
+      "daily": "日",
+      "weekly": "周",
+      "monthly": "月"
+    },
+    "topics": {
+      "button": "话题",
+      "selectAll": "全选"
+    },
+    "platforms": {
+      "button": "平台",
+      "selectAll": "全选"
+    },
+    "countries": {
+      "button": "国家",
+      "selectAll": "全选"
+    },
+    "only": "Only",
+    "promptTypes": {
+      "button": "Prompt 类型",
+      "selectAll": "全选"
+    },
+    "viewBy": {
+      "placeholder": "视图维度",
+      "brand": "品牌",
+      "topic": "话题",
+      "product": "产品",
+      "cross": "交叉"
+    },
+    "reset": "重置"
+  },
+  "viewBy": {
+    "label": "视图维度",
+    "brand": "品牌",
+    "product": "产品",
+    "topic": "话题",
+    "cross": "交叉"
+  },
+  "dimensionLabel": {
+    "brand": "品牌",
+    "product": "产品",
+    "topic": "话题"
+  },
+  "fanouts": {
+    "title": "Query Fanout",
+    "comingSoon": "即将推出..."
+  },
+  "visibility": {
+    "sectionScore": {
+      "title": "可见度得分",
+      "subtitleBrand": "AI 回答中提及您品牌的比例。",
+      "subtitleProduct": "所选范围内，提及至少一个自家产品的有效 AI 回答占比。",
+      "subtitleTopic": "AI 回答在各追踪话题下的自家提及占比（按话题维度聚合）。",
+      "scoreLabel": "可见度得分",
+      "scoreLabelProduct": "产品可见度得分",
+      "scoreTooltip": "您品牌在所选时间范围内所有 AI 回答中的被提及率，计算为（提及您品牌的 Query 数 / 总 Query 数）× 100%。",
+      "scoreTooltipProduct": "提及至少一个自家产品的有效 AI 回答数 ÷ 同筛选范围内全部有效 AI 回答数。产品可见度与产品 SOV 使用不同分母。",
+      "competitiveSwitch": "竞品对比",
+      "emptyState": "该时间段暂无可见度数据。",
+      "rankTitle": "{{dim}}排名",
+      "rankHeader": "可见度得分",
+      "rankLabel": "排名",
+      "rankBrandLabel": "品牌",
+      "rankOwnBadge": "自家",
+      "expand": "展开",
+      "emptyRanking": "暂无数据。"
+    },
+    "sectionSov": {
+      "title": "声量份额 (SOV)",
+      "subtitleBrand": "品牌与竞品之间的提及分布。",
+      "subtitleProduct": "各自家产品在 AI 回答中的提及占比对比。",
+      "subtitleTopic": "各追踪话题在 AI 回答中的提及占比对比。",
+      "sovLabel": "声量份额",
+      "sovTooltip": "所选时间范围内，您品牌在所有 AI 回答中的提及占比 vs. 竞品。",
+      "leadingProductLabel": "头部产品份额",
+      "leadingProductTooltip": "提及次数最多的自家产品，占全部自家产品提及次数的比例。环形图展示各产品之间的提及份额。",
+      "emptyState": "该时间段暂无 SOV 数据。",
+      "rankTitle": "SOV 排名 · {{dim}}",
+      "rankHeader": "提及数"
+    },
+    "sectionPosition": {
+      "title": "平均位次",
+      "subtitle": "您品牌在 AI 回答中的平均排名（越小越好）。",
+      "positionLabel": "平均位次",
+      "positionTooltip": "您品牌在 AI 回答中被提及时的平均位次。#1 表示您品牌排在第一位。",
+      "emptyState": "该时间段暂无位次数据。",
+      "rankTitle": "位次排名",
+      "rankHeader": "平均位次"
+    },
+    "chartMode": {
+      "button": "图表设置",
+      "line": "折线图",
+      "bar": "柱状图",
+      "table": "表格视图"
+    },
+    "chartLegend": {
+      "current": "当前",
+      "previous": "上一周期"
+    },
+    "chartTable": {
+      "date": "日期",
+      "score": "得分",
+      "ownMentions": "Mentioned",
+      "totalMentions": "Total Query",
+      "productMentionedResponses": "提及产品的回答",
+      "eligibleResponses": "有效回答"
+    },
+    "fullRankingDialog": {
+      "title": "完整排名",
+      "description": "该时间段所有品牌的完整排名。"
+    },
+    "topicRanking": {
+      "byTopic": "按话题",
+      "byProduct": "按产品",
+      "titleByTopic": "可见度排名（按话题）",
+      "titleByProduct": "可见度排名（按产品）",
+      "subtitleTopic": "您品牌与竞品在每个追踪话题下的排名对比。点击行展开查看该话题下的 Prompt。",
+      "subtitleProduct": "您品牌与竞品在每个产品上的排名对比。点击行展开查看该产品下的 Prompt。",
+      "columnTopic": "话题",
+      "columnProduct": "产品",
+      "groupPromptCount": "Prompt 数",
+      "groupMentions": "分组提及数",
+      "promptMentions": "Prompt 提及数",
+      "columnBrand": "品牌",
+      "columnBrandRank": "品牌排名",
+      "columnBrandMentions": "品牌提及数",
+      "brandRowsBelow": "品牌指标见下方明细",
+      "groupBrandRow": "分组品牌",
+      "promptBrandRow": "Prompt 品牌",
+      "promptsCount": "{{count}} 条 Prompt",
+      "viewFullPrompt": "查看完整",
+      "fullPromptTitle": "完整 Prompt",
+      "fullPromptDescription": "当前展开行对应的完整 Prompt 文本。",
+      "loading": "正在加载排名矩阵...",
+      "loadingPrompts": "正在加载 Prompt...",
+      "promptPageRange": "{{start}}-{{end}} / 共 {{total}}",
+      "previous": "上一页",
+      "next": "下一页"
+    }
+  },
+  "citations": {
+    "loadFailed": "引用数据加载失败，请重试。",
+    "sectionShare": {
+      "title": "引用份额",
+      "subtitle": "您自有域名在 AI 回答中被引用的频率。",
+      "yourShare": "您的域名份额",
+      "yourShareTooltip": "AI 所有引用中指向您自有域名的比例。计算方式：（您的域名引用 / 总引用）× 100%，时间跨度为所选日期区间。",
+      "totalCitations": "总引用数",
+      "totalCitationsTooltip": "所选时间段内 AI 回答中识别到的引用来源（URL）总数。",
+      "emptyState": "该时间段暂无引用数据。",
+      "citationRank": "引用排名",
+      "columnDomain": "域名",
+      "columnShare": "份额",
+      "ownBadge": "自家",
+      "emptyDomains": "暂无域名数据。",
+      "expand": "展开"
+    },
+    "sectionCategories": {
+      "title": "引用分类",
+      "subtitle": "所选时间段内引用来源按类型的分布。"
+    },
+    "sectionDomains": {
+      "title": "被引用最多的域名",
+      "subtitle": "AI 回答中所有被引用域名的完整列表。",
+      "searchPlaceholder": "搜索域名...",
+      "count": "{{count}} 个域名",
+      "columnHash": "#",
+      "columnDomain": "域名",
+      "columnCategory": "分类",
+      "columnCitations": "引用数",
+      "columnShare": "份额 %",
+      "columnChange": "变化"
+    },
+    "sectionPages": {
+      "title": "被引用最多的页面",
+      "subtitle": "AI 回答中被引用次数最多的具体页面。",
+      "searchPlaceholder": "搜索页面...",
+      "count": "{{count}} 个页面",
+      "columnPageUrl": "页面 URL",
+      "columnCategory": "分类",
+      "columnCitations": "引用数",
+      "columnShare": "份额 %",
+      "columnChange": "变化"
+    },
+    "pagination": {
+      "range": "{{start}}-{{end}} / 共 {{total}}",
+      "rangeMore": "{{start}}-{{end}} / {{total}}+",
+      "loading": "正在加载...",
+      "previous": "上一页",
+      "next": "下一页"
+    },
+    "fullDialog": {
+      "title": "完整引用排名",
+      "description": "所有被引用域名按份额排名的完整列表。"
+    }
+  },
+  "sentiment": {
+    "loadFailed": "情感数据加载失败，请重试。",
+    "filterTitle": "筛选",
+    "filterAll": "全部",
+    "filterPositive": "正面",
+    "filterMixedNeutral": "混合/中立",
+    "filterNegative": "负面",
+    "insufficientEvidence": "证据不足",
+    "insufficientEvidenceSummary": "{{count}} 条证据不足回答未计入情感比例",
+    "ratedResponses": "有效情感回答：{{count}} 条",
+    "overallSentiment": "整体情感",
+    "aiSentimentOverview": "AI 情感概览",
+    "aiSentimentSubtitle": "· AI 平台对您品牌的观感",
+    "trend": "情感趋势",
+    "comparePrevious": "对比上一周期",
+    "vsPrev": "vs. 上一周期",
+    "chartLine": "折线",
+    "chartBar": "柱状",
+    "positiveCurrent": "正面（当前）",
+    "positivePrevious": "正面（上一周期）",
+    "noTrendData": "该时间段暂无趋势数据。",
+    "noThemesData": "暂无情感主题数据。请在 Analyzer 完成分析后再查看。",
+    "noThemeResults": "该主题下暂无结果。",
+    "showMoreThemes": "再显示 {{count}} 条",
+    "positivePctLabel": "{{pct}}% 正面",
+    "mixedNeutralPctLabel": "{{pct}}% 混合/中立",
+    "negativePctLabel": "{{pct}}% 负面",
+    "topPositiveThemes": "主要正面主题",
+    "topNegativeThemes": "主要负面主题",
+    "themesTitle": "情感主题",
+    "themesSubtitle": "从 AI 回答中抽取的反复出现的主题。点击任一行展开详情。",
+    "table": {
+      "theme": "主题",
+      "sentiment": "情感",
+      "occurrences": "出现次数",
+      "change": "变化"
+    },
+    "sectionOverall": {
+      "subtitle": "AI 对您品牌的整体情感倾向。"
+    },
+    "driversPositive": "正面驱动因素",
+    "driversNegative": "负面驱动因素",
+    "emptyState": "该时间段暂无情感数据。",
+    "responseSheetTitle": "回答详情",
+    "responseSheetDesc": "带 Citation 的完整 AI 回答",
+    "responseLoadFailed": "无法加载回答详情。",
+    "queryLabel": "Query",
+    "searchQueriesLabel": "Search 查询",
+    "searchQueriesNotRequested": "本次采集未请求 Search Queries。",
+    "searchQueriesUpstreamUnavailable": "本次 ChatGPT 返回格式未提供内部搜索查询。",
+    "aiResponseLabel": "AI 回答",
+    "noResponseText": "暂无回答内容。",
+    "citationsLabel": "Citation ({{count}})"
+  },
+  "prompts": {
+    "columns": {
+      "rank": "排名",
+      "score": "得分",
+      "avgPos": "平均位次",
+      "citations": "引用数"
+    },
+    "filters": {
+      "searchPlaceholder": "搜索 Prompt...",
+      "allTopics": "全部话题",
+      "allProducts": "全部产品",
+      "allPlatforms": "全部平台",
+      "allCountries": "全部国家",
+      "allPrompts": "全部 Prompt",
+      "groupByPlaceholder": "分组方式",
+      "intent": {
+        "button": "Intent",
+        "ariaLabel": "筛选 Prompt Intent",
+        "selectedCount": "Intent（{{count}}）",
+        "activeGroup": "已启用 Intent",
+        "unconfiguredGroup": "历史 / 未配置 Intent",
+        "unconfiguredBlank": "未配置 Intent",
+        "loadFailed": "Intent 筛选项加载失败。Prompt 列表仍可正常查看。",
+        "empty": "暂无可用的 Intent 筛选项。",
+        "clearSelection": "清除 Intent 筛选"
+      }
+    },
+    "groupBy": {
+      "none": "不分组",
+      "topic": "按话题",
+      "product": "按产品",
+      "country": "按国家"
+    },
+    "fallback": {
+      "noProduct": "未指定产品",
+      "noCountry": "未指定国家"
+    },
+    "export": {
+      "headerTopic": "话题",
+      "headerProduct": "产品",
+      "headerPrompt": "Prompt 文本",
+      "headerPlatform": "平台",
+      "headerCountry": "国家",
+      "headerLanguage": "语言",
+      "headerIntent": "意图",
+      "headerMentions": "提及数",
+      "headerAvgPosition": "平均位次",
+      "headerCitations": "引用数"
+    },
+    "table": {
+      "groupPrompt": "分组 / Prompt",
+      "prompt": "Prompt",
+      "viewPromptAnalysis": "查看 Prompt 分析"
+    },
+    "pageTitle": "Prompt",
+    "pageDescription": "管理并分析您品牌话题下的 Prompt 变体。",
+    "manageButton": "管理 Prompt 库",
+    "loadingPrompts": "加载 Prompt 中…",
+    "pleaseSelectWorkspace": "请先从侧边栏选择工作区。",
+    "failedToLoad": "加载数据失败：{{error}}",
+    "columnsButton": "列",
+    "toggleColumns": "切换列",
+    "exportCSV": "导出 CSV",
+    "import": {
+      "entry": "导入 CSV",
+      "title": "批量导入 Prompt",
+      "description": "先预览并校验当前 Workspace 的 CSV，再创建 Prompt 物理变体。",
+      "workspace": "Workspace：{{workspace}}",
+      "tabs": {
+        "import": "导入 CSV",
+        "allowed": "允许值"
+      },
+      "template": {
+        "download": "下载模板",
+        "viewAllowed": "查看允许值",
+        "noTopic": "当前 Workspace 尚无 Topic。下载的模板只有表头，请先创建 Topic 再导入。"
+      },
+      "file": {
+        "drop": "选择 CSV 文件，或拖放到这里",
+        "limits": "UTF-8 CSV · 最大 10 MB · 2,000 个输入行 · 20,000 个展开变体",
+        "size": "{{size}} KB",
+        "remove": "移除"
+      },
+      "preview": {
+        "loading": "正在解析并校验 CSV…",
+        "empty": "没有可预览的输入行。",
+        "missingValue": "缺少 Prompt",
+        "variants": "查看 {{count}} 个展开变体",
+        "page": "第 {{page}} / {{count}} 页",
+        "noIssues": "没有错误或警告",
+        "columns": {
+          "row": "行号",
+          "normalized": "归一化输入",
+          "expanded": "展开数",
+          "action": "操作",
+          "feedback": "错误 / 警告"
+        }
+      },
+      "actions": {
+        "create": "创建",
+        "skip": "跳过",
+        "conflict": "冲突",
+        "invalid": "无效"
+      },
+      "summary": {
+        "inputRows": "输入行",
+        "expanded": "展开变体",
+        "create": "创建",
+        "skip": "跳过",
+        "conflict": "冲突",
+        "invalid": "无效",
+        "quota": "Quota"
+      },
+      "stale": {
+        "message": "上次 Preview 后，Workspace 配置、Quota 或现有 Prompt 数据已发生变化。",
+        "toast": "Preview 已刷新，请重新检查后再次确认。",
+        "review": "服务端返回了新的 Preview。继续前请重新检查统计和明细。",
+        "confirm": "我已检查新的 Preview"
+      },
+      "commit": {
+        "button": "确认导入",
+        "confirmTitle": "确认批量导入 Prompt",
+        "confirmDescription": "确定在当前 Workspace 创建 {{count}} 个 Prompt 变体吗？已有的完全相同变体会被跳过。"
+      },
+      "result": {
+        "title": "导入完成",
+        "description": "本批次已创建 {{count}} 个 Prompt 变体。",
+        "batch": "批次 ID",
+        "created": "已创建",
+        "skipped": "跳过已有变体",
+        "reverted": "已撤销 · 删除 {{count}} 个 Prompt",
+        "undo": "撤销本次导入",
+        "undoSuccess": "导入已撤销，删除了 {{count}} 个 Prompt。"
+      },
+      "undo": {
+        "title": "撤销 Prompt 导入",
+        "description": "只会删除本次导入批次创建的 Prompt。",
+        "cascadeWarning": "如果这些 Prompt 已产生结果，撤销会同时级联删除其 Task、Result、Mention、Citation 和 Sentiment 事实数据。",
+        "confirm": "撤销本次导入"
+      },
+      "allowed": {
+        "searchPlaceholder": "搜索类型、标准值、展示名或所属 Topic…",
+        "download": "下载允许值 CSV",
+        "canonicalHint": "导入 CSV 时请严格使用这里展示的标准 Value；Label 仅用于界面展示。",
+        "empty": "当前搜索没有匹配的允许值。",
+        "parentTopic": "所属 Topic：{{topic}}",
+        "copyValue": "复制标准值 {{value}}",
+        "copySuccess": "已复制 {{value}}",
+        "copyFailed": "无法复制该标准值。",
+        "types": {
+          "topic": "Topics",
+          "product": "Products",
+          "platform": "AI Platforms",
+          "country": "Countries",
+          "language": "Languages",
+          "intent": "Intents",
+          "other": "{{type}}"
+        }
+      },
+      "errors": {
+        "allowedValues": "无法加载允许值。",
+        "preview": "无法预览该 CSV。",
+        "commit": "无法提交本次导入。",
+        "undo": "无法撤销本次导入。",
+        "download": "无法下载 CSV。"
+      },
+      "issues": {
+        "requestFailed": "无法完成该请求。",
+        "fileTooLarge": "CSV 大小为 {{actual}} 字节，超过 {{allowed}} 字节上限。",
+        "encodingInvalid": "CSV 必须使用 UTF-8 编码。",
+        "headersInvalid": "CSV 表头或表头顺序与导入模板不一致。",
+        "csvMalformed": "CSV 格式无效，请检查引号、分隔符和行结构。",
+        "rowLimitExceeded": "CSV 包含 {{actual}} 个输入行，最多允许 {{allowed}} 行。",
+        "emptyCsv": "CSV 至少需要包含一个非空数据行。",
+        "rowVariantLimitExceeded": "单个 CSV 行展开为 {{actual}} 个变体，单行最多允许 {{allowed}} 个。",
+        "variantLimitExceeded": "CSV 共展开为 {{actual}} 个变体，单次最多允许 {{allowed}} 个。",
+        "extraColumns": "第 {{row}} 行包含多余列；同一单元格内的逗号分隔值必须使用引号包裹。",
+        "customerMismatch": "Customer Name“{{value}}”与当前 Workspace“{{expected}}”不完全一致。",
+        "topicRequired": "Topic 为必填项。",
+        "topicNotAllowed": "Topic“{{value}}”不是当前 Workspace 的启用项。",
+        "topicAmbiguous": "Topic“{{value}}”匹配多个启用 Topic，请先处理重名项。",
+        "productNotAllowed": "Product“{{value}}”不属于所选 Topic，或当前未启用。",
+        "promptRequired": "第 {{row}} 行缺少 Prompt。",
+        "promptPlaceholder": "Preview 前请替换第 {{row}} 行的示例 Prompt 占位符。",
+        "intentRequired": "Intent 为必填项。",
+        "intentNotAllowed": "Intent“{{value}}”不是已启用的 Global Config 值。",
+        "platformRequired": "至少需要填写一个 AI Platform。",
+        "platformNotAllowed": "当前 Workspace 不允许使用 AI Platform“{{value}}”。",
+        "countryRequired": "至少需要填写一个 Country。",
+        "countryNotAllowed": "当前 Workspace 不允许使用 Country“{{value}}”。",
+        "fullWidthDelimiter": "多值单元格只支持英文半角逗号、分号或竖线。",
+        "languageRequired": "Language 为必填项。",
+        "languageNotAllowed": "当前 Workspace 不允许使用 Language“{{value}}”。",
+        "languageMultiple": "每个 CSV 行只能填写一个 Language。",
+        "fileDuplicate": "该行与此前第 {{rows}} 行声明的变体重复。",
+        "platformCountryUnsupported": "该行至少包含一个不支持的 AI Platform 与 Country 组合。",
+        "fileMetadataConflict": "CSV 多行对同一物理 Prompt 变体声明了不同的 Product 或 Intent。",
+        "metadataConflict": "数据库中已有的物理 Prompt 变体具有不同的 Product 或 Intent。",
+        "promptExistsInOtherTopic": "相同的归一化 Prompt 已存在于另外 {{count}} 个 Topic；本情况允许导入。",
+        "inactiveVariantRemainsInactive": "相同的未启用 Prompt 变体已经存在，导入后仍保持未启用。",
+        "quotaExceeded": "导入后将占用 {{actual}} 个 Prompt Quota，当前 Workspace 上限为 {{allowed}}。",
+        "workspaceNotFound": "当前 Workspace 不可用，或您已无权访问。",
+        "manifestRequired": "缺少 Preview Manifest，请重新执行 Preview。",
+        "previewStateRequired": "缺少 Preview 状态，请重新执行 Preview。",
+        "previewStale": "Preview 已过期，请检查刷新后的 Preview 再提交。",
+        "previewNotCommittable": "请先解决全部无效行和冲突，再提交导入。",
+        "undoConfirmationRequired": "撤销本次导入需要明确确认。",
+        "batchNotFound": "当前 Workspace 中不存在该导入批次。",
+        "batchReverting": "该导入批次正在撤销，请稍后重试。",
+        "unknown": "导入返回了无法识别的校验错误（代码：{{code}}）。"
+      }
+    },
+    "promptCount": "{{count}} 条 Prompt",
+    "promptCountRows": "（{{count}} 行）",
+    "tableColumns": {
+      "product": "产品",
+      "platforms": "平台",
+      "countries": "国家",
+      "visibilityScore": "可见度得分",
+      "visibilityRank": "可见度排名",
+      "brandRank": "品牌排名",
+      "mentioned": "提及数",
+      "totalQuery": "总查询数",
+      "avgPos": "平均位次",
+      "promptPlain": "Prompt",
+      "groupPrompt": "分组 / Prompt"
+    },
+    "emptyGroup": {
+      "noActive": "该分组下暂无活跃 Prompt。",
+      "initWithAI": "用 AI 头脑风暴初始化"
+    },
+    "emptyTable": "当前筛选下没有符合条件的 Prompt。",
+    "analysis": {
+      "typeLabel": "{{type}} 分析",
+      "backAllTopics": "全部话题",
+      "backAllProducts": "全部产品",
+      "backAllCountries": "全部国家",
+      "backAllPrompts": "全部 Prompt",
+      "viewGroupAnalysis": "查看{{groupLabel}}分析",
+      "viewPromptAnalysis": "查看 Prompt 分析",
+      "groupLabelTopic": "话题",
+      "groupLabelProduct": "产品",
+      "groupLabelCountry": "国家"
+    },
+    "drilldown": {
+      "back": "返回 Prompt 列表",
+      "context": "话题：{{topic}} · 产品：{{product}}",
+      "domainLoadFailed": "该指标暂时无法加载。其他指标仍可继续查看。",
+      "emptyIntersection": "该下钻目标不在当前全局话题筛选范围内。请调整筛选条件后重试。",
+      "sections": {
+        "visibility": "Visibility",
+        "citation": "Citation",
+        "sentiment": "Sentiment"
+      },
+      "targetType": {
+        "topic": "话题分析",
+        "product": "产品分析",
+        "prompt": "Prompt 分析"
+      },
+      "targetUnavailable": "该下钻目标不存在、已删除，或不属于当前 Workspace。"
+    }
+  },
+  "promptEditor": {
+    "pageTitle": "Prompt 编辑器",
+    "pleaseSelectWorkspace": "请先从侧边栏选择工作区。",
+    "back": "返回",
+    "quotaUsed": "{{used}} / {{quota}} 条 Prompt 已使用",
+    "sidebarTitle": "话题 & 产品",
+    "allTopics": "全部话题",
+    "addProduct": "添加产品",
+    "addTopic": "添加话题",
+    "productPlaceholder": "产品名…",
+    "topicPlaceholder": "话题名…",
+    "tabs": {
+      "active": "已启用",
+      "inactive": "已停用"
+    },
+    "filterTopicAll": "话题",
+    "filterPlatformAll": "平台",
+    "batchUpload": "批量上传",
+    "exportBtn": "导出",
+    "addPromptBtn": "新增 Prompt",
+    "generate": "AI 生成",
+    "saveAllChanges": "保存全部修改",
+    "loading": "加载中…",
+    "searchCountries": "搜索国家…",
+    "searchPlatforms": "搜索平台…",
+    "columns": {
+      "promptText": "Prompt 文本",
+      "topic": "话题",
+      "product": "产品",
+      "country": "国家",
+      "language": "语言",
+      "platform": "平台",
+      "intent": "意图"
+    },
+    "intentConfig": {
+      "loading": "正在加载可用 Intent…",
+      "loadFailed": "无法加载可用 Intent。Prompt 历史数据仍可查看，但创建、复制和扩展变体已暂停。",
+      "noActive": "当前没有已启用的 Intent。Prompt 历史数据仍可查看，但创建、复制和扩展变体已暂停。",
+      "unavailable": "可用 Intent 尚未准备好，暂时无法创建或复制 Prompt。",
+      "missingIntent": "请选择一个已启用的 Intent 后再保存。",
+      "inactiveIntent": "该 Prompt 使用的是历史或未配置 Intent。请为新 Prompt 选择一个已启用的 Intent。",
+      "selectActiveLabel": "选择已启用的 Intent",
+      "selectActivePlaceholder": "选择启用 Intent",
+      "blankValue": "空 Intent",
+      "needsActiveSelection": "需选择启用 Intent"
+    },
+    "workspaceState": {
+      "stale": "Workspace 已切换或数据正在重新加载。为避免写入错误的 Workspace，本次操作已取消。"
+    },
+    "cleanup": {
+      "modeTitle": "Workspace 清理模式",
+      "modeDescription": "此 Workspace 仍有 {{count}} 条物理 Prompt。清理将串行分批执行，失败后可安全恢复。",
+      "open": "开始引导式清理",
+      "workspaceUnavailable": "当前账号无法访问请求的 Workspace，清理尚未开始。",
+      "dialogTitle": "删除 Workspace 的全部 Prompt",
+      "dialogDescription": "此操作会删除 {{workspace}} 中的全部物理 Prompt 及其关联分析数据。",
+      "physicalRows": "当前加载的物理 Prompt 数",
+      "batchExplanation": "系统会重新获取当前租户的 Prompt ID，然后以每批 25 条串行删除；首个错误即停止，并可从重新获取的剩余数据继续。",
+      "confirmation": "我理解此 Workspace 中的全部 Prompt，以及关联的任务、结果、引用、提及和情感数据都会被永久删除。",
+      "total": "总数",
+      "deleted": "已删除",
+      "remaining": "剩余",
+      "start": "删除全部 Prompt",
+      "resume": "继续清理",
+      "failedMessage": "清理已停止：{{message}}。请解决错误后继续，系统会重新获取剩余 Prompt ID。",
+      "partialDelete": "服务端实际删除的 Prompt 数少于本批请求数。",
+      "concurrentPrompts": "清理期间出现了新建的 Prompt 数据。",
+      "remainingAfterRefresh": "刷新后仍存在 Prompt 数据。请继续清理，系统会重新获取并删除当前租户下的剩余数据。",
+      "completeMessage": "Prompt 清理已完成。请返回 Admin 刷新删除准备情况，然后继续清理 Topic。",
+      "staleWorkspace": "Workspace 已切换，或已有清理请求正在运行。",
+      "status": {
+        "idle": "准备就绪",
+        "running": "正在清理",
+        "complete": "Prompt 清理完成",
+        "failed": "清理已停止"
+      }
+    },
+    "newBadge": "新增",
+    "selectPlaceholder": "选择…",
+    "enterPrompt": "输入 Prompt 文本…",
+    "noInStatus": "该状态下没有 Prompt。",
+    "rowActions": {
+      "duplicate": "复制",
+      "pause": "暂停",
+      "activate": "启用",
+      "deleteAll": "全部删除",
+      "deleteConfirmMessage": "确定删除该 Prompt 的所有变体？",
+      "deleteConfirmTitle": "删除 Prompt",
+      "cannotRemoveLastPlatform": "不能删除最后一个平台。",
+      "cannotRemoveLastCountry": "不能删除最后一个国家。",
+      "removeCountryVariantsTitle": "删除国家变体",
+      "removeCountryVariantsMessage": "确定删除国家 {{country}} 对应的 {{count}} 条 Prompt 变体吗？",
+      "removePlatformVariantsTitle": "删除平台变体",
+      "removePlatformVariantsMessage": "确定删除平台 {{platform}} 对应的 {{count}} 条 Prompt 变体吗？"
+    },
+    "bulkActions": {
+      "duplicate": "复制",
+      "disable": "停用",
+      "activate": "启用",
+      "editCountries": "编辑国家",
+      "editPlatforms": "编辑平台",
+      "delete": "删除",
+      "promptsSelected_one": "已选中 {{count}} 条 Prompt",
+      "promptsSelected_other": "已选中 {{count}} 条 Prompt",
+      "clear": "清空"
+    },
+    "configuration": "配置",
+    "multiSelect": {
+      "placeholder": "选择…",
+      "searchLabel": "搜索{{label}}…",
+      "noResults": "没有匹配项。",
+      "nSelected": "已选 {{count}} 项"
+    },
+    "toasts": {
+      "error": "错误：{{message}}",
+      "addTopicError": "添加话题失败：{{message}}",
+      "addProductError": "添加产品失败：{{message}}",
+      "duplicateError": "复制失败：{{message}}",
+      "bulkDuplicateError": "批量复制失败：{{message}}",
+      "bulkDisableError": "批量停用失败：{{message}}",
+      "bulkDeleteConfirmMessage_one": "确定删除已选中的 {{count}} 条 Prompt？",
+      "bulkDeleteConfirmMessage_other": "确定删除已选中的 {{count}} 条 Prompt？",
+      "bulkDeleteConfirmTitle": "删除 Prompt",
+      "bulkDeleting_one": "正在删除 {{count}} 条 Prompt…",
+      "bulkDeleting_other": "正在删除 {{count}} 条 Prompt…",
+      "bulkDeleted": "删除成功",
+      "bulkDeleteError": "批量删除失败：{{message}}",
+      "bulkDeleteTooLarge": "普通批量删除最多选择 {{max}} 条物理 Prompt；如需删除更多，请使用 Workspace 清理模式。",
+      "bulkEditError": "批量编辑失败：{{message}}",
+      "saveError": "保存失败：{{message}}",
+      "brainstormError": "头脑风暴失败：{{message}}",
+      "saveBrainstormError": "保存 Prompt 失败：{{message}}",
+      "quotaExceeded": "配额超出：已有 {{existing}} 条 + 新增 {{new_count}} 条 = {{total}} 条，但配额为 {{quota}} 条。",
+      "needTopic": "请至少选择一个话题。",
+      "needPlatform": "请至少选择一个平台。",
+      "needCountry": "请至少选择一个国家。",
+      "needLanguage": "请选择一种语言。"
+    },
+    "brainstorm": {
+      "dialogTitle": "AI 头脑风暴",
+      "topicsSelected_one": "（已选 {{count}} 个话题）",
+      "topicsSelected_other": "（已选 {{count}} 个话题）",
+      "noTopicsCreated": "尚未创建话题。请先在「品牌设置」中添加话题。",
+      "promptsPerProduct": "每产品 Prompt 数",
+      "promptsPerProductHint": "将为每个产品生成 {{count}} 条独立 Prompt 文本。每条 Prompt 会在所选的全部 平台 × 国家 组合下保存，但仅计为 1 条 Prompt 配额。",
+      "countries": "国家",
+      "language": "语言",
+      "targetPlatforms": "目标平台",
+      "noneConfigured": "（当前 Workspace 未配置）",
+      "noCountriesAvailable": "没有可选国家",
+      "selectCountries": "选择国家…",
+      "noLanguagesAvailable": "没有可选语言",
+      "selectLanguage": "选择语言",
+      "noPlatformsAvailable": "没有可选平台",
+      "selectPlatforms": "选择平台…",
+      "generatingInParallel": "正在并行生成所选组合下的 Prompt…",
+      "promptsGenerated": "已生成 {{count}} 条 Prompt",
+      "selectAll": "全选",
+      "clear": "清空",
+      "saveSelected": "保存选中的 {{count}} 条",
+      "labelPlatforms": "平台",
+      "labelCountries": "国家",
+      "candidateIntentLabel": "候选 Prompt Intent",
+      "selectActiveIntent": "选择启用 Intent",
+      "blankIntent": "空 Intent",
+      "intentNeedsSelection": "需选择启用 Intent"
+    }
+  },
+  "channelAnalysis": {
+    "pageTitle": "渠道分析",
+    "crossDimensionLabel": "交叉维度",
+    "chart1Title": "经销渠道 × 自家产品共现",
+    "chart2Title": "经销渠道产品分布",
+    "chart3Title": "自家产品多渠道分布对比",
+    "chart4Title": "渠道 Citation 分布",
+    "dims": {
+      "brand": {
+        "pairLabel": "经销渠道 × 自家品牌共现",
+        "pairSubtitle": "AI 回答中同时提到经销渠道品牌和自家品牌的次数，按组合排序。",
+        "distributionTitle": "经销渠道的自家品牌分布",
+        "distributionSubtitle": "每个经销渠道品牌下，各自家品牌的共现次数堆叠对比。",
+        "reverseTitle": "自家品牌多渠道分布对比",
+        "reverseSubtitle": "每个自家品牌在不同经销渠道下的共现次数对比。"
+      },
+      "product": {
+        "pairLabel": "经销渠道 × 自家产品共现",
+        "pairSubtitle": "AI 回答中同时提到经销渠道品牌和自家产品的次数，按组合排序。",
+        "distributionTitle": "经销渠道产品分布",
+        "distributionSubtitle": "每个经销渠道品牌下，各自家产品的提及次数堆叠对比。",
+        "reverseTitle": "自家产品多渠道分布对比",
+        "reverseSubtitle": "每个自家产品在不同经销渠道下的出现次数对比。"
+      },
+      "topic": {
+        "pairLabel": "经销渠道 × 话题分布",
+        "pairSubtitle": "每个经销渠道品牌在各追踪话题下的提及次数，按组合排序。",
+        "distributionTitle": "经销渠道的话题分布",
+        "distributionSubtitle": "每个经销渠道品牌下，各话题的提及次数堆叠对比。",
+        "reverseTitle": "话题多渠道分布对比",
+        "reverseSubtitle": "每个话题在不同经销渠道下的出现次数对比。"
+      }
+    },
+    "citationTitle": "渠道 Citation 分布",
+    "citationSubtitle": "AI 引用来源按 citation_role 类别的分布占比（own / peer / shadow / other）。",
+    "emptyCooccurrenceTitle": "暂无共现数据",
+    "emptyCooccurrenceDescBrand": "当 AI 在同一次回答中既提到经销渠道品牌、又与自家品牌相关时，会累积到这里。等待收集任务运行后再查看。",
+    "emptyCooccurrenceDescProduct": "当 AI 在同一次回答中既提到经销渠道品牌、又与自家产品相关时，会累积到这里。等待收集任务运行后再查看。",
+    "emptyCooccurrenceDescTopic": "当 AI 在同一次回答中既提到经销渠道品牌、又与追踪话题相关时，会累积到这里。等待收集任务运行后再查看。",
+    "emptyMissingShadowBrand": "当前 Workspace 尚未配置启用的经销渠道品牌。完成配置后，后续分析会生成渠道交叉数据。",
+    "emptyMissingOwnProduct": "当前 Workspace 尚未配置启用的自家产品。请先在追踪话题下添加产品。",
+    "emptyMissingOwnBrand": "当前 Workspace 尚未配置启用的自家品牌。",
+    "emptyMissingTopic": "当前 Workspace 尚未配置追踪话题。",
+    "emptyNoAnalyzedProductMentions": "产品配置已经存在，但所选时间范围内尚未生成产品提及事实。修复后的后续 Collector 与 Analyzer 数据会显示在这里。",
+    "emptyRequestFailed": "交叉数据请求失败，请稍后重试。",
+    "emptyDistributionTitle": "暂无分布数据",
+    "emptyDistributionDesc": "在「品牌设置」中配置经销渠道品牌及对应的追踪话题 / 产品后，这里会展示各渠道的细分分布。",
+    "emptyReverseTitle": "暂无反向分布数据",
+    "emptyReverseDesc": "当目标维度被多个经销渠道品牌共同提及后，这里会并列展示各渠道的分布。",
+    "emptyCitationTitle": "暂无 Citation 数据",
+    "emptyCitationDesc": "当 AI 回答开始产出可归类的 Citation 时，这里会显示 own / peer / shadow / other 的比例。",
+    "ctaBrandSettings": "去品牌设置",
+    "ctaCitations": "查看 Citation",
+    "tooltips": {
+      "viewByDimension": "切换数据聚合维度：品牌 / 话题 / 产品。在「渠道分析」页下，这三项分别表示「渠道 × 品牌」「渠道 × 话题」「渠道 × 产品」的交叉视图；在其他页面，它们表示 Visibility / Citation / Sentiment 指标按品牌、话题或产品汇总。产品维度需要在追踪话题下配置过产品才会显示。",
+      "channelCooccurrence": "同一条 AI 答案里同时提到经销渠道品牌和您自家产品的次数。这是 OEM / 代理销售模式下最核心的指标，反映您的产品在渠道语境中的可见度。",
+      "channelOtherProducts": "经销渠道上被 AI 推荐的其他产品（非您自己的）。可细分：渠道自家品牌线 / 渠道代理他人。帮您评估在该渠道的竞争格局。",
+      "citationRole": "引用的来源类型：您自家官网引用 / 您在经销渠道上的产品页引用 / 经销渠道其他页面 / 独立竞品渠道 / 第三方媒体评测等。",
+      "peerVoiceShare": "所有您标记为竞品的品牌的声量对比，包括同时也是您经销渠道的品牌（例如 Rough Country 既是渠道又是竞品时都纳入）。"
+    }
+  },
+  "opportunityModal": {
+    "title": "机会发现",
+    "description": "全面诊断品牌在 AI 搜索中的表现，挖掘内容优化机会。",
+    "methodology": {
+      "quadrantTitle": "话题象限定位",
+      "quadrantDesc": "基于品牌覆盖率、AI 引用模式和趋势方向，将话题划分为强势 / 薄弱 / 待挖掘 / 新兴四个象限。",
+      "opportunityTitle": "内容机会挖掘",
+      "opportunityDesc": "从引用数据中发现内容优化方向，按优先级评分排序，找到最有价值的优化切入点。",
+      "graphTitle": "平台–AI 引擎引用图谱",
+      "graphDesc": "映射各发布平台被哪些 AI 引擎引用，揭示平台与引擎之间的引用路径。"
+    },
+    "dateRange": "分析时间范围",
+    "dateRangeOption": "{{days}} 天",
+    "platformFilter": "AI 平台筛选",
+    "platformFilterHint": "（不选 = 全部）",
+    "submit": "开始分析",
+    "taskName": "机会发现 - {{date}}",
+    "toastSuccess": "分析任务已创建",
+    "toastFailed": "创建失败"
+  },
+  "templateModal": {
+    "analysisPipeline": "分析流程",
+    "anthonyWorkLog": "Anthony 工作日志",
+    "viewGeneratedSql": "查看生成的 SQL（{{count}} 条查询）",
+    "dataCharts": "数据图表",
+    "insightReport": "洞察报告",
+    "qualityReview": "质量评估",
+    "qualityDataAccuracy": "数据准确性",
+    "qualityConsistency": "逻辑一致性",
+    "qualityCompleteness": "完整性",
+    "qualityOverall": "综合得分",
+    "issuesFound": "发现的问题：",
+    "reportCompleteMsg": "✓ 洞察报告生成完成",
+    "errorMsg": "❌ 错误：{{message}}",
+    "unknownError": "未知错误",
+    "launchFailedMsg": "❌ 启动失败：{{message}}",
+    "loadingProgress": "加载任务进度...",
+    "restoreComplete": "✓ 报告生成完成",
+    "initMsg": "正在初始化分析任务...",
+    "runtimeSettings": {
+      "modelLabel": "生成模型：",
+      "enableCron": "设为定期自动运行（Cloud Scheduler）",
+      "cronPlaceholder": "例：0 9 * * 1",
+      "cronHint": "自动任务将在后台运行，每次运行会记录在历史列表中。Cron 示例：<1>0 9 * * 1</1> 每周一上午 9 点。"
+    },
+    "header": {
+      "agentRole": "GEO 分析师",
+      "agentGreeting": "你好！我是 Anthony，您的 GEO 分析师。让我们一起配置这份报告，我会帮您分析数据并生成洞察。"
+    },
+    "domains": {
+      "visibility": "可见度",
+      "citation": "引用",
+      "sentiment": "情感"
+    },
+    "actions": {
+      "save": "保存为任务",
+      "saving": "保存中...",
+      "run": "运行分析",
+      "viewReportDetails": "查看完整报告",
+      "exportHtml": "导出 HTML",
+      "runInBackgroundClose": "后台运行并关闭",
+      "close": "关闭",
+      "reconfigure": "重新配置"
+    },
+    "toast": {
+      "saveSuccess": "已保存为任务",
+      "saveFailed": "模板保存失败：{{message}}"
+    },
+    "taskNameSuffixCron": " (定时任务)",
+    "taskNameSuffixSaved": " (已保存任务)"
+  },
+  "tooltips": {
+    "viewByDimension": "切换数据聚合维度：品牌 / 话题 / 产品。在「渠道分析」页下，这三项分别表示「渠道 × 品牌」「渠道 × 话题」「渠道 × 产品」的交叉视图；在其他页面，它们表示 Visibility / Citation / Sentiment 指标按品牌、话题或产品汇总。产品维度需要在追踪话题下配置过产品才会显示。",
+    "channelCooccurrence": "同一条 AI 答案里同时提到经销渠道品牌和您自家产品的次数。这是 OEM / 代理销售模式下最核心的指标，反映您的产品在渠道语境中的可见度。",
+    "channelOtherProducts": "经销渠道上被 AI 推荐的其他产品（非您自己的）。可细分：渠道自家品牌线 / 渠道代理他人。帮您评估在该渠道的竞争格局。",
+    "citationRole": "引用的来源类型：您自家官网引用 / 您在经销渠道上的产品页引用 / 经销渠道其他页面 / 独立竞品渠道 / 第三方媒体评测等。",
+    "peerVoiceShare": "所有您标记为竞品的品牌的声量对比，包括同时也是您经销渠道的品牌（例如 Rough Country 既是渠道又是竞品时都纳入）。"
+  },
+  "viewBy_deprecated_keep_for_compat": {
+    "label": "视图维度",
+    "brand": "品牌",
+    "product": "产品",
+    "topic": "话题",
+    "cross": "交叉"
+  },
+  "citationPage": {
+    "tabs": {
+      "monitor": "引用监控",
+      "publishedPages": "发布页面管理"
+    }
+  },
+  "publishedPages": {
+    "title": "发布页面管理",
+    "subtitle": "维护已发布页面清单，并追踪这些页面在 AI 引用中的表现。",
+    "empty": "暂无发布页面。",
+    "actions": {
+      "downloadTemplate": "下载模板",
+      "importCsv": "导入 CSV",
+      "new": "新增页面",
+      "detail": "查看详情",
+      "edit": "编辑",
+      "disable": "停用",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "filters": {
+      "search": "搜索 URL、标题、渠道或话题...",
+      "status": "发布状态",
+      "allStatuses": "全部发布状态",
+      "channel": "渠道",
+      "allChannels": "全部渠道",
+      "topic": "话题",
+      "allTopics": "全部话题"
+    },
+    "table": {
+      "page": "页面",
+      "publishedAt": "发布日期",
+      "topics": "话题",
+      "channel": "渠道",
+      "status": "发布 / 审核状态",
+      "actions": "操作"
+    },
+    "pagination": {
+      "summary": "共 {{total}} 条，第 {{page}} / {{pages}} 页",
+      "previous": "上一页",
+      "next": "下一页"
+    },
+    "form": {
+      "createTitle": "新增发布页面",
+      "editTitle": "编辑发布页面",
+      "description": "标题、发布页面 URL、发布日期、渠道和发布状态为必填项；系统会自动生成规范化 URL 用于匹配 Citation。",
+      "fields": {
+        "title": "标题",
+        "url": "发布页面 URL",
+        "normalizedUrlPreview": "规范化 URL（系统自动生成）",
+        "normalizedUrlEmpty": "填写发布页面 URL 后自动生成。",
+        "selectDate": "选择日期",
+        "publishedAt": "发布日期",
+        "channel": "渠道",
+        "reviewStatus": "审核状态",
+        "publishStatus": "发布状态",
+        "owner": "负责人",
+        "draftDocUrl": "稿件文档链接（飞书）",
+        "topics": "关联话题",
+        "notes": "备注",
+        "active": "启用追踪"
+      }
+    },
+    "detail": {
+      "title": "发布页面详情",
+      "description": "发布页面的基础信息和追踪配置。"
+    },
+    "import": {
+      "title": "CSV 导入预览",
+      "description": "请先确认校验结果，确认后再写入数据库。单次最多 100 行。review_status 仅支持 not_submitted / in_review / approved / changes_requested / rejected；publish_status 仅支持 draft / scheduled / published / offline。",
+      "total": "总行数",
+      "create": "新增",
+      "update": "更新",
+      "invalid": "错误",
+      "row": "行号",
+      "action": "动作",
+      "errors": "错误",
+      "commit": "确认导入"
+    },
+    "confirm": {
+      "disableTitle": "停用发布页面",
+      "disableMessage": "确认停用「{{title}}」吗？停用后不会参与默认追踪。",
+      "deleteTitle": "删除发布页面",
+      "deleteMessage": "确认删除「{{title}}」吗？此操作不会删除历史 Citation 数据。"
+    },
+    "toasts": {
+      "loadFailed": "加载失败：{{message}}",
+      "requiredFields": "请填写标题、发布页面 URL、发布日期、渠道和发布状态。",
+      "saved": "已保存发布页面。",
+      "saveFailed": "保存失败：{{message}}",
+      "disabled": "已停用发布页面。",
+      "deleted": "已删除发布页面。",
+      "templateFailed": "模板下载失败：{{message}}",
+      "previewFailed": "CSV 预览失败：{{message}}",
+      "importFailed": "导入失败：{{message}}",
+      "imported": "导入完成：新增 {{create}} 条，更新 {{update}} 条。"
+    },
+    "reviewStatuses": {
+      "not_submitted": "未提交",
+      "in_review": "审核中",
+      "approved": "已审核",
+      "changes_requested": "需修改",
+      "rejected": "已拒绝"
+    },
+    "publishStatuses": {
+      "draft": "草稿",
+      "scheduled": "待发布",
+      "published": "已发布",
+      "offline": "已下线"
+    }
+  },
+  "publishedTracking": {
+    "title": "已发布页面追踪",
+    "subtitle": "追踪已发布页面在当前筛选范围内的 AI 引用表现。",
+    "tooltip": "发布页面管理中的话题是页面发布时的意向归属；本表的筛选话题来自实际引用该页面的 AI Response 所对应的 Prompt。若页面在多个话题下被引用，说明它产生了跨话题覆盖。",
+    "empty": "暂无已发布页面追踪数据。请先在“发布页面管理”中录入页面，或调整当前筛选条件。",
+    "unknownCategory": "未分类",
+    "managedTopicBadge": "管理：{{topic}}",
+    "triggeredTopicBadge": "触发：{{topic}}",
+    "table": {
+      "rank": "#",
+      "page": "页面",
+      "channel": "渠道",
+      "category": "分类",
+      "citations": "引用数",
+      "share": "份额",
+      "change": "变化",
+      "latest": "最近引用",
+      "actions": "操作"
+    },
+    "actions": {
+      "detail": "查看详情"
+    },
+    "variants": {
+      "title": "追踪 URL 变体",
+      "description": "系统自动纳入明确的追踪参数变体；确认或排除会按匹配键生效，同一匹配键下的原始 URL 会一起统计。",
+      "button": "URL 变体",
+      "pending": "待确认",
+      "pendingCount": "待确认 {{count}}",
+      "exact": "原始 URL",
+      "automatic": "系统匹配",
+      "confirmed": "已纳入",
+      "rejected": "已排除",
+      "citations": "{{count}} 次引用",
+      "matchKey": "匹配键：{{value}}",
+      "confirm": "纳入追踪",
+      "reject": "排除",
+      "restore": "重新纳入",
+      "empty": "当前筛选范围内暂无 URL 变体。",
+      "loadFailed": "URL 变体加载失败，请重试。",
+      "updateFailed": "更新 URL 追踪状态失败，请重试。"
+    },
+    "detail": {
+      "title": "发布页面详情",
+      "description": "当前筛选条件下的引用明细。",
+      "citations": "引用数",
+      "share": "引用份额",
+      "rank": "排名",
+      "latest": "最近引用",
+      "topics": "话题",
+      "platforms": "引用平台",
+      "countries": "国家",
+      "prompts": "触发 Prompt",
+      "promptCitations": "{{count}} 次引用",
+      "responses": "AI Response 与引用上下文",
+      "topicFilter": "话题筛选",
+      "platformFilter": "平台筛选",
+      "countryFilter": "国家筛选",
+      "allTopics": "全部话题",
+      "allPlatforms": "全部平台",
+      "allCountries": "全部国家",
+      "empty": "暂无详情数据。"
+    }
+  }
+}

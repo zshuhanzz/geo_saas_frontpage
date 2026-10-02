@@ -1,0 +1,132 @@
+{
+  "__doc": "静态报告列表页与详情页。包含今日报告状态、历史报告、快照渲染、数据完整度和本地交互文案。",
+  "list": {
+    "title": "报告",
+    "subtitle": "查看每日静态 GEO 报告快照。",
+    "todayTitle": "今日报告",
+    "snapshotTitle": "报告快照",
+    "day": {
+      "today": "今日",
+      "yesterday": "昨日"
+    },
+    "historyTitle": "历史报告",
+    "emptyHistory": "暂无历史报告",
+    "loading": "正在加载报告...",
+    "view": "查看报告",
+    "generateAndView": "生成并查看",
+    "waitingForData": "等待数据完成",
+    "retrySnapshot": "重试快照生成",
+    "open": "打开",
+    "refresh": "刷新",
+    "useYesterday": "生成昨日报告",
+    "lastGenerated": "最近生成",
+    "dataWindow": "数据窗口",
+    "windowOption": "{{count}} 天"
+  },
+  "status": {
+    "PENDING": "待生成",
+    "MATERIALIZING": "生成中",
+    "COMPLETED": "已完成",
+    "NOT_READY": "数据未完成",
+    "FAILED": "生成失败"
+  },
+  "detail": {
+    "loading": "正在加载报告...",
+    "notFound": "报告不存在",
+    "back": "返回报告列表",
+    "singleDayNotice": "当前报告基于单日数据生成，趋势图已切换为排名和分布视图。",
+    "window": "数据窗口",
+    "windowDays": "{{count}} 天窗口",
+    "materializedAt": "生成时间",
+    "presentationView": "演示视图",
+    "exportHtml": "导出 HTML",
+    "exportStarted": "HTML 文件已开始下载。",
+    "search": "筛选当前表格",
+    "showAll": "展开全部",
+    "showLess": "收起",
+    "noRows": "暂无数据",
+    "listLoadError": "冻结列表加载失败，系统没有使用快照数据静默替代。",
+    "sortingLegacyUnavailable": "此历史快照不支持指标全局排序。重新生成报告后可冻结完整可排序列表；当前页面不会读取实时数据补齐。",
+    "pagination": {
+      "previous": "上一页",
+      "next": "下一页"
+    },
+    "sections": {
+      "visibility": "可见度",
+      "citation": "引用",
+      "sentiment": "情感",
+      "promptTopic": "Prompt 与 Topic",
+      "appendix": "附录"
+    },
+    "filters": {
+      "title": "报告筛选",
+      "topics": "Topics",
+      "platforms": "平台",
+      "selectAll": "全选",
+      "reset": "重置筛选",
+      "notMaterialized": "该快照未冻结 Topic 与平台筛选维度，因此无法使用这些筛选项。"
+    }
+  },
+  "comparison": {
+    "currentPeriod": "当前周期",
+    "vsPrevious": "较上一周期",
+    "legacyUnavailable": "此历史快照不包含上一周期比较。报告仍使用冻结数据，不会读取实时数据。",
+    "incompleteBaseline": "生成快照时部分上一周期基线不可用；缺失的比较显示为 —。",
+    "previousPeriod": "上一周期"
+  },
+  "readiness": {
+    "raw_results_missing": "该日期尚未采集到原始结果。",
+    "analyzed_results_missing": "该日期数据尚未完成分析。",
+    "same_day_analyzed_results_missing": "该日期尚无已分析结果。",
+    "visibility_missing": "可见度数据尚未生成。",
+    "citation_missing": "引用数据尚未生成。",
+    "sentiment_missing": "情感数据尚未生成。",
+    "snapshot_materialization_failed": "报告快照生成失败。",
+    "materialization_in_progress": "报告快照正在生成中。",
+    "materialization_capacity_busy": "当前已有另一份报告正在生成，请稍后重试。"
+  },
+  "sentiment": {
+    "collapseTheme": "收起 {{theme}} 的示例",
+    "emptyThemes": "暂无已抽取的情感主题。请先运行 Analyzer 生成情感数据。",
+    "expandTheme": "展开 {{theme}} 的示例",
+    "showMoreThemes": "查看更多（剩余 {{count}} 条）"
+  },
+  "completeness": {
+    "title": "数据完整度",
+    "rawResults": "原始结果",
+    "analyzedResults": "已分析结果",
+    "sameDayAnalyzed": "今日已分析",
+    "analyzedPct": "分析完成率"
+  },
+  "fields": {
+    "mentions": "提及数",
+    "citations": "引用数",
+    "averagePosition": "平均位置",
+    "ownShare": "自有占比",
+    "confidence": "置信度",
+    "count": "数量",
+    "date": "日期",
+    "status": "状态",
+    "action": "操作",
+    "window": "时长",
+    "brand": "品牌",
+    "role": "角色",
+    "domain": "域名",
+    "category": "类别",
+    "page": "页面",
+    "theme": "主题",
+    "sentiment": "情感",
+    "example": "示例",
+    "platform": "平台",
+    "product": "产品",
+    "prompt": "Prompt",
+    "prompts": "Prompt 数量",
+    "topic": "Topic",
+    "intent": "意图",
+    "country": "国家",
+    "language": "语言",
+    "positive": "正向",
+    "negative": "负向",
+    "allDates": "全部日期"
+  }
+}

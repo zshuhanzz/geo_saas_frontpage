@@ -1,0 +1,329 @@
+{
+  "__doc": "Content Pipeline：ContentTaskModal 7 步向导 + ContentPipelineModal + 7 个 nodes/*。B5 填充的是最高可见字段（步骤标题、主 CTA、section header、goal/contentType 卡片）；精细 placeholder / tooltip 作受控债务。",
+  "taskModal": {
+    "persona": "内容策略师",
+    "intro": "让我帮你配置内容生成任务，基于 RAFT 方法论为品牌产出高质量的 AI 搜索优化内容。",
+    "steps": {
+      "goal": "内容目标",
+      "type": "内容类型",
+      "targetConfig": "目标配置",
+      "promptSelect": "Prompt 选择",
+      "dataStrategy": "数据 & 策略",
+      "modelSchedule": "模型 & 定时",
+      "confirm": "确认执行"
+    },
+    "goals": {
+      "selectTitle": "选择内容目标",
+      "selectHint": "内容目标决定了推荐的内容类型、数据领域和 Prompt 排序策略",
+      "activatedBadge": "「{{label}}」模式已激活",
+      "activatedDesc": "后续步骤将自动预选：推荐内容类型「{{type}}」、数据领域「{{domains}}」、Prompt 按 {{sort}} 排序",
+      "skipHint": "可跳过此步骤，手动配置后续选项",
+      "recommendedTypes": "· 推荐 {{count}} 种内容类型",
+      "items": {
+        "visibility": { "label": "可见度提升", "desc": "提升品牌在 AI 搜索中被提及的频率和位置排名" },
+        "citation": { "label": "引用优化", "desc": "增加品牌被 AI 引擎作为推荐来源引用的次数" },
+        "sentiment": { "label": "情绪修复", "desc": "改善品牌在 AI 引擎回答中的负面描述和情感倾向" },
+        "general": { "label": "全面内容优化", "desc": "多维度提升品牌在 AI 搜索中的综合表现" }
+      }
+    },
+    "contentTypes": {
+      "title": "内容类型",
+      "subtitle": "选择要生成的内容类型",
+      "recommended": "⭐ 推荐",
+      "items": {
+        "faq": { "label": "FAQ 内容", "desc": "生成常见问题与回答，提升品牌在 AI 搜索中的结构化信息" },
+        "aeo_article": { "label": "AEO 文章", "desc": "AI 引擎优化文章，针对 AI 搜索引擎的引用和推荐优化" },
+        "article": { "label": "SEO 文章", "desc": "搜索引擎优化文章，提升传统搜索和 AI 搜索的可见度" },
+        "recommendations": { "label": "优化建议", "desc": "基于数据分析的内容优化建议和行动计划" },
+        "brief": { "label": "Content Brief", "desc": "内容简报，为内容团队提供创作方向和关键信息" },
+        "comparison": { "label": "产品对比/测评", "desc": "品牌 vs 竞品对比分析内容" },
+        "platform_post": { "label": "平台定制帖", "desc": "针对特定发布平台的格式化内容" },
+        "howto": { "label": "How-to 教程", "desc": "操作指南、使用教程" },
+        "listicle": { "label": "Listicle", "desc": "「Top N」类列表文章" }
+      }
+    },
+    "targetConfig": {
+      "topicLabel": "主题 / 话题（Instruction）",
+      "topicHint": "告诉 Anthony 内容的方向和主题",
+      "topicPlaceholder": "例如：扫地机器人宠物家庭场景、品牌在 AI 搜索中的可见度优化...",
+      "aiPlatforms": "目标 AI 平台",
+      "faqCount": "FAQ 数量",
+      "outputLanguage": "输出语言",
+      "factsTitle": "产品核心事实（Facts Input）",
+      "factsBadge": "重要",
+      "factsHint": "输入产品的真实规格和特性，确保 AI 生成的内容基于事实，不产生幻觉。这些信息将作为 Hard Facts 注入生成 Prompt。",
+      "facts": {
+        "specs": "产品规格参数",
+        "specsPlaceholder": "例如：旗舰机型 X1 Pro，11000Pa 吸力，LiDAR + 3D ToF 导航，60 天免维护自清洁基站...",
+        "features": "核心特性 / 卖点",
+        "featuresPlaceholder": "例如：PreciSense LiDAR 导航、3D 障碍物识别、彩色触控屏、自动集尘...",
+        "differentiators": "差异化优势（vs 竞品）",
+        "differentiatorsPlaceholder": "例如：相比竞品 A，核心指标更高；相比竞品 B，某项功能更专业..."
+      },
+      "scopeTitle": "品牌 & 竞品范围",
+      "scopeHint": "选择竞品后，生成内容将包含针对性的对比论述",
+      "extraNote": "附加说明（可选）",
+      "extraNotePlaceholder": "任何特殊要求、风格偏好、需要强调的点..."
+    },
+    "promptSelect": {
+      "title": "选择目标 Prompt",
+      "hint": "选择表现较差的 Prompt 进行定向内容优化，留空则按整体品牌策略生成",
+      "goalHint": "基于「{{label}}」目标，Prompt 已按 <1>{{sort}}</1> 从差到好排列，优先优化排名靠前的 Prompt",
+      "searchPlaceholder": "搜索 Prompt...",
+      "empty": "暂无 Prompt 数据",
+      "mentionLabel": "提及 {{count}}",
+      "citationLabel": "引用 {{count}}",
+      "negativeLabel": "负面 {{count}}",
+      "selectedSummary": "已选择 {{count}} 个 Prompt"
+    },
+    "dataStrategy": {
+      "depthTitle": "内容深度",
+      "focusTitle": "自定义关注点",
+      "focusHint": "添加你特别关注的话题关键词",
+      "focusPlaceholder": "例如：价格竞争力",
+      "focusEmpty": "暂无关注点",
+      "domainsTitle": "数据领域",
+      "recommendedBadge": "已根据目标推荐",
+      "rangeTitle": "数据范围",
+      "rangeFrom": "起始日期",
+      "rangeTo": "结束日期",
+      "strategyPromptTitle": "策略 Prompt",
+      "methodToggleOpen": "📖 RAFT 方法论参考",
+      "methodToggleClose": "收起方法论",
+      "strategyHint": "策略 Prompt 定义了 LLM 生成内容时的方法论和评分标准。点击方法论片段可快速插入",
+      "methodHeader": "RAFT 方法论参考 — 点击可插入 Prompt",
+      "strategyPromptPlaceholder": "输入策略 Prompt，指导 LLM 如何生成内容...",
+      "expandEdit": "展开编辑",
+      "restoreDefault": "恢复模板默认 Prompt",
+      "dialogTitle": "编辑策略 Prompt",
+      "dialogHeader": "编辑策略 Prompt",
+      "dialogConfirm": "确定"
+    },
+    "depth": {
+      "quick": { "label": "快速生成", "desc": "简明扼要，适合快速产出" },
+      "standard": { "label": "标准生成", "desc": "完整内容，覆盖 RAFT 四维度" },
+      "deep": { "label": "深度优化", "desc": "逐 Prompt 定制，多轮打磨" }
+    },
+    "modelSchedule": {
+      "title": "生成模型 & 定时任务",
+      "subtitle": "选择 LLM 模型并配置是否自动运行",
+      "modelLabel": "生成模型：",
+      "scheduleToggle": "设为定期自动运行（Cloud Scheduler）",
+      "cronLabel": "Cron Expression（例：0 9 * * 1 每周一早 9 点）",
+      "cronPlaceholder": "例：0 9 * * 1",
+      "cronHint": "自动任务后台运行，每次运行将记录于历史列表中。"
+    },
+    "confirm": {
+      "title": "确认执行",
+      "flowPreview": "执行流程预览",
+      "flowSteps": {
+        "strategyAnalysis": "策略分析",
+        "promptDiscovery": "Prompt 发现",
+        "contentPlan": "内容规划",
+        "contentGen": "内容生成",
+        "qualityReview": "质量评审",
+        "reviseRound1": "第一轮 Revise",
+        "qualityRecheck": "修订后复查",
+        "reviseRound2": "第二轮 Revise",
+        "qualityRecheck2": "第二轮后复查"
+      },
+      "flowHint": "点击「开始生成」后将按以上流程自动运行；若 Quality Gate 未通过，会进入最多两轮定向修订。",
+      "summaryTitle": "任务配置摘要",
+      "summary": {
+        "goal": "内容目标",
+        "type": "内容类型",
+        "topic": "主题",
+        "topicAuto": "（自动）",
+        "platform": "目标平台",
+        "count": "生成数量",
+        "facts": "产品事实",
+        "factsFilled": "已填写",
+        "factsEmpty": "未填写",
+        "brandPeer": "品牌/竞品",
+        "targetPrompt": "目标 Prompt",
+        "targetPromptCount": "{{count}} 个",
+        "targetPromptAll": "全局",
+        "domains": "数据领域",
+        "range": "数据范围",
+        "depth": "内容深度",
+        "focus": "关注点",
+        "language": "语言",
+        "model": "生成模型",
+        "modelDefault": "默认",
+        "strategyPrompt": "策略 Prompt",
+        "strategyPromptLen": "{{count}} 字",
+        "strategyPromptEmpty": "（空）"
+      }
+    },
+    "footer": {
+      "prev": "上一步",
+      "cancel": "取消",
+      "next": "下一步",
+      "skip": "跳过",
+      "save": "保存",
+      "start": "开始生成"
+    },
+    "runningCard": {
+      "closeHint": "您可以关闭此窗口，任务会在后台继续运行",
+      "close": "关闭"
+    },
+    "resultCard": {
+      "raftQuality": "RAFT 质量评分",
+      "overall": "综合评分",
+      "citationAnalysis": "Citation Analysis 摘要",
+      "generatedContent": "生成内容",
+      "recommendations": "优化建议",
+      "improvements": "改进建议",
+      "viewReportDetail": "查看报告详情",
+      "exportHtml": "导出 HTML",
+      "close": "关闭"
+    },
+    "toasts": {
+      "createFailed": "创建任务失败：{{message}}",
+      "updateFailed": "更新任务失败：{{message}}"
+    },
+    "raftCategories": {
+      "raft4": "RAFT 四维度",
+      "strategy": "内容策略"
+    },
+    "worstSort": {
+      "visibility": "Visibility 最差",
+      "citation": "Citation 最差",
+      "sentiment": "Sentiment 最差"
+    }
+  },
+  "pipelineModal": {
+    "dialogTitle": "Anthony 内容策略师 - {{template}}",
+    "dialogDescription": "配置内容生成任务并执行。",
+    "persona": "内容策略师",
+    "intro": "让我们配置本次内容生成任务。我会基于分析报告为你调整优化策略。",
+    "genModelLabel": "生成模型：",
+    "searchGroundingToggle": "开启 Search Grounding（联网检索）",
+    "searchGroundingHint": "适合产品、竞品、价格、发布时间、行业动态等需要最新事实的内容。开启后 Gemini 会按需联网检索，可能增加生成耗时和费用。",
+    "scheduleToggle": "设为定期自动运行（Cloud Scheduler）",
+    "cronPlaceholder": "例：0 9 * * 1",
+    "cronHintIntro": "自动任务将在后台运行，每次运行会记录在历史列表中。Cron 示例：",
+    "cronHintOutro": "每周一上午 9 点。",
+    "loadingContext": "加载任务上下文中…",
+        "toasts": {
+            "loadAnalysisFailed": "加载分析报告失败",
+            "taskStarted": "内容生成任务已启动",
+            "draftSaved": "草稿已保存",
+            "taskCreateFailed": "任务创建失败：{{message}}",
+            "saveFailed": "保存失败：{{message}}",
+            "citationPreflightRequired": "请先运行 Citation Analysis，再执行这个 AI-citable 模板。",
+            "redditRulesReviewRequired": "请先处理 Reddit Discovery 中未验证的社区规则。",
+            "redditDiscoveryStale": "Reddit Discovery 已过期，请重新运行后再执行。",
+            "redditArtifactsRequired": "请先生成并确认 Artifact Preparation，再执行这个 Reddit 模板。",
+            "redditArtifactsStale": "Artifact Preparation 已过期，请重新生成或确认编辑后再执行。"
+        },
+    "defaultTaskName": "内容生成",
+    "draftSuffix": "草稿",
+    "actions": {
+      "saveDraft": "保存草稿",
+      "saving": "保存中…",
+      "confirmExecute": "确认并执行",
+      "executing": "执行中…"
+    }
+  },
+  "nodes": {
+    "analyzerImport": {
+      "title": "引入分析报告",
+      "optionalBadge": "可选",
+      "intro": "选择一个已完成的「优化机会发现」分析任务，其结果将自动填充后续步骤。",
+      "loading": "正在加载分析任务...",
+      "empty": "暂无已完成的「优化机会发现」分析任务。",
+      "emptyHint": "建议先运行一次「优化机会发现」分析，获取数据驱动的推荐。",
+      "defaultTaskName": "优化机会发现",
+      "opportunityCount": "{{count}} 机会",
+      "skipButton": "跳过，手动配置"
+    },
+    "contentGoals": {
+      "title": "内容目标",
+      "subtitle": "选择本次内容生成要优化的指标和子目标。",
+      "sectionTitle": "成功指标（Metrics）& 子目标（Subgoals）",
+      "autofillHint": "已从分析报告预填推荐目标，你可以自由调整。"
+    },
+    "contentType": {
+      "title": "内容类型",
+      "items": {
+        "faq": { "label": "FAQ", "desc": "结构化问答，AI 引擎高度偏好" },
+        "aeo_article": { "label": "AEO 文章", "desc": "AI Engine Optimized 长文，800–1200 字" },
+        "article": { "label": "SEO 文章", "desc": "传统 SEO 优化文章" },
+        "brief": { "label": "Content Brief", "desc": "详细内容大纲，适合交给内容团队" },
+        "comparison": { "label": "产品对比/测评", "desc": "品牌 vs 竞品对比分析内容" },
+        "platform_post": { "label": "平台定制帖", "desc": "针对特定发布平台的格式化内容" },
+        "howto": { "label": "How-to 教程", "desc": "操作指南、使用教程" },
+        "listicle": { "label": "Listicle", "desc": "「Top N」类列表文章" }
+      }
+    },
+    "promptLink": {
+      "title": "Prompt 关联",
+      "lockedBadge": "锁定模式",
+      "lockedHint": "已关联 {{count}} 个 Prompts（来自分析报告）。如需修改，请回到第一步更换分析报告或跳过。",
+      "manualHint": "选择本次内容生成要针对的 AI 搜索 Prompts。",
+      "loading": "加载中...",
+      "mentionLabel": "提及 {{count}}",
+      "citationLabel": "引用 {{count}}",
+      "negativeLabel": "负面 {{count}}"
+    },
+    "strategy": {
+      "generating": "正在生成策略组合...",
+      "needPrior": "请先完成前序步骤以生成策略。",
+      "title": "内容策略",
+      "tweak": "微调",
+      "regenerate": "重新生成",
+      "engineDistribution": "AI 引擎分布",
+      "tweakHint": "输入你的调整建议，系统会据此重新生成策略：",
+      "tweakPlaceholder": "例如：去掉第 2 条策略、增加口语化的调性...",
+      "applyTweak": "应用调整"
+    },
+    "confirm": {
+      "title": "确认执行",
+      "summary": {
+        "source": "来源分析报告",
+        "sourceEmpty": "无（手动配置）",
+        "metrics": "优化指标",
+        "metricsEmpty": "未选择",
+        "subgoals": "子目标",
+        "subgoalsEmpty": "未选择",
+        "contentType": "内容类型",
+        "strategyCount": "策略数量",
+        "strategyCountValue": "{{count}} 条",
+        "aiPlatforms": "AI 平台",
+        "aiPlatformsEmpty": "未选择",
+        "publishPlatform": "发布平台",
+        "publishPlatformEmpty": "未选择",
+        "language": "语言",
+        "count": "生成数量",
+        "linkedPrompts": "关联 Prompts",
+        "linkedPromptsValue": "{{count}} 个"
+      },
+      "saveDraft": "保存草稿",
+      "executing": "执行中...",
+      "confirmExec": "确认并执行"
+    },
+    "genConfig": {
+      "title": "生成配置",
+      "autofillBadge": "已根据分析报告自动推荐",
+      "autofillHint": "各发布平台 AI 引擎分布",
+      "aiPlatformsLabel": "目标 AI 平台",
+      "publishPlatformsLabel": "发布平台",
+      "languageLabel": "语言",
+      "countLabel": "生成数量",
+      "brandFactsToggle": "查看/补充品牌信息",
+      "autoReason": "基于分析报告：「{{platform}}」引用占比 {{share}}%，主要 AI 引擎为 {{engines}}",
+      "productSpecs": "产品规格",
+      "productSpecsPlaceholder": "核心参数、技术指标...",
+      "keyFeatures": "核心功能",
+      "keyFeaturesPlaceholder": "产品卖点、独特功能...",
+      "differentiators": "差异化优势",
+      "differentiatorsPlaceholder": "相比竞品的核心优势..."
+    }
+  },
+  "domains": {
+    "visibility": "可见度",
+    "citation": "引用",
+    "sentiment": "情感"
+  }
+}

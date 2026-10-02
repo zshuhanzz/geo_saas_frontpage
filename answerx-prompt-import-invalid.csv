@@ -1,0 +1,4 @@
+Customer Name,Topic,Product,Prompt,AI Platforms,Countries,Language,Intent
+Another Workspace,AI Engine Optimization (AEO),AEO Audit Tool,Codex E2E invalid workspace verification,chatgpt,US,en-US,Solution Discovery
+AnswerX,AI Engine Optimization (AEO),AEO Audit Tool,[REPLACE WITH YOUR PROMPT],chatgpt|not-a-platform,US,en-US,Solution Discovery
+AnswerX,AI Engine Optimization (AEO),Unknown Product,Codex E2E invalid allowlist verification,chatgpt,CN,xx-XX,Not Configured

@@ -1,0 +1,71 @@
+<h2>新建 Workspace：功能授权体验</h2>
+<p class="subtitle">当前 Admin 使用一个简短的 “Create New Client” Dialog。下面比较三种在现有体验上增加功能授权的方式。</p>
+
+<div class="cards">
+  <div class="card" data-choice="workspace-inline-preset" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:20px;background:#f7f8fa">
+      <div style="max-width:460px;margin:auto;background:white;border:1px solid #e5e7eb;border-radius:14px;padding:20px;box-shadow:0 12px 35px rgba(15,23,42,.08)">
+        <h3 style="margin-top:0">Create New Workspace</h3>
+        <div class="label">Basic information</div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px;margin:8px 0 18px">
+          <div class="mock-input">Workspace name</div>
+          <div class="mock-input">Prompt quota · 50</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="label">Feature package</div>
+          <span style="font-size:12px;color:#64748b">7 / 11 features</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 14px">
+          <div style="border:2px solid #16a34a;background:#f0fdf4;border-radius:9px;padding:10px;font-size:12px"><b>Analytics</b><br><span style="color:#64748b">查看与监测</span></div>
+          <div style="border:1px solid #e5e7eb;border-radius:9px;padding:10px;font-size:12px"><b>Full Platform</b><br><span style="color:#64748b">全部功能</span></div>
+          <div style="border:1px solid #e5e7eb;border-radius:9px;padding:10px;font-size:12px"><b>Custom</b><br><span style="color:#64748b">逐项选择</span></div>
+        </div>
+        <div style="border:1px solid #e5e7eb;border-radius:9px;padding:12px;font-size:12px">
+          <div style="display:flex;justify-content:space-between"><b>已包含：数据分析与监测</b><span>全部 6 项 ✓</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px"><span>Actions</span><span>配置（只读） · 其余待解锁</span></div>
+          <div style="margin-top:10px;color:#15803d;font-weight:600">Customize feature selection →</div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button class="mock-button" style="background:#fff;color:#334155;border:1px solid #cbd5e1">Cancel</button><button class="mock-button">Create Workspace</button></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · 套餐优先，可随时微调（推荐）</h3>
+      <p>沿用当前单 Dialog。套餐只是选择起点；展开 Customize 后可以逐项勾选，改动后自动标记为 Custom。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="workspace-stepper" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:20px;background:#f7f8fa">
+      <div style="max-width:460px;margin:auto;background:white;border:1px solid #e5e7eb;border-radius:14px;padding:20px">
+        <div style="display:flex;gap:8px;font-size:12px;margin-bottom:18px"><b style="color:#16a34a">1 Basic</b><span>—</span><b style="color:#16a34a">2 Features</b><span>—</span><span style="color:#94a3b8">3 Review</span></div>
+        <h3>Choose features</h3>
+        <div style="border:1px solid #e5e7eb;border-radius:9px;padding:12px;margin-top:12px">
+          <b>▾ 数据分析与监测</b>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px;font-size:12px"><span>☑ 总览</span><span>☑ 可见度</span><span>☑ 引用</span><span>☑ 情感</span><span>☑ Prompt</span><span>☑ 报告</span></div>
+        </div>
+        <div style="border:1px solid #e5e7eb;border-radius:9px;padding:12px;margin-top:10px;font-size:12px"><b>▸ Actions</b> · 1 / 5 selected</div>
+        <div style="display:flex;justify-content:space-between;margin-top:18px"><button class="mock-button" style="background:#fff;color:#334155;border:1px solid #cbd5e1">Back</button><button class="mock-button">Review</button></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · 三步创建向导</h3>
+      <p>引导清晰、适合未来增加套餐价格和合同信息，但比当前创建流程更重，开发和维护成本更高。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="workspace-after-create" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:20px;background:#f7f8fa">
+      <div style="max-width:460px;margin:auto;background:white;border:1px solid #e5e7eb;border-radius:14px;padding:20px">
+        <h3 style="margin-top:0">Workspace created</h3>
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:13px;font-size:13px"><b>Feature access is not configured</b><br><span style="color:#64748b">Users cannot enter product modules until authorization is completed.</span></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:18px"><button class="mock-button">Configure Access Control</button></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C · 创建后再授权</h3>
+      <p>新建 Dialog 最简单，但会产生“已创建、未授权”的中间状态，容易遗漏或造成客户首次登录全被锁定。</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:20px">请点击一个方案。推荐 A：保持当前 Admin 操作节奏，同时兼顾套餐效率与逐项控制。</p>

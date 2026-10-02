@@ -1,0 +1,59 @@
+<h2>待解锁与只读状态（无申请流程）</h2>
+<p class="subtitle">所有 Sidebar 项目照常显示并可进入；页面根据原因展示不同提示。背景是静态预览或骨架，不请求真实受限数据。</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Workspace 尚未购买功能</div>
+    <div class="mockup-body" style="position:relative;min-height:430px;overflow:hidden;background:#f8fafc">
+      <div style="position:absolute;inset:0;filter:blur(7px);opacity:.42;padding:24px">
+        <div style="height:42px;background:#cbd5e1;border-radius:8px;margin-bottom:16px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+          <div style="height:110px;background:#dbe4ea;border-radius:10px"></div>
+          <div style="height:110px;background:#dbe4ea;border-radius:10px"></div>
+          <div style="height:110px;background:#dbe4ea;border-radius:10px"></div>
+        </div>
+        <div style="height:190px;background:#e2e8f0;border-radius:10px;margin-top:14px"></div>
+      </div>
+      <div style="position:absolute;inset:0;background:rgba(255,255,255,.55)"></div>
+      <div style="position:relative;width:330px;margin:76px auto 0;background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px;box-shadow:0 18px 55px rgba(15,23,42,.13)">
+        <span style="display:inline-block;padding:4px 9px;border-radius:999px;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:700">待解锁</span>
+        <h3 style="font-size:23px;margin:18px 0 8px">内容 Agent</h3>
+        <p style="font-size:13px;color:#64748b;line-height:1.65">基于 Citation 数据、内容策略和质量检查生成适合目标平台发布的内容。</p>
+        <div style="margin-top:56px;border-top:1px solid #eef2f7;padding-top:14px;font-size:13px;font-weight:600;color:#334155">联系客户经理申请购买或升级套餐</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Workspace 已购买，但 Viewer 不可执行</div>
+    <div class="mockup-body" style="position:relative;min-height:430px;overflow:hidden;background:#f8fafc">
+      <div style="position:absolute;inset:0;opacity:.36;padding:24px">
+        <div style="height:42px;background:#cbd5e1;border-radius:8px;margin-bottom:16px"></div>
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:14px">
+          <div style="height:310px;background:#e2e8f0;border-radius:10px"></div>
+          <div style="height:310px;background:#dbe4ea;border-radius:10px"></div>
+        </div>
+      </div>
+      <div style="position:absolute;inset:0;background:rgba(255,255,255,.66)"></div>
+      <div style="position:relative;width:330px;margin:76px auto 0;background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px;box-shadow:0 18px 55px rgba(15,23,42,.13)">
+        <span style="display:inline-block;padding:4px 9px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700">仅 Workspace Admin 可用</span>
+        <h3 style="font-size:23px;margin:18px 0 8px">分析 Agent</h3>
+        <p style="font-size:13px;color:#64748b;line-height:1.65">当前账号为 Viewer，可以查看分析数据，但不能创建或运行 Agent 任务。</p>
+        <div style="margin-top:56px;border-top:1px solid #eef2f7;padding-top:14px;font-size:13px;font-weight:600;color:#334155">如需使用，请联系 Workspace 管理员调整权限</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top:22px">
+  <div class="mockup-header">Viewer 查看配置页面</div>
+  <div class="mockup-body">
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:12px 14px;color:#1e40af;font-size:13px"><b>只读模式</b>　你可以查看 Workspace 配置。如需修改，请联系 Workspace 管理员。</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;opacity:.72">
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:16px"><b>品牌与产品</b><p style="color:#64748b;font-size:12px">当前配置内容正常展示</p><button class="mock-button" disabled style="opacity:.45">Edit</button></div>
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:16px"><b>Topics 与 Personas</b><p style="color:#64748b;font-size:12px">新增、删除、自动发现均禁用</p><button class="mock-button" disabled style="opacity:.45">Add</button></div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:20px">这三个状态均没有可点击的申请按钮，也不会创建申请记录。</p>

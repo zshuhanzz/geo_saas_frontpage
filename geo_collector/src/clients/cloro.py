@@ -33,9 +33,17 @@ class CloroPlatformStrategy(ABC):
         pass
 
     @abstractmethod
-    def get_default_include_options(self) -> Dict[str, bool]:
+    def get_default_include_options(self) -> Dict[str, Any]:
         """返回该平台默认的 'include' 参数配置。"""
         pass
+
+    def build_payload(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Build the provider-specific Cloro request payload."""
+        return {
+            "prompt": task["final_prompt"],
+            "country": task.get("country", "US"),
+            "include": self.get_default_include_options()
+        }
 
 # --- Concrete Strategies ---
 
@@ -49,7 +57,7 @@ class ChatGPTStrategy(CloroPlatformStrategy):
     def get_async_task_type(self) -> str:
         return "CHATGPT"
 
-    def get_default_include_options(self) -> Dict[str, bool]:
+    def get_default_include_options(self) -> Dict[str, Any]:
         return {
             "markdown": False,
             "rawResponse": False,
@@ -66,7 +74,7 @@ class GeminiStrategy(CloroPlatformStrategy):
     def get_async_task_type(self) -> str:
         return "GEMINI"
 
-    def get_default_include_options(self) -> Dict[str, bool]:
+    def get_default_include_options(self) -> Dict[str, Any]:
         return {
             "markdown": False,
             "html": False
@@ -82,7 +90,7 @@ class GoogleAiModeStrategy(CloroPlatformStrategy):
     def get_async_task_type(self) -> str:
         return "AIMODE"
 
-    def get_default_include_options(self) -> Dict[str, bool]:
+    def get_default_include_options(self) -> Dict[str, Any]:
         return {
             "markdown": False
         }
@@ -97,10 +105,35 @@ class PerplexityStrategy(CloroPlatformStrategy):
     def get_async_task_type(self) -> str:
         return "PERPLEXITY"
 
-    def get_default_include_options(self) -> Dict[str, bool]:
+    def get_default_include_options(self) -> Dict[str, Any]:
         return {
+            "html": False,
             "markdown": False,
-            "sources": True
+            "rawResponse": False,
+        }
+
+class GoogleAIOverviewStrategy(CloroPlatformStrategy):
+    def get_platform_key(self) -> str:
+        return "aioverview"
+
+    def get_sync_endpoint_suffix(self) -> str:
+        return "/v1/monitor/google"
+
+    def get_async_task_type(self) -> str:
+        return "GOOGLE"
+
+    def get_default_include_options(self) -> Dict[str, Any]:
+        return {
+            "aioverview": {
+                "markdown": True
+            }
+        }
+
+    def build_payload(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "query": task["final_prompt"],
+            "country": task.get("country", "US"),
+            "include": self.get_default_include_options()
         }
 
 # --- Context / Service ---
@@ -127,13 +160,19 @@ class CloroService:
         self._register_strategy(GeminiStrategy())
         self._register_strategy(GoogleAiModeStrategy())
         self._register_strategy(PerplexityStrategy())
+        self._register_strategy(GoogleAIOverviewStrategy())
+        self._register_strategy_alias("ai_overview", "aioverview")
+        self._register_strategy_alias("google_ai_overview", "aioverview")
 
     def _register_strategy(self, strategy: CloroPlatformStrategy):
         self._strategies[strategy.get_platform_key()] = strategy
 
+    def _register_strategy_alias(self, alias: str, platform_key: str):
+        self._strategies[alias] = self._strategies[platform_key]
+
     def _get_strategy(self, platform: str) -> CloroPlatformStrategy:
         """根据平台名称获取对应的策略对象。"""
-        key = platform.lower()
+        key = platform.lower().replace(" ", "_").replace("-", "_")
         strategy = self._strategies.get(key)
         if not strategy:
             logger.warning(f"[CLORO] 未知平台 '{platform}'，使用 ChatGPT 策略")
@@ -151,7 +190,7 @@ class CloroService:
         
         Args:
             client: httpx AsyncClient
-            task: 任务数据 (包含 task_id, platform, prompt_text 等)
+            task: 任务数据 (包含 task_id, platform, final_prompt 等)
             call_index: 第几次调用 (1 ~ M)，用于区分同一 task 的多次调用
         
         Payload 结构 (符合官方文档):
@@ -190,14 +229,12 @@ class CloroService:
                 "url": self._construct_webhook_url(task_id, call_index)
             },
             "payload": {
-                "prompt": task["prompt_text"],
-                "country": task.get("country", "US"),
-                "include": strategy.get_default_include_options()
+                **strategy.build_payload(task)
             }
         }
         
         # 日志：记录关键信息和 Payload 预览
-        prompt_preview = (task['prompt_text'][:50] + '...') if len(task['prompt_text']) > 50 else task['prompt_text']
+        prompt_preview = (task['final_prompt'][:50] + '...') if len(task['final_prompt']) > 50 else task['final_prompt']
         logger.info(f"[CLORO-S1] 发送异步任务 | task_id={task_id} | call={call_index} | platform={platform} | prompt={prompt_preview}")
         logger.debug(f"[CLORO-S1] Full Payload for {task_id}:\n{json.dumps(payload, indent=2)}")
 
@@ -245,9 +282,7 @@ class CloroService:
         
         # 2. 构建 Payload (扁平结构)
         payload = {
-            "prompt": task["prompt_text"],
-            "country": task.get("country", "US"),
-            "include": strategy.get_default_include_options()
+            **strategy.build_payload(task)
         }
 
         logger.info(f"[CLORO-SYNC-S1] 发送同步任务 | task_id={task_id} | platform={platform}")

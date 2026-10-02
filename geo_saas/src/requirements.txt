@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+asyncpg
+pydantic
+google-genai
+google-auth>=2.0.0
+google-cloud-pubsub
+httpx
+python-multipart

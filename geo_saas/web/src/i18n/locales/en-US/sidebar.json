@@ -1,0 +1,40 @@
+{
+  "__doc": "Sidebar (workspace selector, Dashboards / Agents nav, collapse / expand, Settings, Logout) plus the top Header page titles for full-page routes.",
+  "workspace": {
+    "placeholder": "Select Workspace",
+    "loading": "Loading...",
+    "empty": "No workspaces found"
+  },
+  "groups": {
+    "dashboards": "Dashboards",
+    "agents": "Agents"
+  },
+  "nav": {
+    "overview": "Overview",
+    "visibility": "Visibility",
+    "citation": "Citation",
+    "sentiment": "Sentiment",
+    "prompts": "Prompt",
+    "reports": "Reports",
+    "tracking": "Setup",
+    "analysis": "Analysis",
+    "content": "Content",
+    "chat": "Chat with Anthony",
+    "training": "Train Anthony",
+    "settings": "Settings",
+    "knowledge": "Knowledge"
+  },
+  "controls": {
+    "collapse": "Collapse",
+    "expand": "Expand sidebar"
+  },
+  "user": {
+    "signOutTooltip": "{{name}} — Sign out"
+  },
+  "pageTitles": {
+    "answerEngineInsights": "Answer Engine Insights",
+    "trackingStrategy": "Tracking Strategy",
+    "agents": "Agents",
+    "trainAgent": "Train Agent"
+  }
+}

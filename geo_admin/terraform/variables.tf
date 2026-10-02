@@ -48,8 +48,31 @@ variable "db_name" {
   default     = "answer-x-geo-db"
 }
 
+variable "google_oauth_client_id" {
+  description = "Google OAuth Web client ID used by the API to verify ID tokens"
+  type        = string
+}
+
 variable "allow_unauthenticated" {
   description = "Allow unauthenticated access to services"
   type        = bool
   default     = true
+}
+
+variable "allowed_origins" {
+  description = "Comma-separated CORS allowed origins for the API"
+  type        = string
+  default     = "http://localhost:5173"
+}
+
+variable "agent_api_url" {
+  description = "Public Agent API URL used by Admin-created Agent task schedulers"
+  type        = string
+  default     = ""
+}
+
+variable "system_invoker_service_account" {
+  description = "Service account email allowed to invoke system-triggered jobs"
+  type        = string
+  default     = ""
 }

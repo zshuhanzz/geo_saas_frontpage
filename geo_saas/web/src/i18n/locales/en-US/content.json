@@ -1,0 +1,329 @@
+{
+  "__doc": "Content Pipeline: ContentTaskModal 7-step wizard + ContentPipelineModal + 7 nodes/*. B5 populates the highest-visibility fields (step headings, primary CTAs, section headers, goal/type cards); finer placeholder/tooltip text is accepted debt.",
+  "taskModal": {
+    "persona": "Content Strategist",
+    "intro": "I'll help you configure the content generation task and produce high-quality AI-search-optimized content based on the RAFT framework.",
+    "steps": {
+      "goal": "Content Goal",
+      "type": "Content Type",
+      "targetConfig": "Target Config",
+      "promptSelect": "Prompt Selection",
+      "dataStrategy": "Data & Strategy",
+      "modelSchedule": "Model & Schedule",
+      "confirm": "Confirm & Run"
+    },
+    "goals": {
+      "selectTitle": "Select a content goal",
+      "selectHint": "The content goal drives the recommended content types, data domains, and Prompt sorting strategy",
+      "activatedBadge": "\"{{label}}\" mode activated",
+      "activatedDesc": "Later steps will pre-select: recommended content type \"{{type}}\", data domains \"{{domains}}\", Prompts sorted by {{sort}}",
+      "skipHint": "You can skip this step and configure the rest manually",
+      "recommendedTypes": "· {{count}} recommended content types",
+      "items": {
+        "visibility": { "label": "Boost Visibility", "desc": "Increase how often and how prominently your brand is mentioned in AI search" },
+        "citation": { "label": "Citation Optimization", "desc": "Increase how often AI engines cite your brand as a recommended source" },
+        "sentiment": { "label": "Sentiment Repair", "desc": "Improve negative coverage and tone toward your brand in AI answers" },
+        "general": { "label": "General Content Optimization", "desc": "Multi-dimensional overall improvement of your brand's AI-search presence" }
+      }
+    },
+    "contentTypes": {
+      "title": "Content Type",
+      "subtitle": "Pick the content type to generate",
+      "recommended": "⭐ Recommended",
+      "items": {
+        "faq": { "label": "FAQ Content", "desc": "Generate Q&A pairs to strengthen your brand's structured information in AI search" },
+        "aeo_article": { "label": "AEO Article", "desc": "AI-engine-optimized article targeting citations and recommendations from AI search engines" },
+        "article": { "label": "SEO Article", "desc": "SEO-optimized article boosting both traditional search and AI-search visibility" },
+        "recommendations": { "label": "Optimization Recommendations", "desc": "Data-driven content recommendations and action plans" },
+        "brief": { "label": "Content Brief", "desc": "Editorial brief with direction and key information for your content team" },
+        "comparison": { "label": "Comparison / Review", "desc": "Head-to-head comparison content between your brand and competitors" },
+        "platform_post": { "label": "Platform-specific Post", "desc": "Formatted content tailored to a specific publishing platform" },
+        "howto": { "label": "How-to Guide", "desc": "Step-by-step walkthroughs and tutorials" },
+        "listicle": { "label": "Listicle", "desc": "\"Top N\"-style list articles" }
+      }
+    },
+    "targetConfig": {
+      "topicLabel": "Topic / Subject (Instruction)",
+      "topicHint": "Tell Anthony the content's direction and subject",
+      "topicPlaceholder": "e.g. robot vacuums in pet homes, improving brand visibility in AI search...",
+      "aiPlatforms": "Target AI Platforms",
+      "faqCount": "FAQ Count",
+      "outputLanguage": "Output Language",
+      "factsTitle": "Product Facts (Facts Input)",
+      "factsBadge": "Important",
+      "factsHint": "Enter real product specs and features so generated content stays fact-grounded and free of hallucination. These are injected into the generation Prompt as Hard Facts.",
+      "facts": {
+        "specs": "Product Specs",
+        "specsPlaceholder": "e.g. X1 Pro flagship, 11000Pa suction, LiDAR + 3D ToF navigation, 60-day self-clean base...",
+        "features": "Key Features / Selling Points",
+        "featuresPlaceholder": "e.g. PreciSense LiDAR, 3D obstacle detection, color touch panel, auto dust collection...",
+        "differentiators": "Differentiators (vs. competitors)",
+        "differentiatorsPlaceholder": "e.g. higher core spec than competitor A, stronger capability than competitor B..."
+      },
+      "scopeTitle": "Brand & Competitor Scope",
+      "scopeHint": "When competitors are selected, generated content will include targeted comparisons",
+      "extraNote": "Additional notes (optional)",
+      "extraNotePlaceholder": "Any special requirements, style preferences, or points to emphasize..."
+    },
+    "promptSelect": {
+      "title": "Select target Prompts",
+      "hint": "Pick underperforming Prompts for targeted content optimization. Leave empty to generate based on the overall brand strategy.",
+      "goalHint": "Based on the \"{{label}}\" goal, Prompts are sorted by <1>{{sort}}</1> from worst to best — prioritize the top-ranked Prompts.",
+      "searchPlaceholder": "Search Prompts...",
+      "empty": "No Prompt data yet",
+      "mentionLabel": "Mentions {{count}}",
+      "citationLabel": "Citations {{count}}",
+      "negativeLabel": "Negative {{count}}",
+      "selectedSummary": "{{count}} Prompt(s) selected"
+    },
+    "dataStrategy": {
+      "depthTitle": "Content Depth",
+      "focusTitle": "Custom Focus",
+      "focusHint": "Add keywords you particularly want the content to emphasize",
+      "focusPlaceholder": "e.g. price competitiveness",
+      "focusEmpty": "No focus keywords yet",
+      "domainsTitle": "Data Domains",
+      "recommendedBadge": "Recommended by goal",
+      "rangeTitle": "Data Range",
+      "rangeFrom": "Start date",
+      "rangeTo": "End date",
+      "strategyPromptTitle": "Strategy Prompt",
+      "methodToggleOpen": "📖 RAFT methodology reference",
+      "methodToggleClose": "Collapse methodology",
+      "strategyHint": "The strategy Prompt defines the methodology and scoring criteria the LLM uses when generating content. Click a methodology snippet to insert it.",
+      "methodHeader": "RAFT methodology reference — click to insert",
+      "strategyPromptPlaceholder": "Enter the strategy Prompt that guides how the LLM generates content...",
+      "expandEdit": "Expand to edit",
+      "restoreDefault": "Restore template default Prompt",
+      "dialogTitle": "Edit strategy Prompt",
+      "dialogHeader": "Edit strategy Prompt",
+      "dialogConfirm": "Confirm"
+    },
+    "depth": {
+      "quick": { "label": "Quick Generate", "desc": "Concise output for fast turnaround" },
+      "standard": { "label": "Standard Generate", "desc": "Full content covering all four RAFT dimensions" },
+      "deep": { "label": "Deep Optimize", "desc": "Per-Prompt customization with multi-pass polish" }
+    },
+    "modelSchedule": {
+      "title": "Model & Schedule",
+      "subtitle": "Pick the LLM model and configure optional auto-run",
+      "modelLabel": "Model:",
+      "scheduleToggle": "Run on a recurring schedule (Cloud Scheduler)",
+      "cronLabel": "Cron Expression (e.g. 0 9 * * 1 — every Monday 9am)",
+      "cronPlaceholder": "e.g. 0 9 * * 1",
+      "cronHint": "Scheduled runs happen in the background; each run is logged to the history list."
+    },
+    "confirm": {
+      "title": "Confirm & Run",
+      "flowPreview": "Execution flow",
+      "flowSteps": {
+        "strategyAnalysis": "Strategy analysis",
+        "promptDiscovery": "Prompt discovery",
+        "contentPlan": "Content planning",
+        "contentGen": "Content generation",
+        "qualityReview": "Quality review",
+        "reviseRound1": "Revise round 1",
+        "qualityRecheck": "Post-revision recheck",
+        "reviseRound2": "Revise round 2",
+        "qualityRecheck2": "Second post-revision recheck"
+      },
+      "flowHint": "After you click \"Start Generation\", the flow runs automatically; if Quality Gate fails, the task can enter up to two targeted revision rounds.",
+      "summaryTitle": "Task configuration summary",
+      "summary": {
+        "goal": "Content goal",
+        "type": "Content type",
+        "topic": "Topic",
+        "topicAuto": "(auto)",
+        "platform": "Target platforms",
+        "count": "Count",
+        "facts": "Product facts",
+        "factsFilled": "Filled",
+        "factsEmpty": "Empty",
+        "brandPeer": "Brand / Peers",
+        "targetPrompt": "Target Prompts",
+        "targetPromptCount": "{{count}} selected",
+        "targetPromptAll": "Global",
+        "domains": "Data domains",
+        "range": "Data range",
+        "depth": "Content depth",
+        "focus": "Focus keywords",
+        "language": "Language",
+        "model": "Model",
+        "modelDefault": "Default",
+        "strategyPrompt": "Strategy Prompt",
+        "strategyPromptLen": "{{count}} chars",
+        "strategyPromptEmpty": "(empty)"
+      }
+    },
+    "footer": {
+      "prev": "Previous",
+      "cancel": "Cancel",
+      "next": "Next",
+      "skip": "Skip",
+      "save": "Save",
+      "start": "Start Generation"
+    },
+    "runningCard": {
+      "closeHint": "You can close this window — the task will continue running in the background",
+      "close": "Close"
+    },
+    "resultCard": {
+      "raftQuality": "RAFT Quality Score",
+      "overall": "Overall",
+      "citationAnalysis": "Citation Analysis Summary",
+      "generatedContent": "Generated Content",
+      "recommendations": "Recommendations",
+      "improvements": "Improvement Suggestions",
+      "viewReportDetail": "View Report Details",
+      "exportHtml": "Export HTML",
+      "close": "Close"
+    },
+    "toasts": {
+      "createFailed": "Failed to create task: {{message}}",
+      "updateFailed": "Failed to update task: {{message}}"
+    },
+    "raftCategories": {
+      "raft4": "RAFT four dimensions",
+      "strategy": "Content strategy"
+    },
+    "worstSort": {
+      "visibility": "Worst Visibility",
+      "citation": "Worst Citation",
+      "sentiment": "Worst Sentiment"
+    }
+  },
+  "pipelineModal": {
+    "dialogTitle": "Anthony Content Strategist - {{template}}",
+    "dialogDescription": "Configure and run a content generation task.",
+    "persona": "Content Strategist",
+    "intro": "Let's configure your content generation task. I'll tailor the optimization strategy based on your analysis report.",
+    "genModelLabel": "Model:",
+    "searchGroundingToggle": "Enable Search Grounding",
+    "searchGroundingHint": "Use this for product, competitor, pricing, launch-date, or market-trend facts that need fresh web evidence. Gemini may search the web as needed, which can add latency and cost.",
+    "scheduleToggle": "Run on a recurring schedule (Cloud Scheduler)",
+    "cronPlaceholder": "e.g. 0 9 * * 1",
+    "cronHintIntro": "Scheduled tasks run in the background; each run is logged to the history list. Cron example:",
+    "cronHintOutro": "every Monday at 9am.",
+    "loadingContext": "Loading task context…",
+        "toasts": {
+            "loadAnalysisFailed": "Failed to load analysis report",
+            "taskStarted": "Content generation task started",
+            "draftSaved": "Draft saved",
+            "taskCreateFailed": "Task creation failed: {{message}}",
+            "saveFailed": "Save failed: {{message}}",
+            "citationPreflightRequired": "Please run Citation Analysis before executing this AI-citable template.",
+            "redditRulesReviewRequired": "Resolve unverified Reddit community rules before running this template.",
+            "redditDiscoveryStale": "Reddit Discovery is stale. Run it again before executing.",
+            "redditArtifactsRequired": "Generate and confirm Artifact Preparation before running this Reddit template.",
+            "redditArtifactsStale": "Artifact Preparation is stale. Regenerate or reconfirm edits before executing."
+        },
+    "defaultTaskName": "Content Generation",
+    "draftSuffix": "Draft",
+    "actions": {
+      "saveDraft": "Save Draft",
+      "saving": "Saving…",
+      "confirmExecute": "Confirm & Execute",
+      "executing": "Executing…"
+    }
+  },
+  "nodes": {
+    "analyzerImport": {
+      "title": "Import Analysis Report",
+      "optionalBadge": "Optional",
+      "intro": "Pick a completed \"Opportunity Discovery\" task — its results will auto-fill the following steps.",
+      "loading": "Loading analysis tasks...",
+      "empty": "No completed \"Opportunity Discovery\" tasks yet.",
+      "emptyHint": "Running an \"Opportunity Discovery\" analysis first gives you data-driven recommendations.",
+      "defaultTaskName": "Opportunity Discovery",
+      "opportunityCount": "{{count}} opportunities",
+      "skipButton": "Skip — configure manually"
+    },
+    "contentGoals": {
+      "title": "Content Goals",
+      "subtitle": "Choose the metrics and subgoals this content run should optimize for.",
+      "sectionTitle": "Success Metrics & Subgoals",
+      "autofillHint": "Goals pre-filled from the analysis report — feel free to adjust."
+    },
+    "contentType": {
+      "title": "Content Type",
+      "items": {
+        "faq": { "label": "FAQ", "desc": "Structured Q&A — highly preferred by AI engines" },
+        "aeo_article": { "label": "AEO Article", "desc": "AI Engine Optimized long-form article, 800–1200 words" },
+        "article": { "label": "SEO Article", "desc": "Traditional SEO-optimized article" },
+        "brief": { "label": "Content Brief", "desc": "Detailed outline, ideal to hand off to a content team" },
+        "comparison": { "label": "Comparison / Review", "desc": "Head-to-head brand vs. competitor content" },
+        "platform_post": { "label": "Platform-specific Post", "desc": "Formatted for a specific publishing platform" },
+        "howto": { "label": "How-to Guide", "desc": "Step-by-step guides and tutorials" },
+        "listicle": { "label": "Listicle", "desc": "\"Top N\"-style list articles" }
+      }
+    },
+    "promptLink": {
+      "title": "Prompt Linking",
+      "lockedBadge": "Locked mode",
+      "lockedHint": "{{count}} Prompts already linked from the analysis report. To change this, go back to step 1 and swap the analysis report or skip it.",
+      "manualHint": "Pick which AI search Prompts this content run should target.",
+      "loading": "Loading...",
+      "mentionLabel": "Mentions {{count}}",
+      "citationLabel": "Citations {{count}}",
+      "negativeLabel": "Negative {{count}}"
+    },
+    "strategy": {
+      "generating": "Generating strategy combinations...",
+      "needPrior": "Please complete the earlier steps first so strategies can be generated.",
+      "title": "Content Strategy",
+      "tweak": "Tweak",
+      "regenerate": "Regenerate",
+      "engineDistribution": "AI engine distribution",
+      "tweakHint": "Enter your adjustments and the system will regenerate strategies accordingly:",
+      "tweakPlaceholder": "e.g. remove strategy #2, use a more casual tone...",
+      "applyTweak": "Apply tweak"
+    },
+    "confirm": {
+      "title": "Confirm & Run",
+      "summary": {
+        "source": "Source analysis report",
+        "sourceEmpty": "None (manual config)",
+        "metrics": "Optimization metrics",
+        "metricsEmpty": "Not selected",
+        "subgoals": "Subgoals",
+        "subgoalsEmpty": "Not selected",
+        "contentType": "Content type",
+        "strategyCount": "Strategy count",
+        "strategyCountValue": "{{count}} items",
+        "aiPlatforms": "AI platforms",
+        "aiPlatformsEmpty": "Not selected",
+        "publishPlatform": "Publish platform",
+        "publishPlatformEmpty": "Not selected",
+        "language": "Language",
+        "count": "Count",
+        "linkedPrompts": "Linked Prompts",
+        "linkedPromptsValue": "{{count}}"
+      },
+      "saveDraft": "Save Draft",
+      "executing": "Running...",
+      "confirmExec": "Confirm & Run"
+    },
+    "genConfig": {
+      "title": "Generation Config",
+      "autofillBadge": "Auto-recommended from analysis report",
+      "autofillHint": "AI engine distribution per publish platform",
+      "aiPlatformsLabel": "Target AI platforms",
+      "publishPlatformsLabel": "Publish platforms",
+      "languageLabel": "Language",
+      "countLabel": "Count",
+      "brandFactsToggle": "View / fill in brand info",
+      "autoReason": "From the analysis report: \"{{platform}}\" accounts for {{share}}% of citations, mainly via {{engines}}",
+      "productSpecs": "Product specs",
+      "productSpecsPlaceholder": "Core specs, technical parameters...",
+      "keyFeatures": "Key features",
+      "keyFeaturesPlaceholder": "Selling points, unique capabilities...",
+      "differentiators": "Differentiators",
+      "differentiatorsPlaceholder": "Core advantages over competitors..."
+    }
+  },
+  "domains": {
+    "visibility": "Visibility",
+    "citation": "Citation",
+    "sentiment": "Sentiment"
+  }
+}

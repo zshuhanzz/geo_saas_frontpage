@@ -99,7 +99,7 @@ db_name                     = "geo_db"
 db_user                     = "geo_user"
 db_password                 = "your-db-password"
 cloro_api_key               = "your-cloro-key"
-gemini_model_id             = "gemini-2.5-flash"
+gemini_model_id             = "gemini-3-flash-preview"
 # webhook_public_url        = "https://..."  # 第一次部署时留空，部署后填入真实 URL
 ```
 
@@ -210,7 +210,8 @@ PUBSUB_PROJECT_ID=your-gcp-project-id
 PUBSUB_TOPIC_NAME=geo-cloro-callbacks
 GCP_PROJECT_ID=your-gcp-project-id
 GCP_REGION=us-central1
-GEMINI_MODEL_ID=gemini-2.5-flash
+GCP_REGION_GLOBAL=global
+GEMINI_MODEL_ID=gemini-3-flash-preview
 LOG_LEVEL=INFO
 ```
 

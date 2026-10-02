@@ -1,0 +1,132 @@
+{
+  "__doc": "Static report list and detail pages. Covers today's report state, historical reports, snapshot rendering, data completeness, and local interactions.",
+  "list": {
+    "title": "Reports",
+    "subtitle": "View daily static GEO report snapshots.",
+    "todayTitle": "Today's report",
+    "snapshotTitle": "Report snapshot",
+    "day": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "historyTitle": "Report history",
+    "emptyHistory": "No historical reports yet",
+    "loading": "Loading reports...",
+    "view": "View report",
+    "generateAndView": "Generate and view",
+    "waitingForData": "Waiting for data",
+    "retrySnapshot": "Retry snapshot",
+    "open": "Open",
+    "refresh": "Refresh",
+    "useYesterday": "Generate yesterday's report",
+    "lastGenerated": "Last generated",
+    "dataWindow": "Data window",
+    "windowOption": "{{count}} days"
+  },
+  "status": {
+    "PENDING": "Pending",
+    "MATERIALIZING": "Generating",
+    "COMPLETED": "Completed",
+    "NOT_READY": "Data not ready",
+    "FAILED": "Failed"
+  },
+  "detail": {
+    "loading": "Loading report...",
+    "notFound": "Report not found",
+    "back": "Back to reports",
+    "singleDayNotice": "This report is based on single-day data, so trend charts are replaced with rankings and distributions.",
+    "window": "Data window",
+    "windowDays": "{{count}}-day window",
+    "materializedAt": "Generated at",
+    "presentationView": "Presentation view",
+    "exportHtml": "Export HTML",
+    "exportStarted": "HTML download has started.",
+    "search": "Filter this table",
+    "showAll": "Show all",
+    "showLess": "Show less",
+    "noRows": "No data yet",
+    "listLoadError": "This frozen list could not be loaded. It was not silently replaced with fallback data.",
+    "sortingLegacyUnavailable": "Global metric sorting is unavailable for this legacy snapshot. Regenerate the report to freeze complete sortable lists; no live data was loaded.",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "sections": {
+      "visibility": "Visibility",
+      "citation": "Citation",
+      "sentiment": "Sentiment",
+      "promptTopic": "Prompts and Topics",
+      "appendix": "Appendix"
+    },
+    "filters": {
+      "title": "Report filters",
+      "topics": "Topics",
+      "platforms": "Platforms",
+      "selectAll": "Select all",
+      "reset": "Reset filters",
+      "notMaterialized": "Topic and platform filtering is unavailable because this snapshot did not freeze those dimensions."
+    }
+  },
+  "comparison": {
+    "currentPeriod": "Current period",
+    "vsPrevious": "vs previous period",
+    "legacyUnavailable": "Previous-period comparisons are unavailable for this legacy snapshot. The report remains frozen and no live data was loaded.",
+    "incompleteBaseline": "Some previous-period baselines were unavailable when this snapshot was generated. Missing comparisons are shown as —.",
+    "previousPeriod": "Previous period"
+  },
+  "readiness": {
+    "raw_results_missing": "No raw results have been collected for this date.",
+    "analyzed_results_missing": "Data for this date has not finished analysis.",
+    "same_day_analyzed_results_missing": "No analyzed results exist for this date yet.",
+    "visibility_missing": "Visibility data is not ready yet.",
+    "citation_missing": "Citation data is not ready yet.",
+    "sentiment_missing": "Sentiment data is not ready yet.",
+    "snapshot_materialization_failed": "Report snapshot generation failed.",
+    "materialization_in_progress": "Report snapshot generation is in progress.",
+    "materialization_capacity_busy": "Another report is currently being generated. Please retry shortly."
+  },
+  "sentiment": {
+    "collapseTheme": "Collapse examples for {{theme}}",
+    "emptyThemes": "No themes extracted yet. Run the Analyzer to generate sentiment data.",
+    "expandTheme": "Expand examples for {{theme}}",
+    "showMoreThemes": "Show more ({{count}} remaining)"
+  },
+  "completeness": {
+    "title": "Data completeness",
+    "rawResults": "Raw results",
+    "analyzedResults": "Analyzed results",
+    "sameDayAnalyzed": "Analyzed today",
+    "analyzedPct": "Analyzed percentage"
+  },
+  "fields": {
+    "mentions": "Mentions",
+    "citations": "Citations",
+    "averagePosition": "Average position",
+    "ownShare": "Own share",
+    "confidence": "Confidence",
+    "count": "Count",
+    "date": "Date",
+    "status": "Status",
+    "action": "Action",
+    "window": "Window",
+    "brand": "Brand",
+    "role": "Role",
+    "domain": "Domain",
+    "category": "Category",
+    "page": "Page",
+    "theme": "Theme",
+    "sentiment": "Sentiment",
+    "example": "Example",
+    "platform": "Platform",
+    "product": "Product",
+    "prompt": "Prompt",
+    "prompts": "Prompts",
+    "topic": "Topic",
+    "intent": "Intent",
+    "country": "Country",
+    "language": "Language",
+    "positive": "Positive",
+    "negative": "Negative",
+    "allDates": "All dates"
+  }
+}

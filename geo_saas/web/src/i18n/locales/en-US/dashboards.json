@@ -1,0 +1,133 @@
+{
+  "__doc": "Standalone Citation / Sentiment dashboards + BrandHub page. Page titles + filter bar (shared filter keys live in insights.filters.*).",
+  "overview": {
+    "title": "Overview",
+    "eyebrow": "Brand Overview",
+    "subtitle": "Unify visibility, citation, and sentiment into one executive view of your brand's AI search performance.",
+    "workspaceFallback": "Current Client",
+    "freshnessUnknown": "No analyzer run yet",
+    "empty": "No data to display",
+    "deltaFlat": "Flat",
+    "status": {
+      "client": "Client",
+      "scope": "Tracked Metrics",
+      "scopeValue": "Visibility / Citation / Sentiment",
+      "period": "Data Period",
+      "latestAnalysis": "Latest Analysis",
+      "nextAnalysis": "Next Analysis"
+    },
+    "metrics": {
+      "visibility": "Visibility",
+      "visibilityDescription": "Rank {{rank}}, mentioned in {{count}} / {{total}} responses",
+      "citation": "Citation Share",
+      "citationDescription": "Rank {{rank}}, {{count}} / {{total}} citations from owned domains",
+      "sentiment": "Positive Sentiment",
+      "sentimentDescription": "{{positive}} positive, {{negative}} negative",
+      "coverage": "Response Coverage",
+      "coverageDescription": "{{mentions}} own-brand mentions, mention share {{sov}}"
+    },
+    "freshness": {
+      "title": "Data Freshness",
+      "lastRun": "Latest Analysis"
+    },
+    "insights": {
+      "title": "Key Changes",
+      "empty": "No key changes to display",
+      "viewDetail": "View detail",
+      "dialogDescription": "Generated from structured metric movements between the current and previous period."
+    },
+    "alerts": {
+      "empty": "No significant movement in this period",
+      "visibility_score": "Visibility movement",
+      "own_citation_share": "Citation share movement",
+      "positive_sentiment_pct": "Sentiment movement"
+    },
+    "momentum": {
+      "title": "Core Momentum",
+      "badge": "Visibility / Citation / Sentiment",
+      "series": {
+        "visibility_score": "Visibility",
+        "own_citation_share": "Citation Share",
+        "positive_sentiment_pct": "Positive Sentiment"
+      }
+    },
+    "platform": {
+      "title": "Platform Health",
+      "visibility": "Visibility",
+      "citation": "Citation",
+      "sentiment": "Sentiment"
+    },
+    "topics": {
+      "title": "Topic Opportunity Radar",
+      "unknown": "Untitled Topic",
+      "leader": "Leader {{brand}}, {{count}} mentions",
+      "ownRank": "Our Rank",
+      "ownMentions": "Our Mentions",
+      "promptVolume": "Prompt Volume",
+      "mentionShare": "Mention Share",
+      "mentionShareDetail": "{{count}} own mentions",
+      "visibility": "Visibility",
+      "citation": "Citation",
+      "sentiment": "Sentiment",
+      "labels": {
+        "defend": "Defend",
+        "improve": "Improve",
+        "content_gap": "Content Gap",
+        "monitor": "Monitor"
+      }
+    },
+    "competitors": {
+      "title": "Competitor Snapshot",
+      "brand": "Brand",
+      "visibility": "Visibility",
+      "sov": "Mention Share",
+      "mentions": "Mentions",
+      "position": "Position",
+      "citation": "Citation Share",
+      "sentiment": "Sentiment",
+      "ownBrand": "Own Brand"
+    }
+  },
+  "citation": {
+    "title": "Citation",
+    "subtitle": "Analyze which domains and pages AI platforms cite most."
+  },
+  "sentiment": {
+    "title": "Sentiment",
+    "subtitle": "Analyze how AI platforms feel about your brand across different themes."
+  },
+  "brandHub": {
+    "title": "Brand Hub",
+    "description": "Configure brand tonality for <1>{{clientName}}</1>. Anthony uses this profile to match your brand voice in all AI-generated content.",
+    "saveButton": "Save Profile",
+    "saveSaving": "Saving...",
+    "loading": "Loading brand profile...",
+    "noClient": "Select a workspace from the sidebar.",
+    "toastSaved": "Brand profile saved",
+    "toastSaveFailed": "Failed to save: {{message}}",
+    "sections": {
+      "basicTitle": "Basic Information",
+      "basicDescription": "Core brand identity used across all agent interactions.",
+      "toneTitle": "Tone of Voice",
+      "toneDescription": "Describe how your brand communicates. Anthony will mirror this tone in analyses and generated content.",
+      "messagesTitle": "Key Messages",
+      "messagesDescription": "Core messaging pillars. Anthony weaves these into generated content and recommendations.",
+      "valuesTitle": "Brand Values",
+      "valuesDescription": "Core values that guide your brand positioning in AI search engines."
+    },
+    "fields": {
+      "brandName": "Brand Name",
+      "brandNamePlaceholder": "e.g. AnswerX",
+      "primaryLanguage": "Primary Language",
+      "primaryLanguagePlaceholder": "e.g. zh-CN, en-US",
+      "targetAudience": "Target Audience",
+      "targetAudiencePlaceholder": "e.g. Tech-savvy homeowners aged 25-45 in US/EU markets",
+      "tonePlaceholder": "e.g. Professional yet approachable. Data-driven and confident. Emphasize innovation and reliability. Avoid overly casual language.",
+      "messagesEmpty": "No key messages defined yet.",
+      "messagesPlaceholder": "Add a key message...",
+      "addButton": "Add",
+      "valuesEmpty": "No brand values defined yet.",
+      "valuesPlaceholder": "Add a brand value (e.g. Innovation, Reliability)..."
+    }
+  }
+}

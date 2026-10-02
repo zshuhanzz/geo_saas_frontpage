@@ -1,0 +1,454 @@
+{
+  "__doc": "Agent module pages (Analyze / Chat / Content / Training / Tracking / TaskPage) + AgentToolbar / TaskProgressCard / ChatWidgetRenderer components.",
+  "common": {
+    "statusCompleted": "Completed",
+    "statusFailed": "Failed",
+    "statusDraft": "Saved",
+    "statusRunning": "Running",
+    "triggerAuto": "Auto",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "execute": "Execute Task",
+    "rerun": "Rerun",
+    "delete": "Delete",
+    "rename": "Rename",
+    "view": "View",
+    "viewDetail": "View Details",
+    "viewOutput": "View step output",
+    "executionFailed": "Execution failed",
+    "viewFullReport": "View Full Report",
+    "exportHtml": "Export HTML",
+    "emptyOutput": "No output yet",
+    "savedHint": "Task saved. Click the button above to start executing.",
+    "noReportContent": "No report content yet",
+    "stepLabel": "Step {{step}}: {{label}}",
+    "loadingTaskProgress": "Loading task progress...",
+    "creatingTask": "Creating task...",
+    "taskFinished": "Task complete",
+    "anthonyProgress": "Anthony progress"
+  },
+  "pagination": {
+    "summary": "Page {{page}} of {{pages}} · {{total}} total",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "analysis": {
+    "pageTitle": "Analyze Agent",
+    "tabNew": "New Task",
+    "tabAll": "All Tasks",
+    "templateGallery": "Select analysis template",
+    "opportunityTitle": "Opportunity Discovery",
+    "opportunityDesc": "Comprehensively diagnose your brand's optimization opportunities in AI search — topic positioning, content discovery, platform citation analysis, and an action plan for content optimization.",
+    "emptyTasks": "No tasks yet",
+    "createFirstTask": "Create your first task",
+    "domains": {
+      "visibility": "Visibility",
+      "citation": "Citation",
+      "sentiment": "Sentiment"
+    },
+    "steps": {
+      "validate_inputs": "Validate inputs",
+      "hydrate_metrics": "Hydrate metrics",
+      "generate_charts": "Generate charts",
+      "synthesize_report": "Synthesize report",
+      "quality_check": "Quality check",
+      "topic_quadrant": "Topic quadrant analysis",
+      "content_opportunities": "Content opportunity discovery",
+      "platform_analysis": "Platform citation analysis",
+      "synthesize_output": "Synthesize output"
+    },
+    "viewSql": "View generated SQL ({{count}})",
+    "viewChartSql": "View chart SQL ({{count}})",
+    "viewFinalPrompt": "View final prompt (with injected data)",
+    "usedPrompt": "Prompt used",
+    "qualityReport": "Quality check report",
+    "qualityData": {
+      "data_accuracy_score": "Data accuracy",
+      "consistency_score": "Logic consistency",
+      "completeness_score": "Completeness",
+      "overall_score": "Overall score"
+    },
+    "qualityIssuesFound": "Issues found",
+    "insightReport": "Insight report",
+    "opportunity": {
+      "quadrantModel": "Quadrant positioning model",
+      "quadrantActions": {
+        "strong": "Defend",
+        "weak": "Fix",
+        "untapped": "Attack",
+        "emerging": "Seize"
+      },
+      "quadrantLabels": {
+        "strong": "Strong",
+        "weak": "Weak",
+        "untapped": "Untapped",
+        "emerging": "Emerging"
+      },
+      "quadrantDescs": {
+        "strong": "High exposure & high citation — AI cites your brand, maintain the lead.",
+        "weak": "Exposure exists but citation is low — content exists but isn't cited, needs fixing.",
+        "untapped": "Lacks content coverage — needs an offensive strategy.",
+        "emerging": "Search trend rising — seize the window of opportunity."
+      },
+      "strategyLabel": "Strategy: {{action}}",
+      "topicsCount": "{{count}} topics",
+      "matrixTitle": "Opportunity Matrix (Visibility × Citation Rate)",
+      "quadrantDistribution": "Topic quadrant distribution",
+      "visibilityPct": "Visibility {{pct}}%",
+      "citationPct": "Citation rate {{pct}}%",
+      "contentOpps": "Top {{count}} Content Optimization Opportunities",
+      "relatedPrompts": "{{count}} related prompts",
+      "competitorRefs": "{{count}} competitor references",
+      "platformMatrix": "Platform citation matrix",
+      "aiEngines": "AI engines: {{engines}}",
+      "priorityHigh": "High",
+      "priorityMedium": "Medium",
+      "priorityLow": "Low",
+      "citationShare": "Citation share",
+      "engineDistribution": "Engine distribution",
+      "chart": {
+        "tooltipQuadrant": "Quadrant",
+        "tooltipVisibility": "Visibility",
+        "tooltipCitation": "Citation rate",
+        "tooltipMentions": "Mentions",
+        "axisVisibility": "Visibility",
+        "axisCitation": "Citation rate"
+      }
+    },
+    "continueToContent": "Based on this analysis, continue to content generation",
+    "startContentGen": "Start content generation",
+    "renameDialog": {
+      "title": "Rename Report",
+      "nameLabel": "Report name",
+      "placeholder": "Enter a new report name"
+    },
+    "actionTitles": {
+      "viewDetail": "View details",
+      "rename": "Rename",
+      "edit": "Edit"
+    }
+  },
+  "content": {
+    "pageTitle": "Content Agent",
+    "tabNew": "New Task",
+    "tabAll": "All Tasks",
+    "templateGallery": "Select content template",
+    "templateSections": {
+      "generateTitle": "Generate by Template",
+      "generateDescription": "Pick a content template and generate articles, FAQs, briefs, or recommendations from the current setup.",
+      "discoverTitle": "Discover then Generate",
+      "discoverDescription": "Discover platform-specific opportunities first, then generate content from the selected insight.",
+      "discoverEmpty": "No discover-then-generate templates available yet"
+    },
+    "emptyTasks": "No tasks yet",
+    "createFirstTask": "Create your first task",
+    "progress": "Execution progress",
+    "raftQuality": "RAFT Quality Score",
+    "overallScore": "Overall score",
+    "citationAnalysis": "Citation Analysis Summary",
+    "generatedContent": "Generated content",
+    "recommendations": "Recommendations",
+    "renameDialog": {
+      "title": "Rename Report",
+      "nameLabel": "Report name",
+      "placeholder": "Enter a new report name"
+    },
+    "actionTitles": {
+      "view": "View",
+      "rename": "Rename",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "qualityStatus": {
+      "pass": "Quality pass",
+      "passWithWarnings": "Pass with warnings",
+      "revised": "Revised pass",
+      "failed": "Quality failed",
+      "needsHumanReview": "Needs human review"
+    }
+  },
+  "chat": {
+    "greetings": {
+      "lateNight": "It's late — Anthony is on standby.",
+      "morning": "Good morning — how can I help?",
+      "noon": "Good afternoon — need Anthony's help?",
+      "afternoon": "Good afternoon — at your service.",
+      "evening": "Good evening — Anthony is online."
+    },
+    "relative": {
+      "justNow": "Just now",
+      "minutesAgo": "{{mins}} min ago",
+      "hoursAgo": "{{hours}} h ago",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{days}} d ago"
+    },
+    "suggestions": {
+      "s1": "Analyze my brand's visibility across AI platforms",
+      "s2": "Compare my GEO data vs. competitors over the past week",
+      "s3": "Suggest content optimizations based on the latest data",
+      "s4": "Generate an exec-level summary of this month's GEO performance"
+    },
+    "cot": {
+      "tier": "Chain of Thought · Tier {{tier}}",
+      "thinking": "Thinking...",
+      "stepsCount": "({{count}} steps)"
+    },
+    "goalLabels": {
+      "brand_visibility": "Brand visibility analysis",
+      "citation_analysis": "Citation analysis",
+      "sentiment_analysis": "Sentiment analysis",
+      "competitor_comparison": "Competitor comparison",
+      "benchmark": "Competitor benchmark",
+      "trend": "Trend diagnosis",
+      "health": "Health check",
+      "sentiment": "Sentiment analysis",
+      "opportunity_discovery": "Opportunity discovery",
+      "faq": "FAQ generation",
+      "aeo_article": "AEO article",
+      "article": "Article optimization",
+      "recommendations": "Recommendations",
+      "brief": "Content brief",
+      "custom": "Custom task"
+    },
+    "inputLabels": {
+      "goal": "Goal",
+      "analysis_goal": "Analysis goal",
+      "content_type": "Content type",
+      "domains": "Data domains",
+      "platforms": "Target platforms",
+      "topic": "Topic",
+      "date_from": "Start date",
+      "date_to": "End date",
+      "depth": "Depth",
+      "count": "Count",
+      "language": "Language",
+      "task_type": "Task type"
+    },
+    "taskConfig": "Task configuration",
+    "startExecution": "Start execution",
+    "creatingTask": "Creating task...",
+    "taskFinished": "Task complete",
+    "viewReportDetail": "View report details",
+    "exportHtml": "Export HTML",
+    "retry": "Retry",
+    "newChat": "New chat",
+    "recentChats": "Recent chats",
+    "emptyChats": "No chats yet",
+    "modeAnalyze": "📊 Analyze mode",
+    "modeAction": "⚡ Action mode",
+    "modeChat": "💬 Chat mode",
+    "freeChat": "Free-form chat · Ask Anthony anything about GEO",
+    "generating": "Generating...",
+    "downloadReport": "Download HTML report",
+    "contentReady": "Content ready — please review and decide",
+    "regenFeedbackPlaceholder": "To regenerate, describe your feedback (optional)...",
+    "regenerate": "Regenerate",
+    "approve": "Approve",
+    "inputPlaceholder": "Chat with Anthony — type / to see commands...",
+    "disclaimer": "Anthony may generate inaccurate information. Always verify against real GEO data.",
+    "stepBadge": "Step {{current}}/{{total}}",
+    "stepNext": "Next",
+    "stepSkipRemaining": "Skip remaining"
+  },
+  "toolbar": {
+    "slash": {
+      "compressLabel": "Compress Chat",
+      "compressDesc": "Compress chat context to free up space",
+      "flashLabel": "Switch to Flash",
+      "flashDesc": "Use Flash model (faster, more efficient)",
+      "proLabel": "Switch to Pro",
+      "proDesc": "Use Pro model (more precise)",
+      "memoriesLabel": "View Memory",
+      "memoriesDesc": "View preferences and facts Anthony has memorized"
+    },
+    "memoryTitle": "Memory · {{count}} entries",
+    "memoryEmpty": "Anthony hasn't memorized anything yet",
+    "memoryShared": "Shared",
+    "memoryType": {
+      "preference": "Preference",
+      "fact": "Fact",
+      "context": "Context",
+      "brand": "Brand"
+    },
+    "model": {
+      "auto": "Auto",
+      "autoDesc": "System auto-selects optimal model",
+      "pro": "Pro",
+      "proDesc": "High-precision analysis & generation",
+      "flash": "Flash",
+      "flashDesc": "Fast response & chat"
+    },
+    "compressTitle": "Compress chat context",
+    "todayLabel": "Today",
+    "tokensSuffix": "tokens"
+  },
+  "taskProgress": {
+    "completed": "Completed",
+    "failed": "Failed",
+    "running": "Running",
+    "rerun": "Rerun",
+    "viewReportDetail": "View Report Details",
+    "exportHtml": "Export HTML"
+  },
+  "training": {
+    "pageTitle": "Train Anthony",
+    "subtitle": "Add capabilities to your agent and grow your Anthony.",
+    "comingSoon": "Coming Soon",
+    "agentCaption": "AnswerX Agent",
+    "tierLabel": "Tier {{level}}",
+    "view": "View",
+    "addCapability": "Add Capability",
+    "add": "Add"
+  },
+  "tracking": {
+    "pageTitle": "Tracking Strategy",
+    "subtitle": "Configure brand tracking plans, keyword monitoring, and competitive benchmarking strategies.",
+    "comingSoon": "Coming Soon"
+  },
+  "chatWidget": {
+    "confirm": "Confirm",
+    "maxItems": "(max {{max}} items)",
+    "recommended": "Recommended",
+    "executionConfirmed": "Execution confirmed",
+    "taskConfig": "Task Configuration",
+    "startExecution": "Start Execution",
+    "submitting": "Submitting...",
+    "sort": {
+      "visibility": "Visibility",
+      "citation": "Citation",
+      "sentiment": "Sentiment"
+    },
+    "promptEditor": {
+      "placeholder": "The default template is injected by the backend; edit here to customize, or leave empty to use the template default.",
+      "hint": "Hint: [metric(slug)] placeholders inside brackets are replaced with actual data at execution time."
+    },
+    "booleanToggle": {
+      "on": "On",
+      "off": "Off"
+    },
+    "structuredFields": {
+      "specsLabel": "Product Specs",
+      "specsPlaceholder": "e.g., 5300Pa suction, 5000mAh battery...",
+      "featuresLabel": "Key Features",
+      "featuresPlaceholder": "e.g., auto dust collection, smart obstacle avoidance...",
+      "differentiatorsLabel": "Differentiators",
+      "differentiatorsPlaceholder": "e.g., industry-first xxx technology..."
+    },
+    "chatTextPrompt": {
+      "waitingHint": "Waiting for your reply...",
+      "skip": "Skip"
+    },
+    "modeGate": {
+      "manualLabel": "I'll decide",
+      "manualDescription": "I'll pick the topic, prompts, and product facts myself.",
+      "autoLabel": "Let AI find opportunities",
+      "autoDescription": "Anthony auto-selects the worst-performing content opportunities."
+    },
+    "topicPicker": {
+      "loading": "Loading topics...",
+      "empty": "No topics available.",
+      "tierBad": "Critical",
+      "tierOptimize": "Needs work",
+      "autoSelectN": "Auto-select top {{count}}",
+      "autoSelectOne": "Auto-select worst topic",
+      "clear": "Clear",
+      "selectedCount": "{{count}} topic(s) selected",
+      "mentions": "Mentions",
+      "citations": "Citations",
+      "negative": "Negative",
+      "promptCount": "{{count}} prompts"
+    },
+    "promptPicker": {
+      "loading": "Loading prompts...",
+      "empty": "No prompts available.",
+      "tierBad": "Critical",
+      "tierOptimize": "Needs work",
+      "autoSelectN": "Auto-select top {{count}}",
+      "clear": "Clear",
+      "selectedCount": "{{count}} prompt(s) selected",
+      "locked": "Locked",
+      "lockedHint": "{{count}} prompts inherited from the imported analysis — not editable.",
+      "mentions": "Mentions",
+      "citations": "Citations",
+      "negative": "Negative"
+    },
+    "analyzerImport": {
+      "loading": "Loading analyzer tasks...",
+      "empty": "No completed Opportunity Discovery tasks.",
+      "skip": "Skip, configure manually",
+      "selected": "Analysis report context imported",
+      "topicsCount": "{{count}} topics",
+      "opportunitiesCount": "{{count}} opportunities"
+    },
+    "chartConfig": {
+      "queryPlaceholder": "e.g., Daily mention count trend over the past 30 days",
+      "addChart": "Add chart",
+      "removeChart": "Remove",
+      "chartTypeLabel": "Chart type",
+      "typeAuto": "Auto",
+      "typeLine": "Line",
+      "typeBar": "Bar",
+      "typePie": "Pie",
+      "emptyHint": "No charts configured — output will be text-only."
+    },
+    "productFacts": {
+      "expand": "Expand/Collapse",
+      "filledStatus": "{{filled}}/{{total}} filled",
+      "specsLabel": "Product Specs",
+      "specsPlaceholder": "Core parameters, technical specifications...",
+      "featuresLabel": "Key Features",
+      "featuresPlaceholder": "Product highlights, unique capabilities...",
+      "differentiatorsLabel": "Differentiators",
+      "differentiatorsPlaceholder": "Key advantages over competitors..."
+    },
+    "methodology": {
+      "loading": "Loading methodology snippets...",
+      "empty": "No methodology snippets available.",
+      "selectedCount": "{{count}} snippet(s) selected"
+    },
+    "confirmation": {
+      "title": "Confirm Task Configuration",
+      "subtitle": "Review each step's selection. Click Edit to revise; otherwise start execution.",
+      "edit": "Edit",
+      "execute": "Confirm and run",
+      "modify": "Go back to edit",
+      "noValue": "(empty)",
+      "fieldLabel": {
+        "analysis_goal": "Analysis goal",
+        "analysis_framework": "Framework",
+        "default_lenses": "Analysis lenses",
+        "default_domains": "Data domains",
+        "default_platforms": "Platforms",
+        "default_date_range": "Date range",
+        "platforms": "Platforms",
+        "domains": "Data domains",
+        "date_from": "Start date",
+        "date_to": "End date",
+        "topic": "Topic",
+        "topic_ids": "Topics",
+        "prompt_ids": "Prompts",
+        "analyzer_task_id": "Analysis report",
+        "chart_requests": "Chart config",
+        "default_charts": "Chart config",
+        "prompt_edit": "Prompt tweaks",
+        "default_prompt_edits": "Prompt tweaks",
+        "mode_choice": "Generation mode",
+        "content_type": "Content type",
+        "content_goal": "Content goal",
+        "content_strategy": "Content strategy",
+        "default_strategy": "Content strategy",
+        "default_sub_goals": "Subgoals",
+        "depth": "Depth",
+        "count": "Count",
+        "language": "Language",
+        "default_publish_platform": "Publish platform",
+        "default_product_facts": "Product facts",
+        "default_methodology_snippets": "Methodology",
+        "goal": "Goal",
+        "default_goal": "Default goal"
+      }
+    }
+  }
+}

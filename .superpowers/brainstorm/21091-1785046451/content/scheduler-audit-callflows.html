@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scheduler 与 User Audit 调用链</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d9dfeb;
+      --blue: #315efb;
+      --blue-soft: #eef3ff;
+      --amber: #b54708;
+      --amber-soft: #fff4e5;
+      --green: #067647;
+      --green-soft: #ecfdf3;
+      --red: #b42318;
+      --red-soft: #fef3f2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 34px 28px 52px; }
+    h1 { margin: 0; font-size: 28px; letter-spacing: -.03em; }
+    .lead { margin: 8px 0 28px; color: var(--muted); font-size: 14px; }
+    h2 { margin: 0 0 14px; font-size: 18px; }
+    .section { margin-top: 24px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(16, 24, 40, .035);
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .admin { background: var(--blue-soft); color: var(--blue); }
+    .saas { background: var(--green-soft); color: var(--green); }
+    .agent { background: var(--amber-soft); color: var(--amber); }
+    .flow { display: grid; gap: 8px; }
+    .node {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      background: #fff;
+    }
+    .node strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .arrow { text-align: center; color: #98a2b3; line-height: 1; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      color: #344054;
+      word-break: break-all;
+    }
+    .audit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .current { border-top: 4px solid var(--amber); }
+    .recommended { border-top: 4px solid var(--green); }
+    ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .warning {
+      margin-top: 14px;
+      border: 1px solid #fecdca;
+      background: var(--red-soft);
+      color: var(--red);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .decision {
+      margin-top: 18px;
+      border: 1px solid #b2ddff;
+      background: #eff8ff;
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .decision strong { display: block; margin-bottom: 6px; }
+    .decision p { margin: 0; color: #175cd3; font-size: 13px; line-height: 1.6; }
+    @media (max-width: 860px) {
+      .grid, .audit-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Cloud Scheduler 与 User Audit：当前真实调用链</h1>
+  <p class="lead">Admin 是主要配置面，但 Scheduler 会直接回调 Admin、SaaS 或 Agent 的机器入口。</p>
+
+  <section class="section">
+    <h2>三类 Cloud Scheduler 任务</h2>
+    <div class="grid">
+      <article class="card">
+        <span class="tag admin">Workspace 数据作业</span>
+        <div class="flow">
+          <div class="node"><strong>Admin UI</strong>配置 Workspace 的采集、分析、LLM Discovery cron</div>
+          <div class="arrow">↓</div>
+          <div class="node"><strong>Cloud Scheduler</strong>携带服务账号 OIDC</div>
+          <div class="arrow">↓</div>
+          <div class="node"><strong>Admin API 回调</strong><code>/api/clients/{client_id}/jobs/{job_type}/run</code></div>
+          <div class="arrow">↓</div>
+          <div class="node"><strong>Cloud Run Job</strong>Collector / Analyzer / LLM Discovery</div>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="tag saas">SaaS 定时报表</span>
+        <div class="flow">
+          <div class="node"><strong>SaaS 分析 UI</strong>保存分析任务并填写 cron</div>
+          <div class="arrow">↓</div>
+          <div class="node"><strong>Cloud Scheduler</strong>携带服务账号 OIDC</div>
+          <div class="arrow">↓</div>
+          <div class="node"><strong>SaaS API 回调</strong><code>/api/insights/analysis/runs/{task_id}/trigger_cron</code></div>
+          <div class="arrow">↓</div>
+          <div class="node"><strong>报表 Pipeline</strong>创建自动运行实例</div>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="tag agent">Agent 定时任务</span>
+        <div class="flow">
+          <div class="node"><strong>Admin Agent Tasks</strong>启用/停用已有 Agent task 的计划</div>
+          <div class="arrow">↓</div>
+          <div class="node"><strong>Cloud Scheduler</strong>携带服务账号 OIDC</div>
+          <div class="arrow">↓</div>
+          <div class="node"><strong>Agent API 回调</strong><code>/api/agent/tasks/{task_id}/trigger_cron</code></div>
+          <div class="arrow">↓</div>
+          <div class="node"><strong>Agent Pipeline</strong>按 task_type 执行 Analysis 或 Content</div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>User Audit：现状与建议</h2>
+    <div class="audit-grid">
+      <article class="card current">
+        <span class="tag agent">当前：混合模式</span>
+        <div class="flow">
+          <div class="node"><strong>页面访问</strong>React 路由监听器主动 POST audit event</div>
+          <div class="node"><strong>大部分写操作</strong>fetchJSON 成功后 fire-and-forget POST audit event</div>
+          <div class="node"><strong>少量 Admin 敏感操作</strong>业务 SQL 内联 INSERT 审计表</div>
+        </div>
+        <ul>
+          <li>原业务 Promise 不等待审计请求完成</li>
+          <li>但每条审计都有额外 HTTP、鉴权和单行 INSERT</li>
+          <li>直接 API / SSE / 非统一 fetch 调用可能漏记</li>
+          <li>action、route、status 主要由浏览器上报，可伪造</li>
+        </ul>
+      </article>
+
+      <article class="card recommended">
+        <span class="tag saas">建议：服务端声明式切面</span>
+        <div class="flow">
+          <div class="node"><strong>静态技术权限注册表</strong>同一条 route 声明 feature、capability、audit policy</div>
+          <div class="node"><strong>统一 APIRoute / Dependency</strong>鉴权后取得 user、workspace、task_type 与规范化路由</div>
+          <div class="node"><strong>中央 Audit Writer</strong>只记录有业务意义的动作，统一脱敏和 action_key</div>
+        </div>
+        <ul>
+          <li>权限与审计共用同一份路由元数据，避免重复维护</li>
+          <li>页面浏览仍可保留前端 best-effort 统计</li>
+          <li>机器任务标记 system identity，不套 Workspace 用户 RBAC</li>
+          <li>请求体不做通用全量保存，只允许白名单元数据解析器</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="warning">
+      “不阻塞”与“绝不丢审计”不能同时免费获得：进程内异步队列最快，但实例退出时可能丢少量事件；同步数据库写最可靠，但会增加一次写入延迟；可靠异步需要 Pub/Sub / outbox 等持久化缓冲。
+    </div>
+
+    <div class="decision">
+      <strong>下一项需要确认</strong>
+      <p>User Audit 是产品运营级行为记录（允许极少量丢失），还是合规/安全级审计（要求不可伪造、尽量不丢）？这个选择决定写入链路是否需要可靠消息或事务 outbox。</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

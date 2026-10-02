@@ -1,0 +1,63 @@
+# .gcloudignore — excludes files from Cloud Build source upload.
+#
+# Why: every `gcloud builds submit .` uploads the entire repo root as build
+# context (so geo_common/ is visible). Without this file the upload would
+# include venv directories, node_modules, terraform plugins, etc. — potentially
+# hundreds of MB of pure noise.
+#
+# Anything excluded here stays on disk for local dev; it just doesn't travel
+# to Cloud Build.
+
+# --- VCS ---
+.git/
+.github/
+.gitignore
+
+# --- Editor/IDE/agent tooling ---
+.vscode/
+.idea/
+.claude/
+.gstack/
+.cursor/
+
+# --- Python artifacts ---
+**/venv/
+**/.venv/
+**/env/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/*.egg-info/
+
+# --- Node / Frontend builds ---
+**/node_modules/
+**/dist/
+**/build/
+**/.vite/
+
+# --- Terraform state (never upload to Cloud Build) ---
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/*.tfplan
+
+# --- OS cruft ---
+.DS_Store
+**/.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# --- Large binary assets unrelated to build ---
+Anthony*.png
+logo.png
+docs/assets/
+
+# --- Deploy-time log/temp ---
+*.log
+/tmp/

@@ -7,5 +7,5 @@ db_name                     = "your-db-name"
 db_user                     = "your-db-user"
 db_password                 = "your-db-password"
 cloro_api_key               = "your-cloro-api-key"
-gemini_model_id             = "gemini-2.5-flash"
+gemini_model_id             = "gemini-3-flash-preview"
 # webhook_public_url        = "https://..."  # 第一次部署时留空，部署后填入真实 URL

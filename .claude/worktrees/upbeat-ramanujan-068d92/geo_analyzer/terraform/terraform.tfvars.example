@@ -1,0 +1,15 @@
+# GCP Project
+project_id = "your-gcp-project-id"
+region     = "us-central1"
+
+# Artifact Registry
+repo_name = "geo-analyzer-repo"
+
+# Image Tag (update version after each gcloud builds submit)
+image_tag = "us-central1-docker.pkg.dev/YOUR_PROJECT/geo-analyzer-repo/geo-analyzer:v1"
+
+# Cloud SQL
+db_instance_connection_name = "your-project:us-central1:your-instance"
+db_user                     = "your-db-user"
+db_password                 = "your-db-password"
+db_name                     = "your-db-name"

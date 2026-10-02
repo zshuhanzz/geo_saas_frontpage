@@ -1,13 +1,18 @@
 """
-Expander Entry Point
+Expander Entry Point (V2.5 SaaS) — Client-based FinalPromptBuilder
 
-从 geo_requests 读取待处理数据，调用 Gemini 扩展为 geo_tasks。
-可作为 Cloud Run Job 或独立脚本运行。
+Reads CLIENT_ID (and optionally TOPIC_ID) environment variables,
+calls FinalPromptBuilder to expand active prompts into geo_tasks.
+Can be run as a Cloud Run Job or standalone script.
+
+Phase 2.5a: connect/disconnect now drive the shared `geo_common.db` asyncpg pool.
 """
 import asyncio
 import logging
-from src.core.database import database
-from src.services.prompt_expander import get_expander_service
+import os
+
+from src.core import database as db
+from src.services.prompt_expander import get_builder_service
 
 # Configure logging
 logging.basicConfig(
@@ -17,54 +22,52 @@ logging.basicConfig(
 logger = logging.getLogger("Expander")
 
 
-async def process_pending_requests():
-    """处理所有待扩展的 requests"""
-    expander = get_expander_service()
-    
-    # [EXPANDER-S1] 获取待处理的 requests
-    logger.info("[EXPANDER-S1] 查询待扩展的 geo_requests...")
-    pending_requests = await expander.get_pending_requests(limit=10)
-    
-    if not pending_requests:
-        logger.info("[EXPANDER-S1] 没有待处理的 geo_requests，退出")
-        return
-    
-    logger.info(f"[EXPANDER-S1] 找到 {len(pending_requests)} 条待扩展的 requests")
-    
-    total_tasks = 0
-    for idx, request in enumerate(pending_requests, start=1):
-        request_id = str(request["request_id"])
-        
-        # [EXPANDER-S2] 处理单个 request
-        logger.info(f"[EXPANDER-S2] 开始处理 Request ({idx}/{len(pending_requests)}) | request_id={request_id}")
-        
-        try:
-            count = await expander.expand_request(request_id)
-            total_tasks += count
-            logger.info(f"[EXPANDER-S2] Request {request_id} 扩展完成 | 生成 {count} 条 tasks")
-        except Exception as e:
-            logger.error(f"[EXPANDER-S2] Request {request_id} 处理失败 | error={e}")
-            # 继续处理下一个 request
-            continue
-    
-    # [EXPANDER-S3] 汇总
-    logger.info(f"[EXPANDER-S3] 本次运行完成 | 处理 {len(pending_requests)} 条 requests | 共生成 {total_tasks} 条 geo_tasks")
+async def process_client(client_id: str, topic_id: str = None) -> int:
+    """Process active prompts for a client."""
+    builder = get_builder_service()
 
+    if topic_id:
+        logger.info(
+            f"[EXPANDER-S1] 开始处理 Client Topic | "
+            f"client_id={client_id} | topic_id={topic_id}"
+        )
+    else:
+        logger.info(f"[EXPANDER-S1] 开始处理全部 Client Prompts | client_id={client_id}")
 
-async def main():
-    """主入口"""
-    logger.info("[EXPANDER-S0] ========== Prompt Expander Job 启动 ==========")
-    
-    await database.connect()
-    logger.info("[EXPANDER-S0] 数据库连接成功")
-    
     try:
-        await process_pending_requests()
+        count = await builder.expand_client(client_id, topic_id)
+        logger.info(f"[EXPANDER-S1] Client 扩展完成 | 生成 {count} 条 tasks")
+        return count
+    except Exception as e:
+        logger.error(f"[EXPANDER-S1] Client 处理失败 | client_id={client_id} | error={e}")
+        raise
+
+
+async def main() -> None:
+    """主入口"""
+    logger.info("[EXPANDER-S0] ========== FinalPromptBuilder Job 启动 ==========")
+
+    await db.connect()
+    logger.info("[EXPANDER-S0] 数据库连接成功")
+
+    try:
+        client_id = os.getenv("CLIENT_ID")
+        topic_id = os.getenv("TOPIC_ID")
+
+        if client_id:
+            logger.info(f"[EXPANDER-S0] 指定 Client 模式 | CLIENT_ID={client_id}")
+            total = await process_client(client_id, topic_id)
+        else:
+            logger.warning("[EXPANDER-S0] 未指定 CLIENT_ID，必须指定 CLIENT_ID 环境变量")
+            total = 0
+
+        logger.info(f"[EXPANDER-S0] 本次运行完成 | 共生成 {total} 条 geo_tasks")
+
     finally:
-        await database.disconnect()
+        await db.disconnect()
         logger.info("[EXPANDER-S0] 数据库连接已关闭")
-    
-    logger.info("[EXPANDER-S0] ========== Prompt Expander Job 结束 ==========")
+
+    logger.info("[EXPANDER-S0] ========== FinalPromptBuilder Job 结束 ==========")
 
 
 if __name__ == "__main__":

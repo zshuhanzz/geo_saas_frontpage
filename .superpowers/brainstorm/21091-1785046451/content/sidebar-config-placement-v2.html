@@ -1,0 +1,54 @@
+<h2>“配置 / 设置”入口应放在哪里？</h2>
+<p class="subtitle">当前代码中 `/agents/tracking` 与 `/settings` 都渲染同一个 SettingsPage。请确认本次是否保留这个双入口。</p>
+
+<div class="cards">
+  <div class="card" data-choice="config-current" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:18px;background:#f7f8fa">
+      <div style="max-width:250px;margin:auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px">
+        <div class="label">数据分析与监测</div>
+        <div style="font-size:13px;line-height:2.15">总览<br>可见度<br>引用<br>情感<br>Prompt<br>报告</div>
+        <div class="label" style="margin-top:15px">Actions</div>
+        <div style="font-size:13px;line-height:2.15"><b>配置</b><br>分析<br>内容<br>对话 Anthony<br>训练 Anthony</div>
+        <div style="border-top:1px solid #e5e7eb;margin-top:14px;padding-top:10px;font-size:13px">⚙ <b>设置</b></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A1 · 严格保持当前分布</h3>
+      <p>视觉位置完全不变；“配置”和底部“设置”继续指向同一页面，共用一个权限点。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="config-actions-only" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:18px;background:#f7f8fa">
+      <div style="max-width:250px;margin:auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px">
+        <div class="label">数据分析与监测</div>
+        <div style="font-size:13px;line-height:2.15">总览<br>可见度<br>引用<br>情感<br>Prompt<br>报告</div>
+        <div class="label" style="margin-top:15px">Actions</div>
+        <div style="font-size:13px;line-height:2.15"><b>配置</b><br>分析<br>内容<br>对话 Anthony<br>训练 Anthony</div>
+        <div style="border-top:1px solid #e5e7eb;margin-top:14px;padding-top:10px;font-size:13px;color:#9ca3af">底部不再重复“设置”</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A2 · 仅去除重复入口</h3>
+      <p>主体分组不变，只移除底部重复的“设置”；仍把配置归在 Actions。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="config-data-module" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:18px;background:#f7f8fa">
+      <div style="max-width:250px;margin:auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px">
+        <div class="label">数据分析与监测</div>
+        <div style="font-size:13px;line-height:2.15">总览<br>可见度<br>引用<br>情感<br>Prompt<br>报告<br><b>配置</b></div>
+        <div class="label" style="margin-top:15px">Actions</div>
+        <div style="font-size:13px;line-height:2.15">分析<br>内容<br>对话 Anthony<br>训练 Anthony</div>
+        <div style="border-top:1px solid #e5e7eb;margin-top:14px;padding-top:10px;font-size:13px;color:#9ca3af">底部不再重复“设置”</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A3 · 按新业务分类整理</h3>
+      <p>符合最初的功能分类，但会改变当前 Sidebar 分布。</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:20px">如果“不调整当前分布”是硬要求，请选择 A1。</p>

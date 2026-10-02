@@ -1,13 +1,14 @@
 """
-Gemini Client for Vertex AI
+Gemini Client (google-genai SDK)
 
-Uses Google Cloud Vertex AI to call Gemini model for prompt expansion.
+Uses the unified google-genai SDK with Vertex AI backend.
 """
 import json
 import logging
 from typing import Optional
-import vertexai
-from vertexai.generative_models import GenerativeModel, GenerationConfig
+from google import genai
+from google.genai import types
+from geo_common.llm import resolve_model_region
 from src.core.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -15,25 +16,56 @@ settings = get_settings()
 
 
 class GeminiClient:
-    """Vertex AI Gemini Client"""
-    
+    """Google GenAI Gemini Client (Vertex AI backend)"""
+
     def __init__(self):
         self.project_id = settings.GCP_PROJECT_ID
-        self.region = settings.GCP_REGION
         self.model_id = settings.GEMINI_MODEL_ID
-        self._initialized = False
-        self._model: Optional[GenerativeModel] = None
-    
-    def _ensure_initialized(self):
-        """Lazy initialization of Vertex AI SDK"""
-        if not self._initialized:
+        self._current_region: Optional[str] = None
+        self._client: Optional[genai.Client] = None
+        self._model_region_overrides: Optional[str] = None
+
+    def set_model_region_overrides(self, overrides_value: Optional[str]) -> None:
+        """Set DB-loaded model region overrides for subsequent calls."""
+        self._model_region_overrides = overrides_value
+
+    def _resolve_region(self, model_id: str) -> str:
+        """Determine the correct region for a given model ID.
+
+        ``model_region_overrides`` can route GA models such as
+        ``gemini-3.5-flash`` to the global endpoint without changing the
+        existing string-valued model-id settings.
+        """
+        return resolve_model_region(
+            model_id,
+            overrides_value=self._model_region_overrides,
+            default_region=settings.GCP_REGION,
+            global_region=settings.GCP_REGION_GLOBAL,
+        )
+
+    def _ensure_client(self, model_id: Optional[str] = None):
+        """Lazy initialization of genai Client.
+
+        Dynamically switches region when the target model requires a different
+        region than the currently initialized one (e.g., preview vs stable).
+        """
+        effective_model = model_id or self.model_id
+        target_region = self._resolve_region(effective_model)
+
+        if self._client is None or target_region != self._current_region:
             if not self.project_id:
                 raise ValueError("GCP_PROJECT_ID is not set")
-            logger.info(f"[GEMINI-S0] 初始化 Vertex AI | project={self.project_id} | region={self.region} | model={self.model_id}")
-            vertexai.init(project=self.project_id, location=self.region)
-            self._model = GenerativeModel(self.model_id)
-            self._initialized = True
-            logger.info(f"[GEMINI-S0] Vertex AI 初始化完成")
+            logger.info(
+                f"[GEMINI-S0] 初始化 GenAI Client | project={self.project_id} "
+                f"| region={target_region} | model={effective_model}"
+            )
+            self._client = genai.Client(
+                vertexai=True,
+                project=self.project_id,
+                location=target_region,
+            )
+            self._current_region = target_region
+            logger.info(f"[GEMINI-S0] GenAI Client 初始化完成 | region={target_region}")
     
     async def generate_prompts(
         self,
@@ -60,14 +92,14 @@ class GeminiClient:
         Returns:
             list[str]: N prompt strings
         """
-        self._ensure_initialized()
-        
+        self._ensure_client()
+
         if isinstance(peers, list):
             peers = ", ".join(peers)
-            
+
         # Only pass peers when intent is Competitive Evaluation
         effective_peers = peers if intent == "Competitive Evaluation" else None
-        
+
         # Build user prompt with intent-specific guidance
         user_prompt = self._build_user_prompt(
             client_name=client_name,
@@ -78,22 +110,22 @@ class GeminiClient:
             intent=intent,
             n=n
         )
-        
+
         logger.info(f"[GEMINI-S1] 开始生成 prompts | client={client_name} | intent={intent} | n={n} | include_peers={effective_peers is not None}")
         logger.debug(f"[GEMINI-S1] User prompt: {user_prompt[:200]}...")
-        
+
         try:
-            # Use JSON mode for structured output
-            generation_config = GenerationConfig(
+            config = types.GenerateContentConfig(
                 response_mime_type="application/json",
                 temperature=0.8,
-                max_output_tokens=4096
+                max_output_tokens=4096,
             )
-            
-            logger.info(f"[GEMINI-S2] 调用 Gemini API...")
-            response = self._model.generate_content(
+
+            logger.info(f"[GEMINI-S2] 调用 Gemini API (async)...")
+            response = await self._client.aio.models.generate_content(
+                model=self.model_id,
                 contents=user_prompt,
-                generation_config=generation_config,
+                config=config,
             )
             
             logger.info(f"[GEMINI-S2] Gemini API 调用成功 | resp_len={len(response.text)}")
@@ -120,6 +152,41 @@ class GeminiClient:
         except Exception as e:
             logger.error(f"[GEMINI-ERR] 生成失败 | error={e}")
             raise
+
+    async def generate_content_async(
+        self,
+        contents: str,
+        model: Optional[str] = None,
+        config: Optional[types.GenerateContentConfig] = None,
+        # Legacy kwarg support for callers still passing generation_config
+        generation_config: Optional[types.GenerateContentConfig] = None,
+    ):
+        """
+        Generic async content generation, used by FinalPromptBuilder for prompt fusion.
+
+        Dynamically resolves the correct region based on the model being used.
+        Model-specific overrides route GA/global-only models without changing
+        existing model-id settings.
+
+        Args:
+            contents: The prompt text to send to Gemini.
+            model: Optional model ID override.
+            config: Optional GenerateContentConfig override.
+            generation_config: Legacy alias for config (backwards compat).
+
+        Returns:
+            GenerateContentResponse from google-genai.
+        """
+        effective_model_id = model or self.model_id
+        effective_config = config or generation_config
+        # Re-initialize client with correct region if the target model requires it
+        self._ensure_client(model_id=effective_model_id)
+
+        return await self._client.aio.models.generate_content(
+            model=effective_model_id,
+            contents=contents,
+            config=effective_config,
+        )
 
     def _build_user_prompt(
         self,

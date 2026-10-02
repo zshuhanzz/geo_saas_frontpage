@@ -1,12 +1,8 @@
 fastapi
 uvicorn
 pydantic-settings
-sqlalchemy
 asyncpg
-databases
 httpx
 google-cloud-pubsub
 python-dotenv
-alembic
-greenlet
-google-cloud-aiplatform
+google-genai

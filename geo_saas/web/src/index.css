@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 14% 98%;
+    --foreground: 230 15% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 230 15% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 230 15% 8%;
+    --primary: 156 81% 35%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 220 13% 95%;
+    --secondary-foreground: 230 10% 12%;
+    --muted: 220 13% 95%;
+    --muted-foreground: 220 8% 46%;
+    --accent: 220 13% 95%;
+    --accent-foreground: 230 10% 12%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 156 81% 35%;
+    --radius: 0.5rem;
+    --primary-glow: 0 0 20px rgba(46, 232, 158, 0.12);
+  }
+
+  .dark {
+    --background: 230 20% 3%;
+    --foreground: 0 0% 96%;
+    --card: 230 16% 7%;
+    --card-foreground: 0 0% 96%;
+    --popover: 230 16% 7%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 156 81% 55%;
+    --primary-foreground: 230 15% 4%;
+    --secondary: 230 12% 10%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 230 12% 10%;
+    --muted-foreground: 230 5% 50%;
+    --accent: 230 12% 12%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 230 10% 12%;
+    --input: 230 12% 12%;
+    --ring: 156 81% 55%;
+    --primary-glow: 0 0 24px rgba(0, 230, 118, 0.15);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .prose mark {
+    @apply bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 px-1.5 py-0.5 rounded font-semibold;
+  }
+}
+
+/* ===== GRADIENT TEXT (landing page style) ===== */
+.gradient-text {
+  background: linear-gradient(135deg, #00E676, #00BCD4, #7c4dff, #00E676);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientFlow 5s ease-in-out infinite;
+}
+
+.gradient-text-static {
+  @apply text-emerald-500;
+}
+
+/* ===== GLOW CARD (landing page pattern) ===== */
+.glow-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(0,230,118,0), rgba(0,230,118,0.25), rgba(0,200,255,0.15), rgba(120,80,255,0.1), rgba(0,230,118,0));
+  background-size: 400% 400%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.glow-card:hover::before {
+  opacity: 1;
+  animation: borderRotate 4s linear infinite;
+}
+
+/* ===== GLASS CARD ===== */
+.glass-card {
+  @apply bg-white/80 dark:bg-white/[0.03] backdrop-blur-xl border border-white/20 dark:border-white/[0.06];
+}
+
+/* ===== HOVER LIFT ===== */
+.hover-lift {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover dark:hover:shadow-card-hover-dark;
+}
+
+/* ===== NOISE TEXTURE OVERLAY ===== */
+.noise-overlay::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.015;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px;
+}
+
+.dark .noise-overlay::before {
+  opacity: 0.025;
+}
+
+/* ===== GRID BACKGROUND (landing page style with radial mask) ===== */
+.dark-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 50% at 50% 30%, black 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 70% 50% at 50% 30%, black 30%, transparent 80%);
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/30;
+}
+
+/* ===== FOCUS GLOW (for inputs) ===== */
+.focus-glow:focus,
+.focus-glow:focus-within {
+  border-color: hsl(var(--primary) / 0.4);
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.15), 0 0 16px rgba(0, 230, 118, 0.1);
+}
+
+/* ===== ICON BOX (landing page .icon style) ===== */
+.icon-box {
+  @apply flex items-center justify-center rounded-xl;
+  background: rgba(0, 230, 118, 0.05);
+  border: 1px solid rgba(0, 230, 118, 0.08);
+  box-shadow: 0 0 20px rgba(0, 230, 118, 0.05);
+}
+
+.dark .icon-box {
+  background: rgba(0, 230, 118, 0.05);
+  border-color: rgba(0, 230, 118, 0.08);
+}
+
+:root .icon-box {
+  background: hsl(var(--primary) / 0.06);
+  border-color: hsl(var(--primary) / 0.12);
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.06);
+}

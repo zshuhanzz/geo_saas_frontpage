@@ -1,0 +1,46 @@
+{
+  "__doc": "新用户引导（OnboardingWizard）：欢迎语、业务形态分支（Own / OEM / Both / Skip）、经销渠道品牌录入步骤、引导相关 tooltip。",
+  "welcomeTitle": "欢迎来到 AnswerX GEO",
+  "welcomeDescription": "在开始追踪前，我们想快速了解一下 <1>{{clientName}}</1> 的业务结构。",
+  "question": "您的品牌是如何出现在市场上的？",
+  "branches": {
+    "ownTitle": "自营品牌",
+    "ownDesc": "AI 会直接提到我们的品牌名（如小米、华为、Roborock）。",
+    "oemTitle": "OEM / 贴牌供应商",
+    "oemDesc": "我们的产品挂在代理商／零售平台的品牌下销售。",
+    "bothTitle": "两者都有",
+    "bothDesc": "自营品牌 + 同时通过代理商销售。",
+    "skipTitle": "稍后再配置",
+    "skipDesc": "先看看产品，稍后再回来设置。"
+  },
+  "oemStep": {
+    "prompt": "让我们先录入您产品所挂的第一个经销渠道品牌 — 之后您还可以添加更多。",
+    "shadowBrandName": "经销渠道品牌名",
+    "shadowBrandPlaceholder": "例如：渠道品牌名 / Amazon / 京东自营",
+    "alias": "常见别名（可选）",
+    "aliasPlaceholder": "例如 RC",
+    "nextBadge": "下一步",
+    "nextHint": "完成后您可以前往 <1>竞品</1> Tab，添加在同一渠道上销售的竞争 SKU；这一步是可选的，随时可以回来配置。"
+  },
+  "actions": {
+    "skip": "跳过",
+    "next": "下一步",
+    "back": "返回",
+    "finish": "完成"
+  },
+  "toasts": {
+    "shadowBrandSaveFailed": "渠道品牌保存失败，但引导已完成，可在设置页手动添加：{{message}}",
+    "success": "欢迎使用 AnswerX GEO",
+    "completeFailed": "完成引导时出错",
+    "unknownError": "未知错误"
+  },
+  "tooltips": {
+    "onboardingOwn": "AI 会直接提到您的品牌名。典型如 Roborock、小米等有独立品牌站和消费者认知的客户。",
+    "onboardingOem": "您的产品在终端市场上不以您的公司名销售，而是挂在经销商／代理商的品牌下（典型如 ODM 代工厂通过 Amazon / Walmart / 渠道品牌销售）。",
+    "onboardingBoth": "您有自营品牌，同时也在 Amazon / Walmart 等第三方平台销售，需要同时追踪自家品牌 + 渠道维度。",
+    "onboardingSkip": "先跳过引导进入系统。您可以随时在「设置」里完成品牌和话题配置，引导不会再次自动弹出。",
+    "onboardingBusinessShape": "根据您的品牌在市场上的呈现方式选择最贴近的选项，后续的数据口径和建议逻辑会据此适配。可以在「设置」里随时调整。",
+    "onboardingShadowBrandName": "在该渠道上，您产品的外显品牌名（AI 答案里真正出现的名字，例如 Amazon Basics、Rough Country）。",
+    "onboardingShadowAlias": "该经销渠道品牌常见的缩写或别称（例如 RC、AMZ），AI 回答里可能用到的写法都可以加进来。"
+  }
+}

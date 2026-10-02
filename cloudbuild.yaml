@@ -1,0 +1,34 @@
+# cloudbuild.yaml — unified build template for all GEO modules.
+#
+# Build context is the repository root so that both geo_common/ and the
+# requested module's source are visible to Docker. The specific Dockerfile
+# for each module is selected via the _DOCKERFILE substitution.
+#
+# Used by deploy_all.sh for every Python module (collector, analyzer,
+# saas API, admin API, agent). Frontend web images (geo_saas/web,
+# geo_admin/web) do NOT use this file — they have self-contained build
+# contexts under their respective web/ directories.
+#
+# Substitutions:
+#   _DOCKERFILE  path to the module's Dockerfile (relative to repo root)
+#   _IMAGE       full Artifact Registry image tag to produce (incl. version)
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - '${_DOCKERFILE}'
+      - '-t'
+      - '${_IMAGE}'
+      - '.'
+
+images:
+  - '${_IMAGE}'
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+
+substitutions:
+  _DOCKERFILE: ''
+  _IMAGE: ''

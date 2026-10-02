@@ -14,6 +14,7 @@ db_instance_connection_name = "your-project:us-central1:your-instance"
 db_user                     = "your-db-user"
 db_password                 = "your-db-password"
 db_name                     = "your-db-name"
+google_oauth_client_id      = "your-google-oauth-web-client-id.apps.googleusercontent.com"
 
 # Access Control
 allow_unauthenticated = true

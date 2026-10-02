@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Viewer Actions 只读权限矩阵</title>
+  <style>
+    :root { --bg:#f7f8fa; --card:#fff; --ink:#182230; --muted:#667085; --line:#d0d5dd; --green:#067647; --green-soft:#ecfdf3; --red:#b42318; --red-soft:#fef3f2; --blue:#155eef; --blue-soft:#eff4ff; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { max-width:1050px; margin:0 auto; padding:44px 28px; }
+    h1 { margin:0; font-size:28px; letter-spacing:-.03em; }
+    .lead { margin:9px 0 24px; color:var(--muted); font-size:14px; line-height:1.6; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(16,24,40,.035); }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:15px 17px; text-align:left; border-bottom:1px solid #eaecf0; font-size:13px; }
+    th { background:#f9fafb; color:#475467; font-size:12px; }
+    tr:last-child td { border-bottom:0; }
+    .yes, .no, .partial { display:inline-flex; border-radius:999px; padding:4px 9px; font-size:11px; font-weight:750; }
+    .yes { color:var(--green); background:var(--green-soft); }
+    .no { color:var(--red); background:var(--red-soft); }
+    .partial { color:var(--blue); background:var(--blue-soft); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; color:#344054; }
+    .note { margin-top:18px; border:1px solid #b2ddff; background:#eff8ff; border-radius:14px; padding:17px 18px; color:#175cd3; font-size:13px; line-height:1.65; }
+    @media (max-width:760px) { th,td { padding:12px 10px; } .capability { display:none; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Viewer：Actions 只读产物访问</h1>
+  <p class="lead">页面是否可进入，与是否可以执行任务分开判断。Workspace 未购买时仍优先显示购买提示。</p>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>功能</th>
+          <th>Viewer 页面状态</th>
+          <th>Viewer 可做</th>
+          <th>Viewer 不可做</th>
+          <th class="capability">能力拆分</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>分析内容</strong></td>
+          <td><span class="partial">只读</span></td>
+          <td>查看已有分析报告</td>
+          <td>创建、运行、编辑、删除任务</td>
+          <td class="capability"><code>view / execute / manage</code></td>
+        </tr>
+        <tr>
+          <td><strong>内容生成</strong></td>
+          <td><span class="partial">只读</span></td>
+          <td>查看已有生成文章</td>
+          <td>生成、创建、运行、编辑、删除任务</td>
+          <td class="capability"><code>view / execute / manage</code></td>
+        </tr>
+        <tr>
+          <td><strong>对话 Anthony</strong></td>
+          <td><span class="no">角色锁定</span></td>
+          <td>—</td>
+          <td>进入对话、发送消息</td>
+          <td class="capability"><code>execute</code></td>
+        </tr>
+        <tr>
+          <td><strong>训练 Anthony</strong></td>
+          <td><span class="no">角色锁定</span></td>
+          <td>—</td>
+          <td>进入训练、修改训练数据</td>
+          <td class="capability"><code>execute / manage</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note"><strong>交互原则：</strong>Viewer 进入分析或内容页面时保留历史产物列表和详情入口；执行按钮禁用或替换为“联系管理员授予权限”的弱提示。Chat 与 Training 没有独立只读价值，因此显示整页角色锁定状态。</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<title>AnswerX GEO 功能分区与 RBAC 使用 Playbook</title>
+
+<callout emoji="🧭" background-color="light-green" border-color="green">
+  <p><b>适用对象：</b>Account Manager、客户成功、运营及其他需要为客户开通 Workspace 和分配账号权限的内部同事。</p>
+  <p><b>一句话理解：</b>用户最终能做什么，由“Workspace 开通了哪些功能”与“用户在该 Workspace 中是什么角色”共同决定。</p>
+</callout>
+
+<h1>一、先记住这三条规则</h1>
+<ol>
+  <li seq="auto"><b>Workspace 功能包决定功能范围。</b>没有开通的模块，普通客户账号不能使用。</li>
+  <li seq="auto"><b>角色决定可查看、可操作的程度。</b>例如 Viewer 以查看为主，Admin 可以在已开通范围内执行和管理。</li>
+  <li seq="auto"><b>内部支持角色可以跨过功能包限制。</b>Account Manager 和 Super Admin 用于内部服务客户，不应分配给客户人员。</li>
+</ol>
+<p>所有角色看到的左侧 Sidebar 结构保持一致。未开通或无权限的功能不会消失，而会显示对应的说明页，帮助用户理解该功能以及下一步应联系谁。</p>
+
+<h1>二、功能分区</h1>
+<p>目前 SaaS 端分为两个一级功能区。</p>
+<table>
+  <colgroup><col width="180"/><col width="450"/><col width="260"/></colgroup>
+  <thead>
+    <tr>
+      <th background-color="light-green">一级功能区</th>
+      <th background-color="light-green">包含的二级功能</th>
+      <th background-color="light-green">主要用途</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>数据分析与洞察</b></td>
+      <td>总览、可见度、引用、情感、Prompt、报告</td>
+      <td>查看品牌在 AI 搜索平台中的表现、趋势和报告。</td>
+    </tr>
+    <tr>
+      <td><b>Actions</b></td>
+      <td>配置、分析、内容、对话 Anthony、训练 Anthony</td>
+      <td>维护 Workspace 设置，执行分析和内容工作，以及使用 Anthony。</td>
+    </tr>
+  </tbody>
+</table>
+<p>在 Admin UI 的 <b>Feature Access → Feature Catalog &amp; Roles</b> 中，可以查看每个功能点属于哪个分区，以及四种角色对它拥有哪些能力。</p>
+<p><span text-color="gray">图 1｜功能目录与四类角色的能力矩阵</span></p>
+
+<h1>三、Workspace Feature Access：三种开通方式</h1>
+<p>入口：<b>Admin UI → Feature Access → Workspace Grants</b>。选择 Workspace 后，在右侧选择功能包并保存。</p>
+
+<h2>1. Custom（自定义）</h2>
+<p>适合试用、特殊合同或需要单独组合功能的客户。选择 Custom 后，可以逐项打开或关闭 Feature Switch。</p>
+<ul>
+  <li>只打开合同中明确包含的功能。</li>
+  <li>如果客户需要查看 Workspace 配置，请保持 <b>Configuration</b> 开启。</li>
+  <li>保存前再次核对 Workspace 名称，避免把授权改到另一个客户空间。</li>
+</ul>
+<callout emoji="💡" background-color="light-yellow" border-color="yellow">
+  <p><b>操作提示：</b>Custom 与标准功能包使用同一个 Workspace Grants 页面。先在右侧下拉框选择 Custom，再在下方逐项开关。切换 Workspace 时，页面会先进入加载状态；加载完成前不能编辑或保存，以避免旧 Workspace 的设置被误保存。</p>
+</callout>
+<p><span text-color="gray">图 2｜Workspace Grants 操作页面；Custom 也在右侧功能包下拉框中选择</span></p>
+
+<h2>2. Analytics Package（数据分析包）</h2>
+<p>适合以监测、洞察和报告为主的客户。标准包含：</p>
+<ul>
+  <li>总览、可见度、引用、情感、Prompt、报告；</li>
+  <li>Configuration 配置页面；</li>
+  <li>不包含分析任务、内容生成、对话 Anthony 和训练 Anthony。</li>
+</ul>
+<p>在 Analytics Package 中，Admin 可以编辑配置，Viewer 可以只读查看配置。</p>
+<p><span text-color="gray">图 3｜AnswerX Workspace 使用 Analytics Package</span></p>
+
+<h2>3. Full Platform（全部权限包）</h2>
+<p>适合购买完整平台能力的客户。它会开通当前所有数据分析与 Actions 功能。角色差异仍然有效：例如 Viewer 可以查看已有结果，但不能创建、运行、编辑或删除任务。</p>
+<p><span text-color="gray">图 4｜AnswerX Demo Workspace 使用 Full Platform</span></p>
+
+<h2>如何选择</h2>
+<table>
+  <colgroup><col width="200"/><col width="260"/><col width="430"/></colgroup>
+  <thead>
+    <tr>
+      <th background-color="light-green">客户情况</th>
+      <th background-color="light-green">建议选择</th>
+      <th background-color="light-green">说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>标准数据监测客户</td>
+      <td><b>Analytics Package</b></td>
+      <td>开通分析看板、报告和配置查看能力。</td>
+    </tr>
+    <tr>
+      <td>完整平台客户</td>
+      <td><b>Full Platform</b></td>
+      <td>开通全部分析与 Actions 能力。</td>
+    </tr>
+    <tr>
+      <td>试用或特殊合同</td>
+      <td><b>Custom</b></td>
+      <td>根据合同逐项选择；上线前需二次核对。</td>
+    </tr>
+  </tbody>
+</table>
+<p>在 <b>Feature Access → Feature Packages</b> 中，可以查看 Analytics Package 和 Full Platform 当前包含的功能点。</p>
+<p><span text-color="gray">图 5｜标准功能包的组成</span></p>
+
+<h1>四、RBAC：四种角色怎么用</h1>
+<table>
+  <colgroup><col width="150"/><col width="170"/><col width="170"/><col width="370"/></colgroup>
+  <thead>
+    <tr>
+      <th background-color="light-green">角色</th>
+      <th background-color="light-green">适用对象</th>
+      <th background-color="light-green">是否跨过功能包</th>
+      <th background-color="light-green">日常理解</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Viewer</b></td>
+      <td>客户只读用户</td>
+      <td>否</td>
+      <td>查看已开通的数据、报告和已有任务结果；不能创建、运行、编辑或删除任务。</td>
+    </tr>
+    <tr>
+      <td><b>Admin</b></td>
+      <td>客户 Workspace 管理员</td>
+      <td>否</td>
+      <td>在 Workspace 已开通的范围内，可以编辑配置并执行、管理相关任务。</td>
+    </tr>
+    <tr>
+      <td><b>Account Manager</b></td>
+      <td>内部客户负责人</td>
+      <td>是</td>
+      <td>必须明确加入对应 Workspace；加入后可使用该 Workspace 的全部功能，便于代运营和客户支持。</td>
+    </tr>
+    <tr>
+      <td><b>Super Admin</b></td>
+      <td>内部平台管理员</td>
+      <td>是</td>
+      <td>拥有全功能能力；开启 support_all_clients 后可支持所有 Workspace，适合平台维护和紧急排障。</td>
+    </tr>
+  </tbody>
+</table>
+
+<callout emoji="❗" background-color="light-red" border-color="red">
+  <p><b>重要边界：</b>客户 Admin 不是平台超级管理员。客户 Admin 仍然受 Workspace 功能包限制；Account Manager 和 Super Admin 仅供 AnswerX 内部人员使用。</p>
+</callout>
+
+<h2>Viewer：只读查看</h2>
+<p>Viewer 可以查看 Analytics 数据、已有分析任务报告和已有内容结果；在配置页可以切换品牌、竞品、追踪话题和人群等 Tab，也可以查看本 Tab 候选和 AI 建议，但新增、修改、删除等操作仍会保持禁用。</p>
+<p><span text-color="gray">图 6｜Viewer 进入配置页面时显示只读提示</span></p>
+
+<h2>Admin：在已开通范围内管理</h2>
+<p>Admin 可以编辑 Workspace 配置，并在功能包已开通的模块中创建、运行、编辑和删除任务。如果 Workspace 只有 Analytics Package，Admin 仍然不能使用未购买的内容生成或 Anthony 模块。</p>
+<p><span text-color="gray">图 7｜Admin 在 Configuration 页面可编辑</span></p>
+
+<h2>Account Manager：按 Workspace 提供内部支持</h2>
+<p>Account Manager 用于内部客户负责人。需要先在 Client Access 中把该人员加入指定 Workspace；加入后，即使客户只购买 Analytics Package，Account Manager 仍可访问该 Workspace 的全部模块。</p>
+<p><span text-color="gray">图 8｜Account Manager 在 Analytics Workspace 中仍可访问内容模块</span></p>
+
+<h2>Super Admin：平台级支持</h2>
+<p>Super Admin 用于极少数内部平台管理人员。它可以跨过功能包限制；开启 support_all_clients 后，不需要逐个添加 Workspace，也能进行全局支持。</p>
+<p><span text-color="gray">图 9｜Super Admin 在 Analytics Workspace 中跨过功能包限制</span></p>
+
+<h1>五、如何在 Admin UI 中分配权限</h1>
+<h2>Workspace 功能范围</h2>
+<ol>
+  <li seq="auto">进入 <b>Feature Access → Workspace Grants</b>。</li>
+  <li seq="auto">选择正确的 Workspace。</li>
+  <li seq="auto">选择 Custom、Analytics Package 或 Full Platform。</li>
+  <li seq="auto">等待当前 Workspace 授权加载完成后再编辑。</li>
+  <li seq="auto">核对 Feature Switch 并保存。</li>
+</ol>
+
+<h2>用户与角色</h2>
+<ol>
+  <li seq="auto">进入 <b>Access Control → Users</b>，确认用户已创建且状态正常。</li>
+  <li seq="auto">进入 <b>Access Control → Client Access</b>，把用户绑定到指定 Workspace，并选择 Viewer、Admin 或 Account Manager。</li>
+  <li seq="auto">只有平台级内部人员才进入 <b>Access Control → Super Admin</b> 配置 Super Admin；需要跨全部客户支持时，再开启 support_all_clients。</li>
+  <li seq="auto">调整后请让用户刷新页面或重新进入目标 Workspace，并按本文“用户实际看到什么”进行复核。</li>
+</ol>
+
+<h1>六、锁定页面代表什么</h1>
+<p>Sidebar 不会因为权限不同而隐藏功能。用户点击没有权限的模块时，会看到两类提示：</p>
+<table>
+  <colgroup><col width="220"/><col width="330"/><col width="330"/></colgroup>
+  <thead>
+    <tr>
+      <th background-color="light-green">提示原因</th>
+      <th background-color="light-green">含义</th>
+      <th background-color="light-green">建议处理</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Workspace 未开通</b></td>
+      <td>当前客户的功能包不包含该模块。</td>
+      <td>核对合同与 Feature Access；如需开通，联系客户经理升级或调整。</td>
+    </tr>
+    <tr>
+      <td><b>当前角色无权限</b></td>
+      <td>Workspace 已开通，但当前角色不能执行该操作。</td>
+      <td>确认是否应升级为 Admin，或由 Workspace 管理员完成操作。</td>
+    </tr>
+  </tbody>
+</table>
+<p><span text-color="gray">图 10｜Workspace 未开通时的提示</span></p>
+<p><span text-color="gray">图 11｜Workspace 已开通，但 Viewer 角色无权使用对话 Anthony</span></p>
+
+<h1>七、三个常见配置示例</h1>
+<h2>场景 A：标准数据分析客户</h2>
+<ul>
+  <li>Workspace：Analytics Package</li>
+  <li>客户负责人：Admin</li>
+  <li>客户普通成员：Viewer</li>
+  <li>AnswerX 内部服务人员：Account Manager</li>
+</ul>
+
+<h2>场景 B：完整平台客户</h2>
+<ul>
+  <li>Workspace：Full Platform</li>
+  <li>客户负责人：Admin</li>
+  <li>客户只读成员：Viewer</li>
+  <li>AnswerX 内部服务人员：Account Manager</li>
+</ul>
+
+<h2>场景 C：试用或特殊合同</h2>
+<ul>
+  <li>Workspace：Custom</li>
+  <li>只打开试用或合同明确包含的功能点</li>
+  <li>客户角色仍按 Admin / Viewer 分配</li>
+  <li>内部支持优先使用 Account Manager，不要把 Super Admin 给客户</li>
+</ul>
+
+<h1>八、登录时长优化</h1>
+<p>SaaS 端已启用 AnswerX 自有的安全 Session。正常情况下，用户一次登录可持续 <b>24 小时</b>，通常每天登录一次即可。Admin UI 的登录时长为 <b>12 小时</b>。用户主动退出、账号被停用、Session 被撤销或权限发生安全性变化时，系统仍可能要求提前重新登录。</p>
+<p>登录时长的延长不会放松 Workspace 和角色检查：用户每次访问数据时，系统仍会确认其是否有权访问当前 Workspace。</p>
+
+<h1>九、Account Manager 上线检查清单</h1>
+<checkbox done="false">Workspace 名称与客户名称一致。</checkbox>
+<checkbox done="false">功能包与合同一致：Custom / Analytics Package / Full Platform。</checkbox>
+<checkbox done="false">Configuration 是否按预期开放。</checkbox>
+<checkbox done="false">客户负责人是 Admin，普通成员按需设为 Viewer。</checkbox>
+<checkbox done="false">内部服务人员使用 Account Manager，不给客户分配内部角色。</checkbox>
+<checkbox done="false">如使用 Custom，已逐项核对 Feature Switch。</checkbox>
+<checkbox done="false">已分别验证一个客户角色和一个内部角色的实际页面效果。</checkbox>
+<checkbox done="false">发现异常时，先区分“Workspace 未开通”还是“角色无权限”，必要时查看 User Audit。</checkbox>
+
+<callout emoji="✅" background-color="light-green" border-color="green">
+  <p><b>推荐顺序：</b>先配置 Workspace 功能包 → 再分配用户角色 → 最后切换到 SaaS 验证用户实际看到的页面。</p>
+</callout>

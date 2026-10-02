@@ -1,0 +1,40 @@
+{
+  "__doc": "Sidebar（工作区选择器、Dashboards / Agents 导航、折叠 / 展开、Settings、Logout）以及全屏 Header 顶部页标题。",
+  "workspace": {
+    "placeholder": "选择工作区",
+    "loading": "加载中...",
+    "empty": "暂无工作区"
+  },
+  "groups": {
+    "dashboards": "数据看板",
+    "agents": "Agent"
+  },
+  "nav": {
+    "overview": "总览",
+    "visibility": "可见度",
+    "citation": "引用",
+    "sentiment": "情感",
+    "prompts": "Prompt",
+    "reports": "报告",
+    "tracking": "配置",
+    "analysis": "分析",
+    "content": "内容",
+    "chat": "对话 Anthony",
+    "training": "训练 Anthony",
+    "settings": "设置",
+    "knowledge": "知识库"
+  },
+  "controls": {
+    "collapse": "收起",
+    "expand": "展开侧栏"
+  },
+  "user": {
+    "signOutTooltip": "{{name}} — 退出登录"
+  },
+  "pageTitles": {
+    "answerEngineInsights": "答案引擎洞察",
+    "trackingStrategy": "追踪策略",
+    "agents": "Agent",
+    "trainAgent": "训练 Agent"
+  }
+}

@@ -1,0 +1,11 @@
+project_id                  = "your-gcp-project-id"
+region                      = "us-central1"
+repo_name                   = "geo-agent-repo"
+image_tag                   = "us-central1-docker.pkg.dev/YOUR_PROJECT/geo-agent-repo/geo-agent:v1"
+db_instance_connection_name = "your-project:us-central1:your-instance"
+db_name                     = "answer-x-geo-db"
+db_user                     = "answer-x-geo-db-user"
+db_password                 = "your-db-password"
+google_oauth_client_id      = "your-google-oauth-web-client-id.apps.googleusercontent.com"
+allow_unauthenticated       = true
+allowed_origins             = "https://your-saas-domain.com,https://your-admin-domain.com"

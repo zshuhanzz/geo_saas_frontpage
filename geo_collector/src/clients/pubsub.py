@@ -57,21 +57,18 @@ class PubSubService:
             logger.error(f"Failed to publish callback for task {task_id}: {e}")
             raise
 
-    def publish_dispatch_message(self, task_id: str, request_id: str = None):
+    def publish_dispatch_message(self, task_id: str):
         """
         Publishes a task dispatch message to geo-tasks-pending topic.
-        Used by PromptExpander to trigger CloroDispatcher.
+        Used by FinalPromptBuilder to trigger CloroDispatcher.
         
         Args:
             task_id: The task UUID to dispatch
-            request_id: Optional request UUID for tracking
         """
         message_data = {
             "task_id": task_id,
             "action": "dispatch"
         }
-        if request_id:
-            message_data["request_id"] = request_id
             
         data = json.dumps(message_data).encode("utf-8")
         
@@ -88,13 +85,12 @@ class PubSubService:
             logger.error(f"Failed to publish dispatch for task {task_id}: {e}")
             raise
 
-    def publish_dispatch_batch(self, task_ids: list, request_id: str = None) -> int:
+    def publish_dispatch_batch(self, task_ids: list) -> int:
         """
         Publishes multiple dispatch messages in batch.
         
         Args:
             task_ids: List of task UUIDs to dispatch
-            request_id: Optional request UUID for tracking
             
         Returns:
             int: Number of successfully published messages
@@ -107,8 +103,6 @@ class PubSubService:
                 "task_id": task_id,
                 "action": "dispatch"
             }
-            if request_id:
-                message_data["request_id"] = request_id
                 
             data = json.dumps(message_data).encode("utf-8")
             
@@ -130,7 +124,7 @@ class PubSubService:
             except Exception as e:
                 logger.error(f"Failed to publish dispatch for task {task_id}: {e}")
         
-        logger.info(f"Published {success_count}/{len(task_ids)} dispatch messages for request {request_id}")
+        logger.info(f"Published {success_count}/{len(task_ids)} dispatch messages")
         return success_count
     
     # Legacy method name for backward compatibility

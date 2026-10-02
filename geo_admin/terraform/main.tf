@@ -43,13 +43,58 @@ resource "google_cloud_run_v2_service" "geo_admin_api" {
         value = "postgresql+asyncpg://${var.db_user}:${var.db_password}@/${var.db_name}?host=/cloudsql/${var.db_instance_connection_name}"
       }
 
+      env {
+        name  = "GOOGLE_OAUTH_CLIENT_ID"
+        value = var.google_oauth_client_id
+      }
+
+      env {
+        name  = "GCP_PROJECT_ID"
+        value = var.project_id
+      }
+
+      env {
+        name  = "GCP_REGION"
+        value = var.region
+      }
+
+      env {
+        name  = "GCP_REGION_GLOBAL"
+        value = "global"
+      }
+
+      env {
+        name  = "ADMIN_API_URL"
+        value = "https://geo-admin-api-uj5wohdjgq-uc.a.run.app"
+      }
+
+      env {
+        name  = "INVOKER_SERVICE_ACCOUNT"
+        value = var.system_invoker_service_account
+      }
+
+      env {
+        name  = "SERVICE_ACCOUNT_EMAIL"
+        value = var.system_invoker_service_account
+      }
+
+      env {
+        name  = "AGENT_API_URL"
+        value = var.agent_api_url
+      }
+
+      env {
+        name  = "ALLOWED_ORIGINS"
+        value = var.allowed_origins
+      }
+
       resources {
         limits = {
           cpu    = "1"
           memory = "512Mi"
         }
       }
-      
+
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"

@@ -1,218 +1,115 @@
-import sqlalchemy
-from databases import Database
-from sqlalchemy import (
-    Column, 
-    String, 
-    Integer, 
-    Text, 
-    DateTime, 
-    MetaData, 
-    Table, 
-    ForeignKey,
-    Index,
-    Boolean,
-    func
-)
-from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
+"""
+GEO Collector — Database access (Phase 2.5a unified asyncpg pool).
+
+Phase 2.5a migrated this module away from the third-party ``databases`` lib +
+SQLAlchemy ``Table`` MetaData into the shared ``geo_common.db`` asyncpg pool
+factory. Every other GEO module now uses ``create_asyncpg_pool``; this module
+removes the last remaining异类 caller.
+
+Public surface:
+
+* ``get_pool()`` — return the lazily-initialized module-level ``asyncpg.Pool``.
+* ``connect()`` — create the pool (call from app startup).
+* ``disconnect()`` — close the pool (call from app shutdown).
+* Table-name constants (``GEO_TASKS``, ``GEO_RESULTS`` …) for raw-SQL clarity.
+
+Why no SQLAlchemy ``Table`` definitions anymore:
+asyncpg uses ``$1, $2, …`` placeholders and raw SQL. The previous SQLAlchemy
+schema metadata existed only because the ``databases`` lib compiled SA
+constructs. We now write SQL strings directly. The canonical schema lives in
+``migrations/`` (and, for cross-module reference, ``geo_admin/src/database.py``).
+
+Schema alignment (v1.2 dual-mode tracking — Spec
+``docs/superpowers/specs/2026-04-20-dual-mode-tracking-design-v1.2-finalized.md``
+§4 + migrations 040–046):
+
+Collector role:
+* WRITES to ``geo_tasks`` / ``geo_results`` / ``geo_client_prompts``
+  (no longer to ``geo_citations`` directly — analyzer owns that).
+* READS from ``geo_clients`` / ``geo_client_brands`` / ``geo_client_peers``
+  / ``geo_client_domains`` / ``geo_client_topics`` /
+  ``geo_client_topic_products`` / ``geo_client_personas`` /
+  ``geo_client_prompts`` / ``geo_global_*`` for prompt assembly.
+"""
+from __future__ import annotations
+
+from typing import Optional
+
+import asyncpg
+from geo_common.db import create_asyncpg_pool
+
 from src.core.config import get_settings
 
-settings = get_settings()
+# ---------------------------------------------------------------------------
+# Module-level pool (lazy-init, lifecycle managed by FastAPI startup/shutdown
+# hooks or the Cloud Run Job's main()).
+# ---------------------------------------------------------------------------
 
-# Database connection
-database = Database(
-    settings.DATABASE_URL, 
-    min_size=1, 
-    max_size=5
-)
-metadata = MetaData()
+_pool: Optional[asyncpg.Pool] = None
 
-# ============================================================================
-# 1. geo_clients - 客户主表
-# ============================================================================
-geo_clients = Table(
-    "geo_clients",
-    metadata,
-    Column("id", UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4()),
-    Column("name", Text, nullable=False, unique=True),
-    Column("created_at", DateTime(timezone=True), server_default=func.now()),
-    Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now()),
-)
 
-# ============================================================================
-# 2. geo_client_peers - 客户竞对关系表
-# ============================================================================
-geo_client_peers = Table(
-    "geo_client_peers",
-    metadata,
-    Column("id", UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4()),
-    Column("client_id", UUID(as_uuid=True), ForeignKey("geo_clients.id", ondelete="CASCADE"), nullable=False),
-    Column("peer_name", Text, nullable=False),
-    Column("created_at", DateTime(timezone=True), server_default=func.now()),
-)
+async def connect(min_size: int = 1, max_size: int = 5) -> asyncpg.Pool:
+    """
+    Initialize the module-level asyncpg pool.
 
-# ============================================================================
-# 3. geo_client_domains - 客户域名表
-# ============================================================================
-geo_client_domains = Table(
-    "geo_client_domains",
-    metadata,
-    Column("id", UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4()),
-    Column("client_id", UUID(as_uuid=True), ForeignKey("geo_clients.id", ondelete="CASCADE"), nullable=False),
-    Column("domain", Text, nullable=False),
-    Column("is_primary", Boolean, server_default="false"),
-    Column("created_at", DateTime(timezone=True), server_default=func.now()),
-)
+    Idempotent: returns the existing pool if already connected.
+    Defaults preserve the original ``databases`` settings (1..5 connections),
+    appropriate for Cloud Run instances that scale horizontally.
+    """
+    global _pool
+    if _pool is None:
+        settings = get_settings()
+        _pool = await create_asyncpg_pool(
+            settings,
+            min_size=min_size,
+            max_size=max_size,
+        )
+    return _pool
 
-# ============================================================================
-# 4. geo_reports - 分析报告表
-# ============================================================================
-geo_reports = Table(
-    "geo_reports",
-    metadata,
-    Column("id", UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4()),
-    Column("name", Text, nullable=False),
-    
-    # Client 完整信息 (冗余快照)
-    Column("client_id", UUID(as_uuid=True), ForeignKey("geo_clients.id")),
-    Column("client_name", Text, nullable=False),
-    Column("peers", ARRAY(Text), server_default="{}"),
-    Column("owned_domains", ARRAY(Text), server_default="{}"),
-    
-    Column("status", Text, server_default="draft"),
-    Column("created_at", DateTime(timezone=True), server_default=func.now()),
-    Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now()),
-)
 
-# ============================================================================
-# 5. geo_requests - 请求表 (宽表)
-# ============================================================================
-geo_requests = Table(
-    "geo_requests",
-    metadata,
-    Column("request_id", UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4()),
-    
-    # Report 关联 (可选)
-    Column("report_id", UUID(as_uuid=True), ForeignKey("geo_reports.id")),
-    Column("report_name", Text),
-    
-    # Client 完整信息 (冗余)
-    Column("client_id", UUID(as_uuid=True), ForeignKey("geo_clients.id")),
-    Column("client_name", Text, nullable=False),
-    Column("peers", ARRAY(Text), server_default="{}"),
-    Column("owned_domains", ARRAY(Text), server_default="{}"),
-    
-    # 请求参数
-    Column("batch_id", Text),
-    Column("topic", Text),
-    Column("product", Text),
-    Column("country", Text, nullable=False, server_default="US"),
-    Column("platform", Text, nullable=False),
-    Column("intent", Text),
-    Column("target_user", JSONB),
-    
-    # 扩展参数
-    Column("prompts_per_request", Integer, server_default="20"),
-    Column("calls_per_prompt", Integer, server_default="100"),
-    
-    # 状态管理
-    Column("status", Text, server_default="PENDING"),
-    
-    Column("created_at", DateTime(timezone=True), server_default=func.now()),
-    Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now()),
-)
+async def disconnect() -> None:
+    """Close the module-level asyncpg pool. Safe to call when not connected."""
+    global _pool
+    if _pool is not None:
+        await _pool.close()
+        _pool = None
 
-# ============================================================================
-# 6. geo_tasks - 任务表 (宽表)
-# ============================================================================
-geo_tasks = Table(
-    "geo_tasks",
-    metadata,
-    Column("task_id", UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4()),
-    Column("request_id", UUID(as_uuid=True), ForeignKey("geo_requests.request_id"), nullable=False),
-    
-    # Report 关联 (冗余)
-    Column("report_id", UUID(as_uuid=True)),
-    Column("report_name", Text),
-    
-    # Client 完整信息 (冗余)
-    Column("client_id", UUID(as_uuid=True)),
-    Column("client_name", Text, nullable=False),
-    Column("peers", ARRAY(Text), server_default="{}"),
-    Column("owned_domains", ARRAY(Text), server_default="{}"),
-    
-    # 请求参数 (冗余)
-    Column("batch_id", Text),
-    Column("topic", Text),
-    Column("product", Text),
-    Column("country", Text, nullable=False),
-    Column("platform", Text, nullable=False),
-    Column("intent", Text),
-    Column("target_user", JSONB),
-    Column("calls_per_prompt", Integer),
-    
-    # Gemini 生成的内容
-    Column("prompt_text", Text, nullable=False),
-    Column("prompt_index", Integer),
-    
-    # 调度状态
-    Column("dispatched_count", Integer, server_default="0"),
-    Column("completed_count", Integer, server_default="0"),
-    Column("status", Text, server_default="PENDING"),
-    
-    Column("created_at", DateTime(timezone=True), server_default=func.now()),
-    Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now()),
-)
 
-# ============================================================================
-# 7. geo_results - 结果表 (超宽表，Analyzer 主输入)
-# ============================================================================
-geo_results = Table(
-    "geo_results",
-    metadata,
-    Column("result_id", Integer, primary_key=True, autoincrement=True),
-    Column("task_id", UUID(as_uuid=True), ForeignKey("geo_tasks.task_id"), nullable=False),
-    Column("request_id", UUID(as_uuid=True), nullable=False),
-    
-    # Cloro 响应
-    Column("cloro_task_id", Text),
-    Column("call_index", Integer, nullable=False),
-    Column("cloro_response", JSONB, nullable=False),
-    Column("http_status_code", Integer),
-    Column("latency_ms", Integer),
-    
-    # Unpacked Fields
-    Column("text", Text),
-    Column("html", Text),
-    Column("markdown", Text),
-    Column("sources", JSONB),
-    Column("shopping_cards", JSONB),
-    Column("places", JSONB),
-    Column("entities", JSONB),
-    Column("search_queries", JSONB),
-    Column("citation_pills", JSONB),
-    
-    # Report 关联 (冗余)
-    Column("report_id", UUID(as_uuid=True)),
-    Column("report_name", Text),
-    
-    # Client 完整信息 (冗余)
-    Column("client_id", UUID(as_uuid=True)),
-    Column("client_name", Text),
-    Column("peers", ARRAY(Text), server_default="{}"),
-    Column("owned_domains", ARRAY(Text), server_default="{}"),
-    
-    # 请求参数 (冗余)
-    Column("batch_id", Text),
-    Column("topic", Text),
-    Column("product", Text),
-    Column("country", Text),
-    Column("platform", Text),
-    Column("intent", Text),
-    Column("prompt_text", Text),
-    Column("target_user", JSONB),
-    
-    Column("ingested_at", DateTime(timezone=True), server_default=func.now()),
-)
+def get_pool() -> asyncpg.Pool:
+    """
+    Return the live pool. Raises if ``connect()`` has not been called.
 
-# 业务唯一约束 (幂等性)
-Index("uq_task_call", geo_results.c.task_id, geo_results.c.call_index, unique=True)
+    Most call sites should depend on the FastAPI startup hook having run; this
+    helper just unwraps the Optional so caller signatures stay clean.
+    """
+    if _pool is None:
+        raise RuntimeError(
+            "Database pool not initialized. Call `await connect()` first "
+            "(typically from the FastAPI startup hook or job main())."
+        )
+    return _pool
+
+
+# ---------------------------------------------------------------------------
+# Table-name constants — used in raw SQL strings to keep typos catchable in
+# one place. NOT a schema; consult ``migrations/`` for the source of truth.
+# ---------------------------------------------------------------------------
+
+# Global config
+GEO_GLOBAL_SETTINGS = "geo_global_settings"
+GEO_GLOBAL_PLATFORMS = "geo_global_platforms"
+GEO_GLOBAL_INTENTS = "geo_global_intents"
+
+# Client / tenancy
+GEO_CLIENTS = "geo_clients"
+GEO_CLIENT_BRANDS = "geo_client_brands"
+GEO_CLIENT_PEERS = "geo_client_peers"
+GEO_CLIENT_DOMAINS = "geo_client_domains"
+GEO_CLIENT_TOPICS = "geo_client_topics"
+GEO_CLIENT_TOPIC_PRODUCTS = "geo_client_topic_products"
+GEO_CLIENT_PERSONAS = "geo_client_personas"
+GEO_CLIENT_PROMPTS = "geo_client_prompts"
+
+# Execution
+GEO_TASKS = "geo_tasks"
+GEO_RESULTS = "geo_results"

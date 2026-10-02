@@ -1,21 +1,27 @@
 """
-Cloro Callback Service
+Cloro Callback Service (V2)
 
 Cloud Run Service that receives async callbacks from Cloro.dev API.
 Receives the callback JSON, enriches with task metadata, and publishes to Pub/Sub.
 
+V2 schema: reads client_id, topic_id, client_prompt_id, final_prompt from geo_tasks.
+
+Phase 2.5a: migrated from `databases` lib to `geo_common.db` asyncpg pool.
+
 Flow:
     Cloro API → HTTP POST → This Service → Pub/Sub (geo-cloro-callbacks)
 """
-from fastapi import FastAPI, Request, HTTPException, Query
-from pydantic import UUID4
-import logging
 import json
+import logging
 import time
-from sqlalchemy import select
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, HTTPException, Query, Request
+from pydantic import UUID4
+
 from src.clients.pubsub import PubSubService
+from src.core import database as db
 from src.core.config import get_settings
-from src.core.database import database, geo_tasks
 
 logging.basicConfig(
     level=logging.INFO,
@@ -23,25 +29,28 @@ logging.basicConfig(
 )
 logger = logging.getLogger("CloroCallback")
 
-app = FastAPI(title="GEO Cloro Callback Service")
-settings = get_settings()
-pubsub_service = PubSubService()
 
-
-@app.on_event("startup")
-async def startup():
-    """Connect to DB on startup."""
+# FastAPI ``@app.on_event("startup"/"shutdown")`` was deprecated in favour of
+# the ``lifespan`` context manager (FastAPI >=0.93). Same semantics: code before
+# ``yield`` runs on app boot, code after runs on shutdown — but in one place,
+# and exception-safe for resources spanning both phases.
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     logger.info("[CALLBACK-S0] ========== Cloro Callback Service 启动 ==========")
     logger.info("[CALLBACK-S0] 连接数据库...")
-    await database.connect()
+    await db.connect()
     logger.info("[CALLBACK-S0] 数据库连接成功")
+    try:
+        yield
+    finally:
+        logger.info("[CALLBACK-S0] 断开数据库连接...")
+        await db.disconnect()
+        logger.info("[CALLBACK-S0] ========== Cloro Callback Service 关闭 ==========")
 
 
-@app.on_event("shutdown")
-async def shutdown():
-    logger.info("[CALLBACK-S0] 断开数据库连接...")
-    await database.disconnect()
-    logger.info("[CALLBACK-S0] ========== Cloro Callback Service 关闭 ==========")
+app = FastAPI(title="GEO Cloro Callback Service (V2)", lifespan=lifespan)
+settings = get_settings()
+pubsub_service = PubSubService()
 
 
 @app.post("/callback/cloro")
@@ -52,23 +61,20 @@ async def receive_cloro_callback(
 ):
     """
     Receives async callback from Cloro.dev API.
-    
-    Design:
-    - Uses URL query params (task_id, call_index) for routing
-    - Resilient to Cloro JSON schema changes
-    - ELT pattern: extract raw, load to Pub/Sub, transform later
-    
+
     Flow:
     1. Receive JSON body
-    2. Query task metadata from geo_tasks
+    2. Query task metadata from geo_tasks (V2 fields)
     3. Publish to Pub/Sub (geo-cloro-callbacks)
     4. Return 200 OK immediately
     """
     start_time = time.time()
-    
-    # [CALLBACK-S1] 接收 Cloro 回调
-    logger.info(f"[CALLBACK-S1] 收到 Cloro 回调 | task_id={task_id} | call_index={call_index} | client={request.client.host}")
-    
+
+    logger.info(
+        f"[CALLBACK-S1] 收到 Cloro 回调 | task_id={task_id} | "
+        f"call_index={call_index} | client={request.client.host}"
+    )
+
     try:
         body = await request.json()
     except Exception:
@@ -76,39 +82,56 @@ async def receive_cloro_callback(
         raise HTTPException(status_code=400, detail="Invalid JSON body")
 
     payload_size = len(json.dumps(body))
-    logger.info(f"[CALLBACK-S1] 回调数据已接收 | task_id={task_id} | size={payload_size} bytes")
+    logger.info(
+        f"[CALLBACK-S1] 回调数据已接收 | task_id={task_id} | size={payload_size} bytes"
+    )
 
-    # [CALLBACK-S2] Query geo_tasks for metadata
+    # [CALLBACK-S2] Query geo_tasks for metadata (V2 schema)
     logger.info(f"[CALLBACK-S2] 查询 task 元数据 | task_id={task_id}")
     task_meta = None
+    pool = db.get_pool()
     try:
-        query = select(geo_tasks).where(geo_tasks.c.task_id == str(task_id))
-        row = await database.fetch_one(query)
-        if row:
-            task_meta = {
-                # Request/Report 关联
-                "request_id": str(row["request_id"]) if row["request_id"] else None,
-                "report_id": str(row["report_id"]) if row["report_id"] else None,
-                "report_name": row["report_name"],
-                # Client 信息
-                "client_id": str(row["client_id"]) if row["client_id"] else None,
-                "client_name": row["client_name"],
-                "peers": row["peers"] or [],
-                "owned_domains": row["owned_domains"] or [],
-                # 请求参数
-                "platform": row["platform"],
-                "batch_id": row["batch_id"],
-                "topic": row["topic"],
-                "product": row["product"],
-                "country": row["country"],
-                "intent": row["intent"],
-                "prompt_text": row["prompt_text"],
-                "target_user": row["target_user"],
-                "call_index": call_index,
-            }
-            logger.info(f"[CALLBACK-S2] 元数据已加载 | task_id={task_id} | client={task_meta['client_name']} | platform={task_meta['platform']}")
-        else:
-            logger.warning(f"[CALLBACK-S2] Task 不存在，继续处理 | task_id={task_id}")
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow(
+                f"SELECT * FROM {db.GEO_TASKS} WHERE task_id = $1",
+                str(task_id),
+            )
+            if row:
+                task_meta = {
+                    # V2 关联
+                    "client_prompt_id": str(row["client_prompt_id"]) if row["client_prompt_id"] else None,
+                    # Client 信息
+                    "client_id": str(row["client_id"]) if row["client_id"] else None,
+                    "client_name": row["client_name"],
+                    "peers": row["peers"] or [],
+                    "owned_domains": row["owned_domains"] or [],
+                    # 请求参数
+                    "platform": row["platform"],
+                    "batch_id": row["batch_id"],
+                    "topic_id": str(row["topic_id"]) if row["topic_id"] else None,
+                    "topic": row["topic"],
+                    "product": row["product"],
+                    "country": row["country"],
+                    "language": row["language"],
+                    "intent": row["intent"],
+                    "final_prompt": row["final_prompt"],
+                    "persona_used": row["persona_used"],
+                    "call_index": call_index,
+                }
+                # Fetch client_prompt original text
+                if row["client_prompt_id"]:
+                    cp_row = await conn.fetchrow(
+                        f"SELECT text FROM {db.GEO_CLIENT_PROMPTS} WHERE id = $1",
+                        row["client_prompt_id"],
+                    )
+                    if cp_row:
+                        task_meta["client_prompt_text"] = cp_row["text"]
+                logger.info(
+                    f"[CALLBACK-S2] 元数据已加载 | task_id={task_id} | "
+                    f"client={task_meta['client_name']} | platform={task_meta['platform']}"
+                )
+            else:
+                logger.warning(f"[CALLBACK-S2] Task 不存在，继续处理 | task_id={task_id}")
     except Exception as e:
         logger.error(f"[CALLBACK-S2] 查询元数据失败 | task_id={task_id} | error={e}")
 
@@ -117,7 +140,10 @@ async def receive_cloro_callback(
     try:
         message_id = pubsub_service.publish_callback_message(str(task_id), body, task_meta)
         duration = (time.time() - start_time) * 1000
-        logger.info(f"[CALLBACK-S3] Pub/Sub 发布成功 | task_id={task_id} | msg_id={message_id} | time={duration:.2f}ms")
+        logger.info(
+            f"[CALLBACK-S3] Pub/Sub 发布成功 | task_id={task_id} | "
+            f"msg_id={message_id} | time={duration:.2f}ms"
+        )
     except Exception as e:
         logger.error(f"[CALLBACK-S3] Pub/Sub 发布失败 | task_id={task_id} | error={e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
@@ -127,4 +153,4 @@ async def receive_cloro_callback(
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "version": "2.0.0"}

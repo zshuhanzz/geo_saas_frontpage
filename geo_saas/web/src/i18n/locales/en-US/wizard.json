@@ -1,0 +1,258 @@
+{
+  "__doc": "Shared wizard foundation (WizardShell / FieldRenderer / GenericStepRenderer) + customFields/* components. Reused by both the Analyze and Content Pipeline wizards.",
+  "executionPreview": {
+    "intro": "When you click Run, the system will automatically process the following flow:",
+    "bgHint": "The task runs asynchronously in the background — you can track its progress under \"All Tasks\".",
+    "reviseSteps": {
+      "round1": "Revise round 1",
+      "round1Desc": "Prioritize structure, missing modules, Citation Alignment, and platform-fit blockers.",
+      "recheck": "Post-revision recheck",
+      "recheckDesc": "Run Quality Gate again to confirm whether blockers remain after revision.",
+      "round2": "Revise round 2",
+      "round2Desc": "If needed, clean up incomplete sentences, duplicate FAQ, duplicate Conclusion, and brand density.",
+      "recheck2": "Second post-revision recheck",
+      "recheck2Desc": "Run Quality Gate again after the second revision; the final result is based on this recheck."
+    }
+  },
+  "modeGatePicker": {
+    "items": {
+      "manual": {
+        "label": "I'll decide",
+        "description": "Pick each option manually"
+      },
+      "ai_discover": {
+        "label": "Let AI discover",
+        "description": "AI recommends based on your data"
+      }
+    },
+    "aiAnalyzing": "AI is analyzing your data to pick the topics and prompts that need the most optimization...",
+    "aiFailed": "AI pre-selection failed: {{error}}",
+    "aiFailedFallback": "You can switch back to \"I'll decide\" and configure manually, or pick \"Let AI discover\" again to retry.",
+    "aiEmpty": "No recommendable data yet",
+    "aiEmptyHint": "Configure prompts on the Prompts page first and wait for the Analyzer to finish, then come back to use AI mode.",
+    "aiAutofilled": "Later steps have been auto-filled — adjust as needed."
+  },
+  "redditDiscovery": {
+    "sources": {
+      "p0": {
+        "title": "P0 · Web Search + Search Grounding",
+        "description": "Use Reddit URLs, subreddits, and keywords for limited discovery. This is the first production path."
+      },
+      "p1": {
+        "title": "P1 · Reddit API",
+        "description": "Read posts, comments, and subreddit context through the official Reddit API.",
+        "todo": "Needs configuration"
+      }
+    },
+    "inputs": {
+      "urls": "Reddit URLs",
+      "subreddits": "Subreddits",
+      "keywords": "Keywords"
+    },
+    "placeholders": {
+      "urls": "One Reddit post or search-result URL per line",
+      "subreddits": "e.g. r/artificial, r/marketing, r/VideoEditing",
+      "keywords": "e.g. AI promo video tool, product video maker"
+    },
+    "hint": "Discover results are passed into strategy and content generation to shape community questions, objections, competitor signals, and posting risks.",
+    "run": "Run Reddit Discover",
+    "ready": "Reddit insight generated",
+    "preview": {
+      "questions": "Community questions",
+      "angles": "Content angles",
+      "risks": "Posting risks"
+    }
+  },
+  "officialWebsiteDiscovery": {
+    "source": {
+      "title": "P0 · Official Website URLs + Search Grounding",
+      "description": "Read official website article pages and turn them into SEO/AEO content-gap insights for official-site article generation."
+    },
+    "inputs": {
+      "urls": "Official Website URLs"
+    },
+    "placeholders": {
+      "urls": "One official website article URL per line"
+    },
+    "hint": "Discover results are passed into strategy and content generation to fill official-site gaps, strengthen brand extractability, expand use cases, and improve brand-friendly FAQ coverage.",
+    "run": "Run Official Website Discover",
+    "ready": "Official website insight generated",
+    "preview": {
+      "gaps": "Content gaps",
+      "useCases": "Missing use cases",
+      "angles": "Article angles"
+    }
+  },
+  "citationAnalysis": {
+    "title": "Citation Analysis preflight",
+    "description": "Run Citation Analysis before generation so you can review cited pages, brand mention triage, and the grounded writing brief.",
+    "disabled": "Citation Analysis is disabled for this template.",
+    "fields": {
+      "sourceScope": "Citation Source Scope",
+      "brandPolicy": "Brand Mention Triage Policy",
+      "actionStrategy": "Content Action Decision",
+      "maxSources": "Max Citation Pages",
+      "fetchPages": "Fetch Full Web Pages",
+      "includeDomains": "Include Domains",
+      "excludeDomains": "Exclude Domains",
+      "queryOverride": "Citation Query Override"
+    },
+    "fetchHint": "Fetch page title, meta, canonical URL, and readable body when available.",
+    "queryPlaceholder": "Optional prompt, topic, or query override. Leave blank to use the selected prompts and topics.",
+    "runHint": "The result will be injected into strategy generation and final content generation.",
+    "run": "Run Citation Analysis",
+    "ready": "Citation Analysis result is ready",
+    "primaryAction": "Primary action",
+    "topSources": "Top cited source patterns",
+    "learnableStrengths": "Why AI likely cites these sources",
+    "learnableStrengthsDesc": "Reusable source advantages from already-cited pages: structure, evidence density, question framing, and extractable answer patterns.",
+    "visibilityGaps": "Gaps to fill for customer GEO visibility",
+    "visibilityGapsDesc": "Missing, incomplete, or unfavorable brand coverage that the generated content should fill conservatively.",
+    "mentionStates": {
+      "unmentioned": "Unmentioned",
+      "positiveNeutral": "Positive / Neutral",
+      "negativeMisleading": "Negative / Misleading",
+      "ambiguous": "Ambiguous"
+    },
+    "status": {
+      "idle": "Not run",
+      "loading": "Running",
+      "ready": "Ready",
+      "stale": "Needs rerun",
+      "error": "Failed"
+    }
+  },
+  "subredditTargeting": {
+    "title": "Subreddit Targeting",
+    "description": "Choose which Reddit communities this piece should target. AI Recommend only discovers candidates; rules are verified in the next step through deterministic fetch.",
+    "modes": {
+      "redditApi": "Reddit API",
+      "ai": "AI Recommend",
+      "manual": "Manual Input"
+    },
+    "redditApiPending": "Reddit API requires approved Reddit Data API access and configured Client ID / Client Secret. Use AI Recommend or Manual Input while approval is pending.",
+    "keywords": "Additional keywords",
+    "keywordsPlaceholder": "e.g. robot vacuum pet hair, hardwood floors, smart home",
+    "manual": "Manual subreddits",
+    "manualPlaceholder": "One per line, e.g. r/RobotVacuums",
+    "hint": "The result feeds Reddit Discovery for rules, about metadata, and discussion evidence.",
+    "run": "Generate subreddit candidates",
+    "selected": "Confirmed subreddits ({{count}})",
+    "stale": "Upstream inputs changed. Regenerate and confirm subreddit targets.",
+    "errors": {
+      "noCandidates": "No usable subreddit candidates were generated. Adjust the keywords or use manual input.",
+      "noneSelected": "Select at least one subreddit."
+    },
+    "status": {
+      "idle": "Not run",
+      "loading": "Running",
+      "ready": "Ready",
+      "stale": "Needs rerun",
+      "error": "Failed"
+    }
+  },
+  "redditResearchDiscovery": {
+    "title": "Reddit Discovery",
+    "description": "Fetch community rules, about metadata, and discussion evidence for confirmed subreddits. Rules must come from deterministic sources, not model-written text.",
+    "blocked": "Complete Subreddit Targeting and confirm at least one subreddit first.",
+    "hint": "If rules cannot be verified, the system marks them unavailable and requires manual review or a confirmed skip.",
+    "run": "Run Reddit Discovery",
+    "noRules": "No verified rules were fetched. Review this community manually before continuing.",
+    "reviewRequired": "Some communities have unverified rules. Paste reviewed rules or confirm skip.",
+    "manualRulesPlaceholder": "Paste manually reviewed community rules, one per line.",
+    "skipRules": "I reviewed this community and confirm continuing without rules for this run.",
+    "stale": "Subreddit, prompt, topic, or Citation inputs changed. Run Reddit Discovery again.",
+    "boolean": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "metadata": {
+      "subscribers": "Subscribers",
+      "active": "Active users",
+      "type": "Community type",
+      "nsfw": "NSFW",
+      "submission": "Submission type",
+      "source": "Source"
+    },
+    "posts": {
+      "search": "Relevant search posts",
+      "hot": "Hot posts",
+      "top": "Top posts",
+      "new": "New posts"
+    },
+    "riskSignals": "Community risk signals",
+    "status": {
+      "idle": "Not run",
+      "loading": "Running",
+      "ready": "Ready",
+      "stale": "Needs rerun",
+      "error": "Failed"
+    }
+  },
+  "redditResearchLinks": {
+    "subreddit": "Subreddit",
+    "about": "About",
+    "wiki": "Wiki",
+    "rulesSource": "Rules source"
+  },
+  "promptArtifactPreparation": {
+    "title": "Artifact Preparation",
+    "description": "Compress Reddit Research and strategy into final-prompt artifacts the generator can reuse directly.",
+    "blocked": "Complete Reddit Discovery first.",
+    "rulesBlocked": "Reddit Discovery still has unconfirmed community rules. Resolve them before generating artifacts.",
+    "hint": "Confirmed artifacts are passed into final generation; the backend will not regenerate them.",
+    "run": "Generate artifacts",
+    "regenerate": "Regenerate",
+    "ready": "Artifacts generated",
+    "confirmEdit": "Confirm edits",
+    "stale": "Upstream inputs changed. Regenerate or reconfirm edited artifacts.",
+    "status": {
+      "idle": "Not run",
+      "loading": "Running",
+      "ready": "Ready",
+      "stale": "Needs rerun",
+      "error": "Failed"
+    }
+  },
+  "promptRefPicker": {
+    "autoSelectN": "Auto-select the {{count}} worst-performing",
+    "clear": "Clear",
+    "next": "Next",
+    "pagination": "Page {{page}} / {{totalPages}} · {{total}} total",
+    "previous": "Previous",
+    "searchPlaceholder": "Search Client Prompts",
+    "tierBad": "Poor",
+    "tierOptimize": "Needs work",
+    "view": {
+      "aggregate": "Aggregate",
+      "detail": "Detail"
+    }
+  },
+  "topicRefPicker": {
+    "autoSelectOne": "Auto-select the worst-performing topic",
+    "autoSelectN": "Auto-select the {{count}} worst-performing topics",
+    "clear": "Clear",
+    "tierBad": "Poor",
+    "tierOptimize": "Needs work"
+  },
+  "promptEditor": {
+    "methodToggleOpen": "📖 GEO methodology reference",
+    "methodToggleClose": "Collapse methodology",
+    "methodHeader": "GEO methodology reference — click to insert into Prompt",
+    "promptPlaceholder": "Enter your analysis instruction...\n\nClick the data metrics above to insert them into the Prompt",
+    "expandTitle": "Expand editor",
+    "dialogTitle": "Edit analysis Prompt",
+    "dialogDescription": "Configure the underlying Prompt variables.",
+    "dialogHeader": "Edit analysis Prompt",
+    "dialogConfirm": "Confirm",
+    "metricsSectionPreset": "Template preset metrics",
+    "metricsSectionAvailable": "Available metrics",
+    "metricsHint": "Click to insert into Prompt",
+    "insertAll": "Insert all metrics ({{count}})",
+    "metricsEmpty": "No metrics available — select data domains in the previous step first"
+  },
+  "shell": {
+    "loadingSchema": "Loading configuration schema…",
+    "failedToLoad": "Failed to load workflow_config"
+  }
+}

@@ -1,0 +1,11 @@
+project_id                  = "your-gcp-project-id"
+region                      = "us-central1"
+repo_name                   = "answer-x-geo-repo"
+image_tag                   = "us-central1-docker.pkg.dev/YOUR_PROJECT/answer-x-geo-repo/geo-collector:v1"
+db_instance_connection_name = "your-project:us-central1:your-instance"
+db_name                     = "your-db-name"
+db_user                     = "your-db-user"
+db_password                 = "your-db-password"
+cloro_api_key               = "your-cloro-api-key"
+gemini_model_id             = "gemini-2.5-flash"
+# webhook_public_url        = "https://..."  # 第一次部署时留空，部署后填入真实 URL

@@ -58,5 +58,5 @@ variable "webhook_public_url" {
 variable "gemini_model_id" {
   description = "Gemini model ID for Vertex AI"
   type        = string
-  default     = "gemini-2.5-flash"
+  default     = "gemini-3-flash-preview"
 }

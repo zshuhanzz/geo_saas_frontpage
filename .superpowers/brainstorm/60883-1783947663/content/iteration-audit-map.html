@@ -1,0 +1,129 @@
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --panel: #ffffff;
+    --panel-2: #f8fafc;
+    --line: #d7e0ea;
+    --text: #152238;
+    --muted: #52657c;
+    --risk: #c73f47;
+    --warn: #a66a00;
+    --target: #147d64;
+    --accent: #245fc7;
+  }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; background: var(--bg) !important; }
+  body { margin: 0; color: var(--text) !important; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 38px 28px 52px; }
+  .eyebrow { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  h1 { margin: 10px 0 10px; font-size: clamp(30px, 4vw, 50px); line-height: 1.05; letter-spacing: -.04em; }
+  .lead { max-width: 850px; margin: 0 0 28px; color: var(--muted); font-size: 16px; line-height: 1.65; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 22px; color: var(--muted); font-size: 13px; }
+  .dot { display: inline-block; width: 9px; height: 9px; margin-right: 7px; border-radius: 50%; }
+  .risk { background: var(--risk); } .warn { background: var(--warn); } .target { background: var(--target); }
+  .tracks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .track { overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); box-shadow: 0 16px 45px rgba(35,57,82,.10); }
+  .track-head { padding: 20px 20px 16px; border-bottom: 1px solid var(--line); }
+  .num { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 24px; padding: 0 9px; border-radius: 999px; background: #e7effd; color: #2456a8; font-size: 12px; font-weight: 800; }
+  h2 { margin: 12px 0 5px; font-size: 21px; }
+  .sub { color: var(--muted); font-size: 13px; line-height: 1.45; }
+  .flow { padding: 18px; }
+  .node { position: relative; padding: 14px 14px 13px; border: 1px solid var(--line); border-radius: 12px; background: #fbfcfe; }
+  .node + .arrow { height: 30px; display: grid; place-items: center; color: #8aa0b8; font-size: 18px; }
+  .node strong { display: block; margin-bottom: 5px; font-size: 14px; }
+  .node p { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+  .node.current { border-left: 4px solid var(--risk); }
+  .node.gap { border-left: 4px solid var(--warn); }
+  .node.future { border-left: 4px solid var(--target); background: #effaf6; }
+  .tag { float: right; margin-left: 8px; font-size: 10px; font-weight: 800; letter-spacing: .06em; }
+  .current .tag { color: var(--risk); } .gap .tag { color: var(--warn); } .future .tag { color: var(--target); }
+  .cross { margin-top: 22px; padding: 19px 20px; border: 1px dashed #9eb0c5; border-radius: 16px; background: #ffffff; }
+  .cross h3 { margin: 0 0 10px; font-size: 15px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .chip { padding: 7px 10px; border-radius: 999px; background: #edf3f9; color: #40566e; font-size: 12px; border: 1px solid #d0dce8; }
+  .decision { margin-top: 22px; padding: 18px 20px; border-left: 4px solid var(--accent); border-radius: 4px 14px 14px 4px; background: #eef4ff; }
+  .decision strong { display: block; margin-bottom: 5px; }
+  .decision p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 13px; }
+  @media (max-width: 920px) { .tracks { grid-template-columns: 1fr; } }
+</style>
+
+<main class="wrap">
+  <div class="eyebrow">AnswerX GEO · P0 iteration audit</div>
+  <h1>需求 16–20：从五个需求点<br>收敛成三条交付主线</h1>
+  <p class="lead">这张图基于当前仓库的真实路由、API、数据模型和报告快照实现。红色是当前断点，黄色是需要我们确认的产品契约，绿色是建议的目标状态。</p>
+  <div class="legend">
+    <span><i class="dot risk"></i>当前断点</span>
+    <span><i class="dot warn"></i>待确认契约</span>
+    <span><i class="dot target"></i>目标状态</span>
+  </div>
+
+  <section class="tracks">
+    <article class="track">
+      <header class="track-head">
+        <span class="num">16 + 17</span>
+        <h2>Prompt Intelligence</h2>
+        <div class="sub">入口、指标下钻、Intent 筛选与批量导入应共用一个 Prompt 数据契约。</div>
+      </header>
+      <div class="flow">
+        <div class="node current"><span class="tag">CURRENT</span><strong>Prompt 藏在 Insights Tab</strong><p>已有 `/insights/prompts` 路由；Sidebar 没有一级入口。分析视图只加载 Visibility。</p></div>
+        <div class="arrow">↓</div>
+        <div class="node gap"><span class="tag">DECIDE</span><strong>Prompt concept 与 Intent 语义</strong><p>当前前端按 text + topic + product 合并；“三种 intent”可能指 V/C/S 类别，也可能指实际 intent_name。</p></div>
+        <div class="arrow">↓</div>
+        <div class="node current"><span class="tag">CURRENT</span><strong>Batch Upload 只有空按钮</strong><p>后端 `/prompts/batch` 只支持 JSON 创建，没有模板、预览、重复项策略和提交确认。</p></div>
+        <div class="arrow">↓</div>
+        <div class="node future"><span class="tag">TARGET</span><strong>统一 Prompt 工作台</strong><p>Sidebar 一级入口；Topic / Product / Prompt 全部展示 V/C/S；CSV 预览后按同一 concept key 导入。</p></div>
+      </div>
+    </article>
+
+    <article class="track">
+      <header class="track-head">
+        <span class="num">18</span>
+        <h2>Report Consistency</h2>
+        <div class="sub">静态与动态不应各自解释“指标、变化、排序”，而应共享契约。</div>
+      </header>
+      <div class="flow">
+        <div class="node current"><span class="tag">CURRENT</span><strong>静态页存在 live fallback</strong><p>选 Topic / Platform 后会直接调用实时 V/C/S API，与不可变快照语义发生漂移。</p></div>
+        <div class="arrow">↓</div>
+        <div class="node current"><span class="tag">CURRENT</span><strong>同环比字段大多为空</strong><p>快照只保存当前窗口；多项 change 字段固定为 null，缺少等长上期窗口。</p></div>
+        <div class="arrow">↓</div>
+        <div class="node gap"><span class="tag">DECIDE</span><strong>排序是局部还是全量</strong><p>当前列表会截断；若只对已加载行排序，就不等于真正的全局指标排序。</p></div>
+        <div class="arrow">↓</div>
+        <div class="node future"><span class="tag">TARGET</span><strong>共享 Metric + Sort Contract</strong><p>冻结 current / previous / delta；Prompt、Visibility、Citation、Sentiment 的静态与动态列表使用同一排序定义。</p></div>
+      </div>
+    </article>
+
+    <article class="track">
+      <header class="track-head">
+        <span class="num">19 + 20</span>
+        <h2>Admin Control Plane</h2>
+        <div class="sub">品牌主数据与 Workspace 生命周期都属于 Admin 控制面一致性问题。</div>
+      </header>
+      <div class="flow">
+        <div class="node current"><span class="tag">CURRENT</span><strong>Alias 双源且不同步</strong><p>SaaS 编辑 `geo_client_brands.aliases`；Admin 编辑 legacy `geo_clients.aliases`，分析链路不使用后者。</p></div>
+        <div class="arrow">↓</div>
+        <div class="node future"><span class="tag">TARGET</span><strong>品牌行是唯一事实源</strong><p>低风险方案是先移除 Admin legacy 字段；若保留编辑，则必须按 brand_id 编辑真实品牌行。</p></div>
+        <div class="arrow">↓</div>
+        <div class="node current"><span class="tag">CURRENT</span><strong>删除占用请求连接池</strong><p>同步级联删除一直持有 Admin pool 连接；并发时 Create 在名称检查之前就卡住。</p></div>
+        <div class="arrow">↓</div>
+        <div class="node future"><span class="tag">TARGET</span><strong>持久化异步删除任务</strong><p>API 快速返回 202；专用 worker 有界并发、幂等执行，删除工作不再竞争普通 CRUD 请求池。</p></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="cross">
+    <h3>贯穿三条主线的验收底座</h3>
+    <div class="chips">
+      <span class="chip">client_id 租户隔离</span>
+      <span class="chip">zh-CN / en-US i18n</span>
+      <span class="chip">无原生浏览器弹窗</span>
+      <span class="chip">DDL 仅交付 migration</span>
+      <span class="chip">静态报告可复现</span>
+      <span class="chip">两租户人工隔离验证</span>
+    </div>
+  </section>
+
+  <section class="decision">
+    <strong>建议的讨论顺序</strong>
+    <p>先确认 16 的信息架构与 Prompt concept → 再确认 17 的导入语义 → 再定义 18 的比较与排序契约 → 最后定 19 的 Admin 产品边界和 20 的异步删除生命周期。</p>
+  </section>
+</main>

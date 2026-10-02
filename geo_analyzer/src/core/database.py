@@ -1,211 +1,174 @@
 """
-GEO Analyzer - Database Connection and Table Definitions
-Synced with actual Cloud SQL database schema.
+GEO Analyzer — Database access (Phase 2.5b unified asyncpg pool).
+
+Phase 2.5b migrated this module from sync SQLAlchemy + psycopg2 (with full
+``Table`` MetaData definitions) onto the shared ``geo_common.db`` asyncpg pool
+factory. All other GEO modules now use ``create_asyncpg_pool``; analyzer was
+the last sync hold-out and now matches the collector's shape (see
+``geo_collector/src/core/database.py``).
+
+Public surface:
+
+* ``get_pool()`` — return the lazily-initialized module-level ``asyncpg.Pool``.
+* ``connect()`` — create the pool (call from job ``main()`` startup).
+* ``disconnect()`` — close the pool (call from job ``main()`` shutdown).
+* ``parse_affected(status_string)`` — turn an asyncpg command tag like
+  ``"UPDATE 7"`` into the affected row count, mirroring the collector helper.
+* Table-name constants (``GEO_RESULTS`` …) for raw-SQL clarity.
+
+Why no SQLAlchemy ``Table`` definitions anymore:
+asyncpg uses ``$1, $2, …`` placeholders and raw SQL. The previous SQLAlchemy
+schema metadata existed only because the analyzer compiled SA constructs via
+``sessionmaker`` — we now write SQL strings directly. The canonical schema
+lives in ``migrations/`` (and, for cross-module reference,
+``geo_admin/src/database.py``).
+
+Schema alignment (v1.2 dual-mode tracking — Spec
+``docs/superpowers/specs/2026-04-20-dual-mode-tracking-design-v1.2-finalized.md``
+§4 + migrations 040–046):
+
+Analyzer role:
+* READS from ``geo_results`` (un-analyzed batches) plus the per-client
+  config tables: ``geo_clients`` / ``geo_client_brands`` /
+  ``geo_client_peers`` / ``geo_client_domains`` / ``geo_client_topics`` /
+  ``geo_client_topic_products`` / ``geo_product_tracked_urls``.
+* WRITES to ``geo_brand_mentions`` / ``geo_product_mentions`` /
+  ``geo_citations`` / ``geo_sentiment_results`` / ``geo_sentiment_themes``
+  / ``geo_sentiment_theme_dictionary`` / ``geo_domain_categories`` /
+  ``geo_settings_candidates`` and stamps ``geo_results.analyzed_at``.
 """
-from contextlib import contextmanager
-from sqlalchemy import (
-    create_engine, MetaData, Table, Column, 
-    String, Integer, Boolean, DateTime, Text,
-    ForeignKey, func
-)
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
+from __future__ import annotations
+
+import json
+from typing import Optional
+
+import asyncpg
+from geo_common.db import create_asyncpg_pool
+
 from src.core.config import get_settings
 
-settings = get_settings()
-engine = create_engine(settings.database_url, pool_pre_ping=True)
-SessionLocal = sessionmaker(bind=engine)
-metadata = MetaData()
+
+async def _init_connection(conn: asyncpg.Connection) -> None:
+    """Per-connection initializer registered with the asyncpg pool.
+
+    Registers a JSON/JSONB codec so PG ``json``/``jsonb`` columns are
+    automatically decoded into Python objects on read and serialized via
+    ``json.dumps`` on write. Without this, asyncpg returns/sends raw text
+    and every read site would need a manual ``json.loads`` (and every
+    write a manual ``json.dumps``). Analyzer reads ``geo_results.sources``
+    / ``citation_pills`` and writes ``geo_settings_candidates.metadata``
+    (JSONB), so it benefits from both directions.
+    """
+    for typename in ("json", "jsonb"):
+        await conn.set_type_codec(
+            typename,
+            encoder=json.dumps,
+            decoder=json.loads,
+            schema="pg_catalog",
+        )
+
+# ---------------------------------------------------------------------------
+# Module-level pool (lazy-init, lifecycle managed by the Cloud Run Job's
+# main() — start with `await connect()` and end with `await disconnect()`).
+# ---------------------------------------------------------------------------
+
+_pool: Optional[asyncpg.Pool] = None
 
 
-# ============================================================================
-# Source Tables (READ) - From geo_collector
-# ============================================================================
+async def connect(min_size: int = 1, max_size: int = 5) -> asyncpg.Pool:
+    """
+    Initialize the module-level asyncpg pool.
 
-geo_clients = Table(
-    "geo_clients",
-    metadata,
-    Column("id", UUID(as_uuid=True), primary_key=True),
-    Column("name", Text, nullable=False, unique=True),
-    Column("created_at", DateTime(timezone=True)),
-    Column("updated_at", DateTime(timezone=True)),
-)
-
-geo_reports = Table(
-    "geo_reports",
-    metadata,
-    Column("id", UUID(as_uuid=True), primary_key=True),
-    Column("name", Text, nullable=False),
-    Column("client_id", UUID(as_uuid=True)),
-    Column("client_name", Text, nullable=False),
-    Column("peers", ARRAY(Text)),
-    Column("owned_domains", ARRAY(Text)),
-    Column("status", Text),
-    Column("created_at", DateTime(timezone=True)),
-    Column("updated_at", DateTime(timezone=True)),
-)
-
-geo_requests = Table(
-    "geo_requests",
-    metadata,
-    Column("request_id", UUID(as_uuid=True), primary_key=True),
-    Column("report_id", UUID(as_uuid=True)),
-    Column("report_name", Text),
-    Column("client_id", UUID(as_uuid=True)),
-    Column("client_name", Text, nullable=False),
-    Column("peers", ARRAY(Text)),
-    Column("owned_domains", ARRAY(Text)),
-    Column("batch_id", Text),
-    Column("topic", Text),
-    Column("product", Text),
-    Column("country", Text, nullable=False),
-    Column("platform", Text, nullable=False),
-    Column("intent", Text),
-    Column("target_user", JSONB),
-    Column("status", Text),
-    Column("created_at", DateTime(timezone=True)),
-    Column("updated_at", DateTime(timezone=True)),
-)
-
-geo_tasks = Table(
-    "geo_tasks",
-    metadata,
-    Column("task_id", UUID(as_uuid=True), primary_key=True),
-    Column("request_id", UUID(as_uuid=True)),
-    Column("report_id", UUID(as_uuid=True)),
-    Column("report_name", Text),
-    Column("client_id", UUID(as_uuid=True)),
-    Column("client_name", Text, nullable=False),
-    Column("peers", ARRAY(Text)),
-    Column("owned_domains", ARRAY(Text)),
-    Column("batch_id", Text),
-    Column("topic", Text),
-    Column("product", Text),
-    Column("country", Text, nullable=False),
-    Column("platform", Text, nullable=False),
-    Column("intent", Text),
-    Column("target_user", JSONB),
-    Column("prompt_text", Text, nullable=False),
-    Column("prompt_index", Integer),
-    Column("status", Text),
-    Column("created_at", DateTime(timezone=True)),
-    Column("updated_at", DateTime(timezone=True)),
-)
-
-# geo_results - Analyzer主输入表
-geo_results = Table(
-    "geo_results",
-    metadata,
-    Column("result_id", Integer, primary_key=True, autoincrement=True),
-    Column("task_id", UUID(as_uuid=True)),
-    Column("request_id", UUID(as_uuid=True)),
-    Column("cloro_task_id", Text),
-    Column("call_index", Integer, nullable=False),
-    Column("cloro_response", JSONB, nullable=False),
-    Column("http_status_code", Integer),
-    Column("latency_ms", Integer),
-    # Unpacked Fields
-    Column("text", Text),
-    Column("html", Text),
-    Column("markdown", Text),
-    Column("sources", JSONB),
-    Column("shopping_cards", JSONB),
-    Column("places", JSONB),
-    Column("entities", JSONB),
-    Column("search_queries", JSONB),
-    Column("citation_pills", JSONB),
-    # Report/Client info
-    Column("report_id", UUID(as_uuid=True)),
-    Column("report_name", Text),
-    Column("client_id", UUID(as_uuid=True)),
-    Column("client_name", Text),
-    Column("peers", ARRAY(Text)),
-    Column("owned_domains", ARRAY(Text)),
-    # Request params
-    Column("batch_id", Text),
-    Column("topic", Text),
-    Column("product", Text),
-    Column("country", Text),
-    Column("platform", Text),
-    Column("intent", Text),
-    Column("prompt_text", Text),
-    Column("target_user", JSONB),
-    Column("ingested_at", DateTime(timezone=True)),
-    Column("analyzed_at", DateTime(timezone=True)),
-)
+    Idempotent: returns the existing pool if already connected.
+    Defaults (1..5 connections) match the collector's choice — analyzer is a
+    Cloud Run Job that processes one client at a time, so a small pool is
+    enough and avoids burning Cloud SQL connection slots.
+    """
+    global _pool
+    if _pool is None:
+        settings = get_settings()
+        _pool = await create_asyncpg_pool(
+            settings,
+            min_size=min_size,
+            max_size=max_size,
+            init=_init_connection,
+        )
+    return _pool
 
 
-# ============================================================================
-# Analyzer Output Tables (WRITE) - Actual DB schema
-# ============================================================================
-
-geo_company_mentions = Table(
-    "geo_company_mentions",
-    metadata,
-    Column("id", UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid()),
-    Column("report_id", UUID(as_uuid=True)),
-    Column("request_id", UUID(as_uuid=True)),
-    Column("task_id", UUID(as_uuid=True)),
-    Column("result_id", Integer, nullable=False),
-    Column("client_id", UUID(as_uuid=True)),
-    Column("company_name", String(255), nullable=False),
-    Column("mention_position", Integer),
-    Column("is_client", Boolean, server_default="false"),
-    Column("is_peer", Boolean, server_default="false"),
-    Column("client_name", Text),
-    Column("platform", String(50)),
-    Column("intent", String(100)),
-    Column("topic", Text),
-    Column("product", Text),
-    Column("country", String(10)),
-    Column("executed_at", DateTime(timezone=True)),
-    Column("created_at", DateTime(timezone=True), server_default=func.now()),
-)
-
-geo_citations = Table(
-    "geo_citations",
-    metadata,
-    Column("id", UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid()),
-    Column("report_id", UUID(as_uuid=True)),
-    Column("request_id", UUID(as_uuid=True)),
-    Column("task_id", UUID(as_uuid=True)),
-    Column("result_id", Integer, nullable=False),
-    Column("client_id", UUID(as_uuid=True)),
-    Column("source_url", Text),
-    Column("source_domain", String(255)),
-    Column("source_position", Integer),
-    Column("source_label", Text),
-    Column("domain_category", String(50)),
-    Column("is_citation_pill", Boolean, server_default="false"),
-    Column("client_name", Text),
-    Column("platform", String(50)),
-    Column("intent", String(100)),
-    Column("topic", Text),
-    Column("product", Text),
-    Column("country", String(10)),
-    Column("executed_at", DateTime(timezone=True)),
-    Column("created_at", DateTime(timezone=True), server_default=func.now()),
-)
+async def disconnect() -> None:
+    """Close the module-level asyncpg pool. Safe to call when not connected."""
+    global _pool
+    if _pool is not None:
+        await _pool.close()
+        _pool = None
 
 
-# ============================================================================
-# Database Connection
-# ============================================================================
+def get_pool() -> asyncpg.Pool:
+    """
+    Return the live pool. Raises if ``connect()`` has not been called.
 
-@contextmanager
-def get_db_connection():
-    """Context manager for database session."""
-    session = SessionLocal()
+    Most call sites should depend on the job ``main()`` having run
+    ``connect()`` first; this helper just unwraps the Optional so caller
+    signatures stay clean.
+    """
+    if _pool is None:
+        raise RuntimeError(
+            "Database pool not initialized. Call `await connect()` first "
+            "(typically from the Cloud Run Job main())."
+        )
+    return _pool
+
+
+def parse_affected(status_string: str) -> int:
+    """
+    Parse asyncpg's command-status string (e.g. ``"UPDATE 7"``) into an
+    affected-row count. Returns 0 on any unexpected shape so that callers
+    treat the operation as a no-op (matches the collector helper).
+    """
+    if not status_string:
+        return 0
+    parts = status_string.strip().split()
+    if not parts:
+        return 0
     try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
+        return int(parts[-1])
+    except ValueError:
+        return 0
 
 
-def get_engine():
-    """Get raw SQLAlchemy engine for direct operations."""
-    return engine
+# ---------------------------------------------------------------------------
+# Table-name constants — used in raw SQL strings to keep typos catchable in
+# one place. NOT a schema; consult ``migrations/`` for the source of truth.
+# ---------------------------------------------------------------------------
+
+# Global config
+GEO_GLOBAL_SETTINGS = "geo_global_settings"
+GEO_GLOBAL_PLATFORMS = "geo_global_platforms"
+GEO_GLOBAL_INTENTS = "geo_global_intents"
+
+# Client / tenancy
+GEO_CLIENTS = "geo_clients"
+GEO_CLIENT_BRANDS = "geo_client_brands"
+GEO_CLIENT_PEERS = "geo_client_peers"
+GEO_CLIENT_DOMAINS = "geo_client_domains"
+GEO_CLIENT_TOPICS = "geo_client_topics"
+GEO_CLIENT_TOPIC_PRODUCTS = "geo_client_topic_products"
+GEO_CLIENT_PERSONAS = "geo_client_personas"
+GEO_CLIENT_PROMPTS = "geo_client_prompts"
+GEO_PRODUCT_TRACKED_URLS = "geo_product_tracked_urls"
+GEO_PRODUCT_SALES_CHANNELS = "geo_product_sales_channels"
+GEO_SETTINGS_CANDIDATES = "geo_settings_candidates"
+
+# Execution / Cloro
+GEO_TASKS = "geo_tasks"
+GEO_RESULTS = "geo_results"
+
+# Analyzer outputs
+GEO_BRAND_MENTIONS = "geo_brand_mentions"
+GEO_PRODUCT_MENTIONS = "geo_product_mentions"
+GEO_CITATIONS = "geo_citations"
+GEO_DOMAIN_CATEGORIES = "geo_domain_categories"
+GEO_SENTIMENT_RESULTS = "geo_sentiment_results"
+GEO_SENTIMENT_THEMES = "geo_sentiment_themes"
+GEO_SENTIMENT_THEME_DICTIONARY = "geo_sentiment_theme_dictionary"

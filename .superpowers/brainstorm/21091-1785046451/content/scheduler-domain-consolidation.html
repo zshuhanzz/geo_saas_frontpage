@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>统一调度域设计</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #fff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d0d5dd;
+      --blue: #155eef;
+      --blue-soft: #eff4ff;
+      --green: #067647;
+      --green-soft: #ecfdf3;
+      --amber: #b54708;
+      --amber-soft: #fff4e5;
+      --red: #b42318;
+      --red-soft: #fef3f2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 34px 28px 52px; }
+    h1 { margin: 0; font-size: 28px; letter-spacing: -.03em; }
+    .lead { margin: 8px 0 28px; color: var(--muted); font-size: 14px; }
+    h2 { margin: 0 0 14px; font-size: 18px; }
+    .section { margin-top: 26px; }
+    .legacy {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid #fecdca;
+      background: var(--red-soft);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .legacy .box {
+      background: #fff;
+      border: 1px solid #fecdca;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .legacy .arrow { color: var(--red); font-size: 20px; }
+    .strike { text-decoration: line-through; color: var(--red); }
+    .domains { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(16, 24, 40, .035);
+    }
+    .card.blue { border-top: 4px solid var(--blue); }
+    .card.amber { border-top: 4px solid var(--amber); }
+    .card.green { border-top: 4px solid var(--green); }
+    .tag {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .blue .tag { background: var(--blue-soft); color: var(--blue); }
+    .amber .tag { background: var(--amber-soft); color: var(--amber); }
+    .green .tag { background: var(--green-soft); color: var(--green); }
+    .title { font-size: 16px; font-weight: 750; margin-bottom: 8px; }
+    .flow { display: grid; gap: 7px; }
+    .node {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 9px 10px;
+      font-size: 12px;
+      line-height: 1.45;
+      background: #fff;
+    }
+    .arrow-down { text-align: center; color: #98a2b3; line-height: 1; }
+    ul { margin: 12px 0 0; padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .registry {
+      margin-top: 18px;
+      border: 1px solid #b2ddff;
+      background: #eff8ff;
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .registry-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 12px; }
+    code {
+      display: block;
+      padding: 9px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #b2ddff;
+      color: #175cd3;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      word-break: break-word;
+    }
+    .question {
+      margin-top: 18px;
+      border-radius: 14px;
+      border: 1px solid #abefc6;
+      background: var(--green-soft);
+      padding: 17px;
+      color: var(--green);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    @media (max-width: 860px) {
+      .domains, .registry-grid { grid-template-columns: 1fr; }
+      .legacy { grid-template-columns: 1fr; }
+      .legacy .arrow { transform: rotate(90deg); text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>统一调度域：保留三类正式任务，清退一条旧链路</h1>
+  <p class="lead">调度配置可以出现在不同产品页面，但机器执行入口必须按任务域清晰分层。</p>
+
+  <section class="section">
+    <h2>旧版 SaaS 分析运行链路</h2>
+    <div class="legacy">
+      <div class="box"><strong>早期 Analysis UI</strong><br/>创建 geo_report_runs</div>
+      <div class="arrow">→</div>
+      <div class="box"><strong>Cloud Scheduler</strong><br/>回调 SaaS trigger_cron</div>
+      <div class="arrow">→</div>
+      <div class="box"><strong class="strike">geo_report_runs</strong><br/>迁移 014 已声明由 geo_agent_tasks 替代并删除</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>收敛后的三类正式调度</h2>
+    <div class="domains">
+      <article class="card blue">
+        <span class="tag">平台数据作业</span>
+        <div class="title">Workspace Operations</div>
+        <div class="flow">
+          <div class="node">Admin 配置 Collector / Analyzer / LLM Discovery</div>
+          <div class="arrow-down">↓</div>
+          <div class="node">Scheduler 回调 Admin API</div>
+          <div class="arrow-down">↓</div>
+          <div class="node">启动 Cloud Run Job</div>
+        </div>
+        <ul>
+          <li>不属于客户 Actions 功能</li>
+          <li>Super Admin 管理</li>
+        </ul>
+      </article>
+
+      <article class="card amber">
+        <span class="tag">Actions 自动任务</span>
+        <div class="title">Agent Task Schedule</div>
+        <div class="flow">
+          <div class="node">SaaS/Admin 配置分析或内容任务</div>
+          <div class="arrow-down">↓</div>
+          <div class="node">Scheduler 回调 Agent API</div>
+          <div class="arrow-down">↓</div>
+          <div class="node">按 task_type 执行 Analysis / Content</div>
+        </div>
+        <ul>
+          <li>复用 geo_agent_tasks</li>
+          <li>不再使用 geo_report_runs</li>
+        </ul>
+      </article>
+
+      <article class="card green">
+        <span class="tag">未来预留</span>
+        <div class="title">Report Snapshot Schedule</div>
+        <div class="flow">
+          <div class="node">Reports 页面配置 cron、时区、窗口</div>
+          <div class="arrow-down">↓</div>
+          <div class="node">Scheduler 回调 SaaS Report system endpoint</div>
+          <div class="arrow-down">↓</div>
+          <div class="node">幂等生成当日 Report snapshot</div>
+        </div>
+        <ul>
+          <li>只读取已分析数据</li>
+          <li>不触发 Collector / Analyzer / Agent</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="registry">
+    <strong>权限静态注册表提前预留</strong>
+    <div class="registry-grid">
+      <code>analytics.reports:view</code>
+      <code>analytics.reports:materialize</code>
+      <code>analytics.reports:schedule_manage</code>
+    </div>
+  </section>
+
+  <div class="question">
+    <strong>需要确认：</strong>未来 cron 生成的 Report 应该冻结执行时的数据，形成真正不可变的历史快照；还是只保存日期范围，用户以后打开时继续看到最新数据？推荐前者。
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+  "__doc": "Shared copy: Save/Cancel/Delete/Confirm/Loading, language toggle, theme toggle — reused across pages. Do not duplicate these keys in other namespaces.",
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "close": "Close",
+    "add": "Add",
+    "remove": "Remove",
+    "retry": "Retry",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "ok": "OK",
+    "search": "Search"
+  },
+  "states": {
+    "loading": "Loading...",
+    "loadingFailed": "Loading failed",
+    "requestTimeout": "The request timed out because the database or service is busy. Please refresh and try again.",
+    "serverBusy": "The service is temporarily busy. Please refresh and try again.",
+    "comingSoon": "Coming soon...",
+    "signOut": "Sign out",
+    "toggleTheme": "Toggle theme"
+  },
+  "confirmDialog": {
+    "defaultTitle": "Confirm"
+  },
+  "language": {
+    "toggleTooltip": "Switch language / 切换语言",
+    "zh": "中文",
+    "en": "English"
+  },
+  "theme": {
+    "toLight": "Switch to light mode",
+    "toDark": "Switch to dark mode",
+    "light": "Light Mode",
+    "dark": "Dark Mode"
+  },
+  "login": {
+    "welcome": "Welcome to AnswerX",
+    "subtitle": "Sign in to your account",
+    "loginFailed": "Login failed",
+    "googleFailed": "Google login failed, please try again",
+    "restoreFailed": "Unable to restore your login. Check your connection and try again."
+  },
+  "report": {
+    "loading": "Loading report...",
+    "missingParams": "Missing task ID or client ID."
+  },
+  "access": {
+    "loading": "Checking Workspace feature access...",
+    "lockedBadge": "Feature locked",
+    "noWorkspaceDescription": "This account is not linked to an accessible Workspace. Contact an administrator for access.",
+    "noWorkspaceTitle": "No accessible Workspace",
+    "readOnly": "You are in read-only mode. You can view existing data and results; contact a Workspace Admin to run or modify anything.",
+    "roleLockedDescription": "Contact a Workspace Admin to request access.",
+    "roleLockedTitle": "Your role does not have access",
+    "workspaceLockedDescription": "Contact your account manager to purchase or upgrade the feature package.",
+    "workspaceLockedTitle": "This feature is not enabled for the Workspace"
+  }
+}

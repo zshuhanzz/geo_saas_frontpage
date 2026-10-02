@@ -1,0 +1,258 @@
+{
+  "__doc": "共享 Wizard 基础（WizardShell / FieldRenderer / GenericStepRenderer）+ customFields/* 定制字段组件。在 Analyze 和 Content Pipeline 两个 wizard 里都会被复用。",
+  "executionPreview": {
+    "intro": "点击执行后，系统将按以下流程自动处理：",
+    "bgHint": "任务将在后台异步执行，您可以在「所有任务」中查看进度",
+    "reviseSteps": {
+      "round1": "第一轮 Revise",
+      "round1Desc": "优先修复结构、缺失模块、Citation Alignment 和平台适配问题。",
+      "recheck": "修订后复查",
+      "recheckDesc": "重新运行 Quality Gate，确认修订后的内容是否仍有阻断项。",
+      "round2": "第二轮 Revise",
+      "round2Desc": "如仍未通过，继续清理残缺句、重复 FAQ、重复 Conclusion 和品牌密度问题。",
+      "recheck2": "第二轮后复查",
+      "recheck2Desc": "第二轮修订后再次运行 Quality Gate，最终结果以这次复查为准。"
+    }
+  },
+  "modeGatePicker": {
+    "items": {
+      "manual": {
+        "label": "我来定",
+        "description": "我自己挑每一项"
+      },
+      "ai_discover": {
+        "label": "AI 帮我发现",
+        "description": "AI 根据数据推荐"
+      }
+    },
+    "aiAnalyzing": "AI 正在分析您的数据，挑选最该优化的话题与 prompts…",
+    "aiFailed": "AI 预选失败：{{error}}",
+    "aiFailedFallback": "你可以切回「我来定」手动配置，或重新选择「AI 帮我发现」重试。",
+    "aiEmpty": "暂无可推荐的数据",
+    "aiEmptyHint": "先到 Prompts 页配置 prompts 并等待 Analyzer 处理完，再回来使用 AI 模式。",
+    "aiAutofilled": "后续步骤已自动预填，可按需调整。"
+  },
+  "redditDiscovery": {
+    "sources": {
+      "p0": {
+        "title": "P0 · Web Search + Search Grounding",
+        "description": "基于 Reddit URL、Subreddit 和关键词做有限发现，适合当前优先上线。"
+      },
+      "p1": {
+        "title": "P1 · Reddit API",
+        "description": "通过 Reddit 官方 API 读取帖子、评论和 Subreddit 上下文。",
+        "todo": "待配置"
+      }
+    },
+    "inputs": {
+      "urls": "Reddit URLs",
+      "subreddits": "Subreddits",
+      "keywords": "关键词"
+    },
+    "placeholders": {
+      "urls": "每行一个 Reddit 帖子或搜索结果 URL",
+      "subreddits": "例如 r/artificial, r/marketing, r/VideoEditing",
+      "keywords": "例如 AI promo video tool, product video maker"
+    },
+    "hint": "Discover 结果会传入策略生成和内容生成，用于识别社区问题、反对意见、竞品信号和发布风险。",
+    "run": "运行 Reddit Discover",
+    "ready": "Reddit Insight 已生成",
+    "preview": {
+      "questions": "社区问题",
+      "angles": "内容角度",
+      "risks": "发布风险"
+    }
+  },
+  "officialWebsiteDiscovery": {
+    "source": {
+      "title": "P0 · 官网 URL + Search Grounding",
+      "description": "读取客户官网文章页面，并转化为面向官网 SEO/AEO 文章生成的内容短板洞察。"
+    },
+    "inputs": {
+      "urls": "Official Website URLs"
+    },
+    "placeholders": {
+      "urls": "每行一个客户官网文章 URL"
+    },
+    "hint": "Discover 结果会传入策略生成和内容生成，用于补齐官网内容短板、增强品牌可抽取性、扩展 Use Case，并优化品牌友好的 FAQ 覆盖。",
+    "run": "运行 Official Website Discover",
+    "ready": "官网 Insight 已生成",
+    "preview": {
+      "gaps": "内容短板",
+      "useCases": "缺失 Use Case",
+      "angles": "文章角度"
+    }
+  },
+  "citationAnalysis": {
+    "title": "Citation Analysis 预运行",
+    "description": "在最终生成前运行 Citation Analysis，让你先看到被引用页面、品牌提及分流和基于 Citation 的写作 brief。",
+    "disabled": "当前模板未开启 Citation Analysis。",
+    "fields": {
+      "sourceScope": "Citation 来源范围",
+      "brandPolicy": "品牌提及分流策略",
+      "actionStrategy": "内容动作决策",
+      "maxSources": "最多 Citation 页面",
+      "fetchPages": "抓取完整网页",
+      "includeDomains": "包含域名",
+      "excludeDomains": "排除域名",
+      "queryOverride": "Citation 查询覆盖"
+    },
+    "fetchHint": "可用时抓取页面标题、meta、canonical URL 和可读正文。",
+    "queryPlaceholder": "可选。手动指定 prompt、topic 或 query；留空则使用已选 prompts 和 topics。",
+    "runHint": "结果会注入策略生成和最终内容生成。",
+    "run": "运行 Citation Analysis",
+    "ready": "Citation Analysis 结果已生成",
+    "primaryAction": "主要内容动作",
+    "topSources": "高引用来源模式",
+    "learnableStrengths": "AI 为什么引用这些来源",
+    "learnableStrengthsDesc": "从已被 AI 引用的页面中提炼可学习的结构、证据密度、问题表达和可抽取模式。",
+    "visibilityGaps": "需要补足的 GEO Visibility 缺口",
+    "visibilityGapsDesc": "识别当前引文没有覆盖、覆盖不完整或对客户品牌不利的部分，用于指导新内容补位。",
+    "mentionStates": {
+      "unmentioned": "Unmentioned",
+      "positiveNeutral": "Positive / Neutral",
+      "negativeMisleading": "Negative / Misleading",
+      "ambiguous": "Ambiguous"
+    },
+    "status": {
+      "idle": "未运行",
+      "loading": "运行中",
+      "ready": "已就绪",
+      "stale": "需重跑",
+      "error": "失败"
+    }
+  },
+  "subredditTargeting": {
+    "title": "Subreddit Targeting",
+    "description": "先确定这篇 Reddit 内容应该面向哪些社区。AI 推荐只负责发现候选，规则会在后续环节用确定性抓取验证。",
+    "modes": {
+      "redditApi": "Reddit API",
+      "ai": "AI Recommend",
+      "manual": "Manual Input"
+    },
+    "redditApiPending": "Reddit API 需要 Reddit Data API 审核通过并配置 Client ID / Client Secret 后才能使用。审核期间请使用 AI Recommend 或 Manual Input。",
+    "keywords": "补充关键词",
+    "keywordsPlaceholder": "例如 robot vacuum pet hair, hardwood floors, smart home",
+    "manual": "手动输入 Subreddits",
+    "manualPlaceholder": "每行一个，例如 r/RobotVacuums",
+    "hint": "结果会进入 Reddit Discovery，用于抓取规则、about 信息和相关讨论证据。",
+    "run": "生成 Subreddit 候选",
+    "selected": "已确认的 Subreddit（{{count}}）",
+    "stale": "上游输入已变化，请重新生成并确认 Subreddit。",
+    "errors": {
+      "noCandidates": "没有生成可用的 Subreddit 候选，请调整关键词或改用手动输入。",
+      "noneSelected": "请至少选择一个 Subreddit。"
+    },
+    "status": {
+      "idle": "未运行",
+      "loading": "运行中",
+      "ready": "已就绪",
+      "stale": "需重跑",
+      "error": "失败"
+    }
+  },
+  "redditResearchDiscovery": {
+    "title": "Reddit Discovery",
+    "description": "基于已确认的 Subreddit 获取社区规则、about 信息和讨论证据。规则只能来自确定性来源，不能由模型编写。",
+    "blocked": "请先完成 Subreddit Targeting 并确认至少一个 Subreddit。",
+    "hint": "如果规则无法验证，系统会标记 unavailable，并要求人工确认或跳过。",
+    "run": "运行 Reddit Discovery",
+    "noRules": "未获取到可验证规则。请人工确认该社区规则后再继续。",
+    "reviewRequired": "存在未验证规则的社区，请粘贴人工确认的规则或确认跳过。",
+    "manualRulesPlaceholder": "粘贴你人工确认过的社区规则，每行一条。",
+    "skipRules": "我已人工检查该社区，确认本次不使用规则继续。",
+    "stale": "Subreddit、Prompt、Topic 或 Citation 输入已变化，请重新运行 Reddit Discovery。",
+    "boolean": {
+      "yes": "是",
+      "no": "否"
+    },
+    "metadata": {
+      "subscribers": "订阅者",
+      "active": "活跃用户",
+      "type": "社区类型",
+      "nsfw": "NSFW",
+      "submission": "发帖类型",
+      "source": "来源"
+    },
+    "posts": {
+      "search": "相关搜索帖子",
+      "hot": "热门帖子",
+      "top": "高分帖子",
+      "new": "最新帖子"
+    },
+    "riskSignals": "社区风险信号",
+    "status": {
+      "idle": "未运行",
+      "loading": "运行中",
+      "ready": "已就绪",
+      "stale": "需重跑",
+      "error": "失败"
+    }
+  },
+  "redditResearchLinks": {
+    "subreddit": "Subreddit",
+    "about": "About",
+    "wiki": "Wiki",
+    "rulesSource": "Rules Source"
+  },
+  "promptArtifactPreparation": {
+    "title": "Artifact Preparation",
+    "description": "把 Reddit Research 和策略压缩为最终 Prompt 可直接引用的写作 artifacts。",
+    "blocked": "请先完成 Reddit Discovery。",
+    "rulesBlocked": "Reddit Discovery 还有未确认的社区规则，请先处理后再生成 Artifacts。",
+    "hint": "确认后的 artifacts 会直接进入最终生成，后台不会重复生成。",
+    "run": "生成 Artifacts",
+    "regenerate": "重新生成",
+    "ready": "Artifacts 已生成",
+    "confirmEdit": "确认编辑",
+    "stale": "上游输入已变化，请重新生成或确认编辑后的 Artifacts。",
+    "status": {
+      "idle": "未运行",
+      "loading": "运行中",
+      "ready": "已就绪",
+      "stale": "需重跑",
+      "error": "失败"
+    }
+  },
+  "promptRefPicker": {
+    "autoSelectN": "自动勾选表现最差的 {{count}} 个",
+    "clear": "清空",
+    "next": "下一页",
+    "pagination": "第 {{page}} / {{totalPages}} 页 · 共 {{total}} 条",
+    "previous": "上一页",
+    "searchPlaceholder": "搜索 Client Prompt",
+    "tierBad": "表现差",
+    "tierOptimize": "待优化",
+    "view": {
+      "aggregate": "聚合",
+      "detail": "明细"
+    }
+  },
+  "topicRefPicker": {
+    "autoSelectOne": "自动选择表现最差的 Topic",
+    "autoSelectN": "自动勾选表现最差的 {{count}} 个 Topics",
+    "clear": "清空",
+    "tierBad": "表现差",
+    "tierOptimize": "待优化"
+  },
+  "promptEditor": {
+    "methodToggleOpen": "📖 GEO 方法论参考",
+    "methodToggleClose": "收起方法论",
+    "methodHeader": "GEO 方法论参考 — 点击插入到 Prompt",
+    "promptPlaceholder": "输入分析指令…\n\n点击上方数据指标插入到 Prompt",
+    "expandTitle": "展开编辑器",
+    "dialogTitle": "编辑分析 Prompt",
+    "dialogDescription": "配置底层 Prompt 变量。",
+    "dialogHeader": "编辑分析 Prompt",
+    "dialogConfirm": "确认",
+    "metricsSectionPreset": "模板预设指标",
+    "metricsSectionAvailable": "可用指标",
+    "metricsHint": "点击插入到 Prompt",
+    "insertAll": "插入全部指标 ({{count}})",
+    "metricsEmpty": "暂无可用指标 — 请先在上一步选择数据领域"
+  },
+  "shell": {
+    "loadingSchema": "加载配置 Schema 中…",
+    "failedToLoad": "加载 workflow_config 失败"
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "__doc": "Citation / Sentiment 独立 Dashboard 页 + BrandHub 页。主要是页标题 + filter bar（与 Insights 共享键位于 insights.filters.*）。",
+  "overview": {
+    "title": "总览 · Overview",
+    "eyebrow": "品牌总览",
+    "subtitle": "汇总可见度、引用和情感的核心表现，帮助你快速判断品牌在 AI 搜索中的整体状态。",
+    "workspaceFallback": "当前客户",
+    "freshnessUnknown": "暂无运行记录",
+    "empty": "暂无可展示数据",
+    "deltaFlat": "持平",
+    "status": {
+      "client": "客户",
+      "scope": "监测维度",
+      "scopeValue": "可见度 / 引用 / 情感",
+      "period": "数据区间",
+      "latestAnalysis": "最新分析时间",
+      "nextAnalysis": "下次分析时间"
+    },
+    "metrics": {
+      "visibility": "可见度",
+      "visibilityDescription": "排名 {{rank}}，{{count}} / {{total}} 个回答提及品牌",
+      "citation": "引用占比",
+      "citationDescription": "排名 {{rank}}，{{count}} / {{total}} 条引用来自自有域名",
+      "sentiment": "正向情感",
+      "sentimentDescription": "{{positive}} 条正向，{{negative}} 条负向",
+      "coverage": "回答覆盖",
+      "coverageDescription": "{{mentions}} 次自有品牌提及，提及份额 {{sov}}"
+    },
+    "freshness": {
+      "title": "数据新鲜度",
+      "lastRun": "最新分析时间"
+    },
+    "insights": {
+      "title": "关键变化",
+      "empty": "暂无可展示的关键变化",
+      "viewDetail": "查看详情",
+      "dialogDescription": "基于当前周期和上一周期的结构化指标生成。"
+    },
+    "alerts": {
+      "empty": "当前周期暂无显著波动",
+      "visibility_score": "可见度变化",
+      "own_citation_share": "引用占比变化",
+      "positive_sentiment_pct": "正向情感变化"
+    },
+    "momentum": {
+      "title": "核心趋势",
+      "badge": "Visibility / Citation / Sentiment",
+      "series": {
+        "visibility_score": "可见度",
+        "own_citation_share": "引用占比",
+        "positive_sentiment_pct": "正向情感"
+      }
+    },
+    "platform": {
+      "title": "平台健康度",
+      "visibility": "可见度",
+      "citation": "引用",
+      "sentiment": "情感"
+    },
+    "topics": {
+      "title": "Topic 机会雷达",
+      "unknown": "未命名 Topic",
+      "leader": "领先品牌 {{brand}}，{{count}} 次提及",
+      "ownRank": "我方排名",
+      "ownMentions": "我方提及",
+      "promptVolume": "Prompt 数量",
+      "mentionShare": "提及份额",
+      "mentionShareDetail": "我方提及 {{count}} 次",
+      "visibility": "可见度",
+      "citation": "引用覆盖",
+      "sentiment": "情感倾向",
+      "labels": {
+        "defend": "Defend",
+        "improve": "Improve",
+        "content_gap": "Content Gap",
+        "monitor": "Monitor"
+      }
+    },
+    "competitors": {
+      "title": "竞品快照",
+      "brand": "品牌",
+      "visibility": "可见度",
+      "sov": "提及份额",
+      "mentions": "提及",
+      "position": "位置",
+      "citation": "引用占比",
+      "sentiment": "情感倾向",
+      "ownBrand": "我方品牌"
+    }
+  },
+  "citation": {
+    "title": "引用 · Citation",
+    "subtitle": "分析 AI 平台最常引用哪些域名和页面。"
+  },
+  "sentiment": {
+    "title": "情感 · Sentiment",
+    "subtitle": "分析 AI 平台在不同主题下对您品牌的态度。"
+  },
+  "brandHub": {
+    "title": "品牌中心",
+    "description": "为 <1>{{clientName}}</1> 配置品牌基调。Anthony 会据此匹配您的品牌语气生成所有 AI 内容。",
+    "saveButton": "保存档案",
+    "saveSaving": "保存中...",
+    "loading": "加载品牌档案中...",
+    "noClient": "请先从侧边栏选择工作区。",
+    "toastSaved": "品牌档案已保存",
+    "toastSaveFailed": "保存失败：{{message}}",
+    "sections": {
+      "basicTitle": "基本信息",
+      "basicDescription": "贯穿所有 Agent 交互的核心品牌标识。",
+      "toneTitle": "品牌语气",
+      "toneDescription": "描述您品牌的沟通方式。Anthony 会在分析报告和生成内容中匹配此语气。",
+      "messagesTitle": "关键信息",
+      "messagesDescription": "核心信息支柱。Anthony 会将这些信息融入生成的内容与建议中。",
+      "valuesTitle": "品牌价值观",
+      "valuesDescription": "指导您品牌在 AI 搜索引擎中的定位的核心价值观。"
+    },
+    "fields": {
+      "brandName": "品牌名",
+      "brandNamePlaceholder": "例如 AnswerX",
+      "primaryLanguage": "主要语言",
+      "primaryLanguagePlaceholder": "例如 zh-CN、en-US",
+      "targetAudience": "目标人群",
+      "targetAudiencePlaceholder": "例如：25–45 岁、欧美市场、对科技敏感的家庭用户",
+      "tonePlaceholder": "例如：专业但亲切，以数据驱动且自信。强调创新和可靠性，避免过于口语化。",
+      "messagesEmpty": "暂未定义关键信息。",
+      "messagesPlaceholder": "新增一条关键信息...",
+      "addButton": "添加",
+      "valuesEmpty": "暂未定义品牌价值观。",
+      "valuesPlaceholder": "新增品牌价值观（例如 创新、可靠性）..."
+    }
+  }
+}

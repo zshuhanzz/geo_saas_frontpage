@@ -1,0 +1,454 @@
+{
+  "__doc": "Agent 模块页面（Analyze / Chat / Content / Training / Tracking / TaskPage）+ AgentToolbar / TaskProgressCard / ChatWidgetRenderer 组件。",
+  "common": {
+    "statusCompleted": "已完成",
+    "statusFailed": "失败",
+    "statusDraft": "已保存",
+    "statusRunning": "运行中",
+    "triggerAuto": "自动",
+    "edit": "编辑",
+    "cancel": "取消",
+    "confirm": "确认",
+    "close": "关闭",
+    "execute": "执行任务",
+    "rerun": "重新执行",
+    "delete": "删除",
+    "rename": "重命名",
+    "view": "查看",
+    "viewDetail": "查看详情",
+    "viewOutput": "查看步骤输出",
+    "executionFailed": "执行失败",
+    "viewFullReport": "查看完整报告",
+    "exportHtml": "导出 HTML",
+    "emptyOutput": "暂无输出内容",
+    "savedHint": "任务已保存。点击上方按钮开始执行。",
+    "noReportContent": "暂无报告内容",
+    "stepLabel": "步骤 {{step}}：{{label}}",
+    "loadingTaskProgress": "加载任务进度...",
+    "creatingTask": "创建任务中...",
+    "taskFinished": "任务完成",
+    "anthonyProgress": "Anthony 执行进度"
+  },
+  "pagination": {
+    "summary": "第 {{page}} / {{pages}} 页，共 {{total}} 条",
+    "previous": "上一页",
+    "next": "下一页"
+  },
+  "analysis": {
+    "pageTitle": "分析 Agent",
+    "tabNew": "新建任务",
+    "tabAll": "所有任务",
+    "templateGallery": "选择分析模板",
+    "opportunityTitle": "优化机会发现",
+    "opportunityDesc": "全面诊断品牌在 AI 搜索中的优化机会 — 话题定位、内容发现、平台引用分析、内容优化行动方案。",
+    "emptyTasks": "暂无任务记录",
+    "createFirstTask": "创建首个任务",
+    "domains": {
+      "visibility": "可见度",
+      "citation": "引用",
+      "sentiment": "情感"
+    },
+    "steps": {
+      "validate_inputs": "输入校验",
+      "hydrate_metrics": "指标注入",
+      "generate_charts": "图表生成",
+      "synthesize_report": "报告合成",
+      "quality_check": "质量检查",
+      "topic_quadrant": "话题象限分析",
+      "content_opportunities": "内容机会发现",
+      "platform_analysis": "平台引用分析",
+      "synthesize_output": "综合输出"
+    },
+    "viewSql": "查看生成的 SQL ({{count}})",
+    "viewChartSql": "查看图表 SQL ({{count}})",
+    "viewFinalPrompt": "查看最终 Prompt（含注入数据）",
+    "usedPrompt": "使用的 Prompt",
+    "qualityReport": "质量检查报告",
+    "qualityData": {
+      "data_accuracy_score": "数据准确度",
+      "consistency_score": "逻辑一致性",
+      "completeness_score": "完整度",
+      "overall_score": "综合评分"
+    },
+    "qualityIssuesFound": "发现的问题",
+    "insightReport": "洞察报告",
+    "opportunity": {
+      "quadrantModel": "象限定位模型",
+      "quadrantActions": {
+        "strong": "守",
+        "weak": "修",
+        "untapped": "攻",
+        "emerging": "抢"
+      },
+      "quadrantLabels": {
+        "strong": "强势",
+        "weak": "薄弱",
+        "untapped": "待挖掘",
+        "emerging": "新兴"
+      },
+      "quadrantDescs": {
+        "strong": "高曝光 & 高引用，品牌被 AI 引用，保持优势",
+        "weak": "有曝光但引用率低，有内容但未被引用，需修复",
+        "untapped": "缺乏内容覆盖，需进攻策略",
+        "emerging": "搜索趋势上升，抓住机会窗口"
+      },
+      "strategyLabel": "策略：{{action}}",
+      "topicsCount": "{{count}} 个话题",
+      "matrixTitle": "机会矩阵（可见度 × 引用率）",
+      "quadrantDistribution": "话题象限分布",
+      "visibilityPct": "可见度 {{pct}}%",
+      "citationPct": "引用率 {{pct}}%",
+      "contentOpps": "内容优化机会 Top {{count}}",
+      "relatedPrompts": "{{count}} 个提示词",
+      "competitorRefs": "{{count}} 个竞品引用",
+      "platformMatrix": "平台引用矩阵",
+      "aiEngines": "AI 引擎：{{engines}}",
+      "priorityHigh": "高",
+      "priorityMedium": "中",
+      "priorityLow": "低",
+      "citationShare": "引用占比",
+      "engineDistribution": "引擎分布",
+      "chart": {
+        "tooltipQuadrant": "象限",
+        "tooltipVisibility": "可见度",
+        "tooltipCitation": "引用率",
+        "tooltipMentions": "提及次数",
+        "axisVisibility": "可见度",
+        "axisCitation": "引用率"
+      }
+    },
+    "continueToContent": "基于此分析结果，进入内容生成",
+    "startContentGen": "开始内容生成",
+    "renameDialog": {
+      "title": "重命名报告",
+      "nameLabel": "报告名称",
+      "placeholder": "输入新的报告名称"
+    },
+    "actionTitles": {
+      "viewDetail": "查看详情",
+      "rename": "重命名",
+      "edit": "编辑"
+    }
+  },
+  "content": {
+    "pageTitle": "内容 Agent",
+    "tabNew": "新建任务",
+    "tabAll": "所有任务",
+    "templateGallery": "选择内容模板",
+    "templateSections": {
+      "generateTitle": "Generate by Template",
+      "generateDescription": "直接选择内容模板，按当前配置生成文章、FAQ、Brief 或优化建议。",
+      "discoverTitle": "Discover then Generate",
+      "discoverDescription": "先让系统发现平台机会，再基于选中的 Insight 生成对应内容。",
+      "discoverEmpty": "暂无可用的先发现再生成模板"
+    },
+    "emptyTasks": "暂无任务记录",
+    "createFirstTask": "创建首个任务",
+    "progress": "执行进度",
+    "raftQuality": "RAFT 质量评分",
+    "overallScore": "综合评分",
+    "citationAnalysis": "Citation Analysis 摘要",
+    "generatedContent": "生成的内容",
+    "recommendations": "优化建议",
+    "renameDialog": {
+      "title": "重命名报告",
+      "nameLabel": "报告名称",
+      "placeholder": "输入新的报告名称"
+    },
+    "actionTitles": {
+      "view": "查看",
+      "rename": "重命名",
+      "edit": "编辑",
+      "delete": "删除"
+    },
+    "qualityStatus": {
+      "pass": "质量通过",
+      "passWithWarnings": "通过但有警告",
+      "revised": "已修订通过",
+      "failed": "质量未通过",
+      "needsHumanReview": "需人工复核"
+    }
+  },
+  "chat": {
+    "greetings": {
+      "lateNight": "夜深了，Anthony 随时待命",
+      "morning": "早上好，有什么可以帮您？",
+      "noon": "中午好，需要 Anthony 帮忙吗？",
+      "afternoon": "下午好，随时为您服务",
+      "evening": "晚上好，Anthony 已上线"
+    },
+    "relative": {
+      "justNow": "刚刚",
+      "minutesAgo": "{{mins}} 分钟前",
+      "hoursAgo": "{{hours}} 小时前",
+      "yesterday": "昨天",
+      "daysAgo": "{{days}} 天前"
+    },
+    "suggestions": {
+      "s1": "分析我的品牌在各 AI 平台的可见度表现",
+      "s2": "对比上周我的 GEO 数据与竞品的变化",
+      "s3": "基于最新数据给出内容优化建议",
+      "s4": "生成本月 GEO 表现的管理层摘要"
+    },
+    "cot": {
+      "tier": "思维链 · 层级 {{tier}}",
+      "thinking": "思考中...",
+      "stepsCount": "({{count}} 步)"
+    },
+    "goalLabels": {
+      "brand_visibility": "品牌可见度分析",
+      "citation_analysis": "引用分析",
+      "sentiment_analysis": "情感分析",
+      "competitor_comparison": "竞品对比",
+      "benchmark": "竞品基准测试",
+      "trend": "趋势诊断",
+      "health": "全面健康检查",
+      "sentiment": "情感分析",
+      "opportunity_discovery": "机会发现",
+      "faq": "FAQ 生成",
+      "aeo_article": "AEO 文章",
+      "article": "文章优化",
+      "recommendations": "优化建议",
+      "brief": "内容简报",
+      "custom": "自定义任务"
+    },
+    "inputLabels": {
+      "goal": "目标",
+      "analysis_goal": "分析目标",
+      "content_type": "内容类型",
+      "domains": "数据维度",
+      "platforms": "目标平台",
+      "topic": "主题",
+      "date_from": "开始日期",
+      "date_to": "结束日期",
+      "depth": "分析深度",
+      "count": "数量",
+      "language": "语言",
+      "task_type": "任务类型"
+    },
+    "taskConfig": "任务配置",
+    "startExecution": "开始执行",
+    "creatingTask": "创建任务中...",
+    "taskFinished": "任务完成",
+    "viewReportDetail": "查看报告详情",
+    "exportHtml": "导出 HTML",
+    "retry": "重试",
+    "newChat": "新对话",
+    "recentChats": "最近对话",
+    "emptyChats": "暂无对话记录",
+    "modeAnalyze": "📊 分析模式",
+    "modeAction": "⚡ 执行模式",
+    "modeChat": "💬 对话模式",
+    "freeChat": "自由对话模式 · 您可以向 Anthony 咨询任何 GEO 相关问题",
+    "generating": "生成中...",
+    "downloadReport": "下载 HTML 报告",
+    "contentReady": "内容已生成，请审核并决定",
+    "regenFeedbackPlaceholder": "如需重新生成，请输入您的反馈（可选）...",
+    "regenerate": "重新生成",
+    "approve": "批准",
+    "inputPlaceholder": "与 Anthony 自由对话，输入 / 查看命令...",
+    "disclaimer": "Anthony 可能产生不准确的信息，请以实际 GEO 数据为准",
+    "stepBadge": "步骤 {{current}}/{{total}}",
+    "stepNext": "下一步",
+    "stepSkipRemaining": "跳过剩余"
+  },
+  "toolbar": {
+    "slash": {
+      "compressLabel": "压缩对话",
+      "compressDesc": "压缩对话上下文以释放空间",
+      "flashLabel": "切换到 Flash",
+      "flashDesc": "使用 Flash 模型（更快、更节省）",
+      "proLabel": "切换到 Pro",
+      "proDesc": "使用 Pro 模型（更精确）",
+      "memoriesLabel": "查看记忆",
+      "memoriesDesc": "查看 Anthony 已记住的偏好与事实"
+    },
+    "memoryTitle": "Memory · {{count}} 条",
+    "memoryEmpty": "Anthony 还没有记住任何内容",
+    "memoryShared": "共享",
+    "memoryType": {
+      "preference": "偏好",
+      "fact": "事实",
+      "context": "上下文",
+      "brand": "品牌"
+    },
+    "model": {
+      "auto": "Auto",
+      "autoDesc": "系统自动选择最优模型",
+      "pro": "Pro",
+      "proDesc": "高精度分析与生成",
+      "flash": "Flash",
+      "flashDesc": "快速响应与对话"
+    },
+    "compressTitle": "压缩对话上下文",
+    "todayLabel": "今日",
+    "tokensSuffix": "tokens"
+  },
+  "taskProgress": {
+    "completed": "已完成",
+    "failed": "失败",
+    "running": "运行中",
+    "rerun": "重新执行",
+    "viewReportDetail": "查看报告详情",
+    "exportHtml": "导出 HTML"
+  },
+  "training": {
+    "pageTitle": "训练 Anthony",
+    "subtitle": "为您的 Agent 添加能力，让 Anthony 一起成长。",
+    "comingSoon": "即将推出",
+    "agentCaption": "AnswerX Agent",
+    "tierLabel": "Tier {{level}}",
+    "view": "查看",
+    "addCapability": "添加能力",
+    "add": "添加"
+  },
+  "tracking": {
+    "pageTitle": "配置追踪策略",
+    "subtitle": "配置品牌追踪计划、关键词监控与竞品对标策略。",
+    "comingSoon": "即将推出"
+  },
+  "chatWidget": {
+    "confirm": "确认",
+    "maxItems": "（最多 {{max}} 项）",
+    "recommended": "推荐",
+    "executionConfirmed": "已确认执行",
+    "taskConfig": "任务配置",
+    "startExecution": "开始执行",
+    "submitting": "提交中...",
+    "sort": {
+      "visibility": "可见度",
+      "citation": "引用率",
+      "sentiment": "情感"
+    },
+    "promptEditor": {
+      "placeholder": "默认模板由后端注入；如需自定义可直接修改这里的内容，留空将使用模板默认值。",
+      "hint": "提示：方括号内的 [指标(slug)] 占位符会在执行时被实际数据替换。"
+    },
+    "booleanToggle": {
+      "on": "已开启",
+      "off": "已关闭"
+    },
+    "structuredFields": {
+      "specsLabel": "产品规格",
+      "specsPlaceholder": "例如：5300Pa 吸力、5000mAh 电池...",
+      "featuresLabel": "核心功能",
+      "featuresPlaceholder": "例如：自动集尘、智能避障...",
+      "differentiatorsLabel": "差异化亮点",
+      "differentiatorsPlaceholder": "例如：行业首创的 xxx 技术..."
+    },
+    "chatTextPrompt": {
+      "waitingHint": "等待你的回复...",
+      "skip": "跳过"
+    },
+    "modeGate": {
+      "manualLabel": "我来定",
+      "manualDescription": "我自己挑话题、Prompt、产品事实。",
+      "autoLabel": "AI 帮我发现",
+      "autoDescription": "Anthony 自动挑表现最差的内容机会。"
+    },
+    "topicPicker": {
+      "loading": "正在加载话题...",
+      "empty": "暂无可选话题。",
+      "tierBad": "表现差",
+      "tierOptimize": "待优化",
+      "autoSelectN": "自动选择前 {{count}} 个",
+      "autoSelectOne": "自动选择最差的话题",
+      "clear": "清除",
+      "selectedCount": "已选 {{count}} 个话题",
+      "mentions": "命中",
+      "citations": "引用",
+      "negative": "负面",
+      "promptCount": "{{count}} 条 Prompt"
+    },
+    "promptPicker": {
+      "loading": "正在加载 Prompts...",
+      "empty": "暂无可选 Prompt。",
+      "tierBad": "表现差",
+      "tierOptimize": "待优化",
+      "autoSelectN": "自动选择前 {{count}} 个",
+      "clear": "清除",
+      "selectedCount": "已选 {{count}} 条 Prompt",
+      "locked": "已锁定",
+      "lockedHint": "{{count}} 条 Prompt 来自已导入的分析报告，不可修改。",
+      "mentions": "命中",
+      "citations": "引用",
+      "negative": "负面"
+    },
+    "analyzerImport": {
+      "loading": "正在加载分析任务...",
+      "empty": "暂无已完成的机会发现任务。",
+      "skip": "跳过，手动配置",
+      "selected": "已导入分析报告上下文",
+      "topicsCount": "{{count}} 话题",
+      "opportunitiesCount": "{{count}} 机会"
+    },
+    "chartConfig": {
+      "queryPlaceholder": "例如：过去 30 天每日命中数趋势",
+      "addChart": "添加图表",
+      "removeChart": "删除",
+      "chartTypeLabel": "图表类型",
+      "typeAuto": "自动",
+      "typeLine": "折线图",
+      "typeBar": "柱状图",
+      "typePie": "饼图",
+      "emptyHint": "未配置图表，将生成纯文本报告。"
+    },
+    "productFacts": {
+      "expand": "展开/收起",
+      "filledStatus": "{{filled}}/{{total}} 已填写",
+      "specsLabel": "产品规格",
+      "specsPlaceholder": "核心参数、技术规格...",
+      "featuresLabel": "核心功能",
+      "featuresPlaceholder": "产品亮点、独特能力...",
+      "differentiatorsLabel": "差异化亮点",
+      "differentiatorsPlaceholder": "相对竞品的关键优势..."
+    },
+    "methodology": {
+      "loading": "正在加载方法论...",
+      "empty": "暂无可选方法论片段。",
+      "selectedCount": "已选 {{count}} 个方法论片段"
+    },
+    "confirmation": {
+      "title": "确认任务配置",
+      "subtitle": "请检查每一步的选择，确认无误后开始执行。",
+      "edit": "修改",
+      "execute": "确认执行",
+      "modify": "返回修改",
+      "noValue": "（未填）",
+      "fieldLabel": {
+        "analysis_goal": "分析目标",
+        "analysis_framework": "分析框架",
+        "default_lenses": "分析视角",
+        "default_domains": "数据域",
+        "default_platforms": "平台",
+        "default_date_range": "时间范围",
+        "platforms": "平台",
+        "domains": "数据域",
+        "date_from": "开始日期",
+        "date_to": "结束日期",
+        "topic": "话题",
+        "topic_ids": "话题",
+        "prompt_ids": "Prompts",
+        "analyzer_task_id": "分析报告",
+        "chart_requests": "图表配置",
+        "default_charts": "图表配置",
+        "prompt_edit": "Prompt 编辑",
+        "default_prompt_edits": "Prompt 调整",
+        "mode_choice": "生成模式",
+        "content_type": "内容类型",
+        "content_goal": "内容目标",
+        "content_strategy": "内容策略",
+        "default_strategy": "内容策略",
+        "default_sub_goals": "子目标",
+        "depth": "深度",
+        "count": "数量",
+        "language": "语言",
+        "default_publish_platform": "发布平台",
+        "default_product_facts": "产品事实",
+        "default_methodology_snippets": "方法论",
+        "goal": "目标",
+        "default_goal": "默认目标"
+      }
+    }
+  }
+}

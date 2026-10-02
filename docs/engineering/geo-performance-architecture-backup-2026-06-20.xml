@@ -1,0 +1,300 @@
+<title>AnswerX GEO 数据查询性能、数据库选型与技术演进备忘录</title>
+
+<h1>AnswerX GEO 数据查询性能、数据库选型与技术演进备忘录</h1>
+
+<p><b>日期：</b>2026-06-20</p>
+<p><b>背景：</b>本备忘录用于沉淀 2026-06-19 至 2026-06-20 对 AnswerX GEO SaaS 数据看板、静态报告、Citation 查询、Overview 页面以及 Cloud SQL 压力问题的排查、优化、技术选型讨论和后续演进建议。</p>
+
+<callout emoji="📌" background-color="light-yellow" border-color="yellow">
+  <p><b>核心结论：</b>当前问题不是“几十万行数据天然不该被 PostgreSQL 支撑”，而是在线 SaaS 看板把多个重聚合查询、全量扫描、排序、COUNT DISTINCT、JSON snapshot 读取、前端重复请求和 Cloud Run 并发放大叠加到 2 vCPU Cloud SQL 上，导致 CPU、连接池、IO 和响应时间一起被放大。短期应继续做 SQL 下推、接口拆分、请求去重、分页和索引；中期应把 Analyzer 后的看板指标物化成聚合表；长期可评估 AlloyDB 或 BigQuery 分层承载分析负载。</p>
+</callout>
+
+<h2>一、背景与现状</h2>
+
+<h3>1.1 业务与系统背景</h3>
+<p>AnswerX GEO 是面向出海品牌的 Generative Engine Optimization SaaS，核心数据看板包括：</p>
+<ul>
+  <li><b>可见度 Visibility：</b>品牌在 AI 回答中被提及的回答占比，核心口径是“品牌出现过的回答数 / 总回答数”。</li>
+  <li><b>引用 Citation：</b>AI 回答中引用了哪些域名、页面以及自有域名占比。</li>
+  <li><b>情感 Sentiment：</b>AI 回答中对品牌的正负向表达、主题分布和趋势。</li>
+  <li><b>总览 Overview：</b>融合可见度、引用、情感的高层指标、趋势、关键变化、平台健康度、机会雷达和竞品快照。</li>
+  <li><b>静态报告 Static Report：</b>将某个客户某个时间窗口的看板数据物化成可浏览和可导出的报告。</li>
+</ul>
+
+<p>系统由多个 Cloud Run 服务组成，当前这次性能问题主要集中在 <code>geo_saas</code> 的 FastAPI 后端、React 前端，以及共享 Cloud SQL PostgreSQL 实例。</p>
+
+<h3>1.2 当前 Cloud SQL 规格与观测到的状态</h3>
+<table>
+  <thead>
+    <tr><th background-color="light-gray">项目</th><th background-color="light-gray">当前状态</th><th background-color="light-gray">说明</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>数据库</td><td>Cloud SQL for PostgreSQL 18.3</td><td>截图中显示 PostgreSQL 18.3。</td></tr>
+    <tr><td>版本/Edition</td><td>Enterprise Plus</td><td>已启用 Enterprise Plus，截图显示 Data Cache 约 375 GB。</td></tr>
+    <tr><td>Region</td><td>us-central1</td><td>与 SaaS 服务同区域部署。</td></tr>
+    <tr><td>Availability</td><td>Single zone</td><td>当前不是高可用双区部署。</td></tr>
+    <tr><td>规格</td><td>2 vCPU / 16 GB Memory</td><td>这是当前最核心的瓶颈之一。2 vCPU 对多个并发 OLAP 聚合查询非常敏感。</td></tr>
+    <tr><td>存储</td><td>100 GB SSD</td><td>截图中显示 100 GB SSD。</td></tr>
+    <tr><td>CPU</td><td>过去 1 小时多次超过 50%，一度达到 100%</td><td>加 Overview 页面后，多个 Tab 并发访问更容易触发 CPU 满载。</td></tr>
+    <tr><td>Memory</td><td>短期约 7 GB 量级，未逼近 16 GB</td><td>Memory 相对稳定，当前主要瓶颈更像 CPU、排序/聚合、连接和 IO，而不是数据库内存耗尽。</td></tr>
+    <tr><td>连接池</td><td>Cloud Run 单实例 DB pool 已调整到 8</td><td>限制单实例并发打到数据库的连接数，避免每个实例无限放大数据库压力。</td></tr>
+    <tr><td>Statement Timeout</td><td>取数接口已引入 60 秒级超时策略</td><td>目标是避免 300 秒慢查询拖死数据库连接和应用实例。</td></tr>
+  </tbody>
+</table>
+
+<h3>1.3 观察到的性能问题</h3>
+<ul>
+  <li><b>Overview 页面成为查询放大器：</b>新增 Overview 后，一个页面会同时请求 KPI、趋势、机会雷达、竞品快照、平台健康度、关键变化等多个接口。如果这些接口各自再实时调用 Visibility / Citation / Sentiment 的重查询，就会在一个页面里重复扫描大表。</li>
+  <li><b>Citation 页面明显慢：</b>动态 Citation 页面 sidebar 和列表接口曾经出现 40 秒到 50 秒级响应时间。Cited Domains / Cited Pages 即使只展示 Top 20 或 Top 50，也需要先扫描、聚合、排序大量 Citation 数据。</li>
+  <li><b>静态报告 materialize 曾经内存压力大：</b>早期 7 天静态报告生成时，snapshot_json 中存了大量 Source Rows，如 Citation Source Rows、Visibility Response Source Rows 等，导致生成、读取、序列化、网络响应都被放大。</li>
+  <li><b>详情接口响应体过大：</b>如果 GET 静态报告详情一次性返回完整 snapshot_json，可能出现 10 MB 以上响应体。响应体大不仅影响网络，也会在 Python 对象、JSON 序列化、ASGI response、浏览器解析中多次放大内存。</li>
+  <li><b>前端重复请求和取消问题：</b>静态报告页、Overview 页、Citation 列表在滚动、筛选切换、组件进入视口时曾出现请求取消后重发、旧请求覆盖新筛选结果的问题。</li>
+  <li><b>COUNT DISTINCT 与全量聚合叠加：</b>单独的 COUNT DISTINCT 不一定是根因，但在 CPU 已经高、并发请求多、排序和聚合已占用资源时，它会成为额外放大器。</li>
+  <li><b>Cloud Run 弹性放大数据库连接：</b>每个实例池子为 8，并不代表全局只有 8 个连接。如果 Cloud Run 扩到 X 个实例，理论连接上限约为 8X，因此还需要 max instances、请求并发、SQL timeout 等配套控制。</li>
+</ul>
+
+<h3>1.4 为什么几十万行数据也会出现瓶颈</h3>
+<p>几十万行在 OLAP 引擎里通常不算大，但当前瓶颈来自“查询形态 + 资源规格 + 并发放大”的组合：</p>
+<ol>
+  <li seq="auto"><b>PostgreSQL 是行存 OLTP 优先系统。</b>它可以做分析查询，但不像 ADB、ClickHouse、BigQuery 这类列式/MPP/云数仓引擎那样天然擅长高并发、大量 GROUP BY、ORDER BY、COUNT DISTINCT、长窗口扫描。</li>
+  <li seq="auto"><b>2 vCPU 对复杂聚合非常窄。</b>当多个 API 并发执行聚合和排序，CPU 很容易被打满。CPU 满后，所有查询都会排队，前端看起来就是请求卡住、超时、失败。</li>
+  <li seq="auto"><b>Dashboard 是高 fan-out 模式。</b>一个页面不是一个 SQL，而是多个卡片、图表、列表共同请求。如果每个卡片都扫一遍相同事实表，负载会被乘法放大。</li>
+  <li seq="auto"><b>Top N 也可能需要扫全量。</b>例如“被引用最多的页面”只返回 20 条，但如果没有预聚合表，数据库仍需扫描窗口内全部 citation，按 URL 或 domain 分组、排序后再 LIMIT。</li>
+  <li seq="auto"><b>有些旧逻辑把数据拉回应用层聚合。</b>这会同时增加数据库网络输出、Python 内存、CPU 和序列化开销。正确方向是能在 SQL GROUP BY / SUM / COUNT 中完成的，尽量在数据库完成，返回聚合结果或分页短列表。</li>
+  <li seq="auto"><b>静态报告曾经存全量 Source Rows。</b>这会让“本来只需要图表指标”的浏览页面变成“携带全量明细数据”的大对象，导致 materialize、详情读取和前端渲染都变慢。</li>
+  <li seq="auto"><b>索引和本地日期表达式很关键。</b>当前系统大量用客户、本地日期、topic、platform、domain/url 过滤。如果索引未覆盖这些过滤路径，查询会退化为大范围扫描。</li>
+</ol>
+
+<h2>二、今天已经完成或明确落地的优化</h2>
+
+<h3>2.1 静态报告 Snapshot 与接口拆分</h3>
+<ul>
+  <li>Materialize 接口不再把完整 snapshot_json 返回给前端，只返回轻量 metadata。</li>
+  <li>详情页不再依赖单个大详情接口一次性返回所有模块数据，而是拆成 Summary、Filters、Visibility、Citations、Sentiment 等模块接口。</li>
+  <li>静态报告列表类数据改成“首屏 20 条 + 下一页实时接口”。导出 HTML 保留首屏，不再为了离线分页把全量列表塞进 snapshot。</li>
+  <li>静态报告不再保留 19 万行 Source Rows、16 万行 Citation Source Rows、5.6 万行 Visibility Response Source Rows 这类高粒度全量数据作为默认渲染依赖。</li>
+  <li>Visibility 静态报告口径修复：筛选 Topic / Platform 后，可见度使用 response-level visibility，即品牌出现回答数 / 总回答数，不再误用 mention_count / total_mentions。</li>
+</ul>
+
+<h3>2.2 动态与静态报告接口对齐</h3>
+<ul>
+  <li>Visibility 大接口已逐步拆为 score、brand-ranking、sov、position 等更小接口。</li>
+  <li>Citation 相关接口按 share、ranking、categories、cited-domains、cited-pages、published-url-tracking 等职责拆分。</li>
+  <li>Sentiment 静态报告和动态页面保持同一类拆分思路，避免静态报告单独走全量 snapshot 聚合路径。</li>
+  <li>Prompt 下钻中 AI Video 可见度与 Visibility 页面筛选 AI Video 的口径已对齐；后续又修复了 SOV/声量份额被 score 默认值覆盖的问题。</li>
+</ul>
+
+<h3>2.3 前端请求治理</h3>
+<ul>
+  <li>Overview 页面曾出现点击进入后第一批请求立即取消再重新发起的问题，已定位为渲染状态和依赖变化导致的重复请求方向。</li>
+  <li>静态报告页面快速切换筛选项时，已加入 AbortController 和 request sequence guard，避免旧请求晚返回后覆盖新筛选结果。</li>
+  <li>StaticCitationSection 修复了滚动路过容器时 Cited Pages 请求取消后重发的问题：稳定空数组/对象引用，避免 effect dependency 因 render 生成新引用而反复触发 cleanup。</li>
+  <li>列表分页从“依赖全量总数同步返回”改为更稳健的异步 count / hasMore 机制；下一页按钮基于 hasMore 和真实 count 返回状态控制。</li>
+</ul>
+
+<h3>2.4 SQL、索引和连接控制</h3>
+<ul>
+  <li>对 Citation、Visibility、Overview 的 SQL 做了一轮审查，重点原则是：只需要聚合指标时只返回聚合结果；列表接口在 SQL 层排序 LIMIT，避免全量拉回应用层截断。</li>
+  <li>用户已执行新增索引，包括 Citation 相关索引和本地日期过滤表达式索引方向。</li>
+  <li>连接池从单实例默认较宽配置收敛到 8，配合 pool acquire timeout，避免应用层无限等待数据库连接。</li>
+  <li>取数接口引入 statement timeout，防止超长查询占住数据库连接、拖垮 Cloud Run 实例和 Cloud SQL。</li>
+  <li>新增工程性能原则文档：<code>docs/engineering/data-query-performance-principles.md</code>，作为未来开发数据接口的约束。</li>
+</ul>
+
+<h3>2.5 今日优化后的效果</h3>
+<ul>
+  <li>7 日静态报告 materialize 在线上约 40 秒返回，较早期本地 3.7 分钟和线上 OOM/500 情况有明显改善。</li>
+  <li>Cloud SQL 最近 5 到 10 分钟观测中，CPU 不再持续 100%，但仍可能在复杂查询并发时达到高位，说明优化有效但瓶颈没有被根治。</li>
+  <li>Memory 未表现为主要瓶颈，当前更需要关注 CPU、查询计划、排序/聚合、连接堆积和请求 fan-out。</li>
+</ul>
+
+<h2>三、技术选型对比：Cloud SQL、AlloyDB、BigQuery</h2>
+
+<h3>3.1 Cloud SQL for PostgreSQL：当前方案</h3>
+<p><b>适合：</b>事务型数据、后台配置、客户/Prompt/任务状态、实时 API、小到中等规模聚合查询。</p>
+<p><b>优势：</b>当前系统已经建在 PostgreSQL 上，工程改造成本最低；SQL 和 ORM/asyncpg 逻辑已有；事务一致性、索引、JOIN、权限模型成熟。</p>
+<p><b>劣势：</b>2 vCPU 下不适合多 Tab、多页面同时触发的大量 OLAP 聚合；行存结构对宽窗口扫描、COUNT DISTINCT、GROUP BY、ORDER BY 的效率不如列式分析库；扩容可以缓解但不能解决查询形态问题。</p>
+<p><b>建议：</b>短期继续使用，但需要升级规格、限制并发、优化 SQL，并尽快把 Analyzer 后的核心看板指标写入聚合表。</p>
+
+<h3>3.2 AlloyDB for PostgreSQL</h3>
+<p><b>定位：</b>AlloyDB 是 Google Cloud 托管的 PostgreSQL 兼容数据库，面向更高性能的事务和混合查询场景。它相比 Cloud SQL 更偏高性能 PostgreSQL 托管服务，并提供 columnar engine 等能力用于加速分析类查询。</p>
+<p><b>适合：</b>希望保持 PostgreSQL 兼容、低延迟在线 API、较低迁移成本，同时需要更强读性能和分析查询能力的阶段。</p>
+<p><b>优势：</b></p>
+<ul>
+  <li>PostgreSQL 兼容，迁移成本明显低于 BigQuery 重构。</li>
+  <li>仍适合在线 SaaS API 的低延迟查询，不像 BigQuery 那样天然偏离线数仓。</li>
+  <li>Columnar engine 可以提升扫描、JOIN、聚合、排序类分析查询。</li>
+  <li>可作为 Cloud SQL 升级后的中期演进目标。</li>
+</ul>
+<p><b>劣势：</b></p>
+<ul>
+  <li>费用通常高于同规格 Cloud SQL。</li>
+  <li>不是无限水平扩展的云数仓；如果未来做跨客户、长历史、大规模探索式分析，仍可能需要 BigQuery。</li>
+  <li>迁移虽低于 BigQuery，但仍要做连接、备份、权限、性能回归、索引和 SQL 计划验证。</li>
+</ul>
+<p><b>适合我们的使用方式：</b>作为在线 dashboard 主库或读库增强，用于承载低延迟的聚合 API；同时保留 Cloud SQL/AlloyDB 中的聚合表，避免每次页面访问都实时扫原始事实表。</p>
+
+<h3>3.3 BigQuery</h3>
+<p><b>定位：</b>BigQuery 是 serverless cloud data warehouse，适合大规模 OLAP、列式扫描、长历史、多客户汇总、离线报表、探索式分析。</p>
+<p><b>适合：</b>客户数增加、历史窗口拉长、跨客户分析、长期数据仓库、成本按扫描量可控的批量分析。</p>
+<p><b>优势：</b></p>
+<ul>
+  <li>天然适合 GROUP BY、COUNT DISTINCT、ORDER BY、大窗口扫描等 OLAP 查询。</li>
+  <li>存储与计算分离，按扫描量或 slot 计费，容量扩展弹性强。</li>
+  <li>可与 Looker Studio、Dataform、scheduled queries、materialized views、BI Engine 等数据栈配合。</li>
+  <li>对 10x 甚至更高数据量增长更稳。</li>
+</ul>
+<p><b>劣势：</b></p>
+<ul>
+  <li>在线 SaaS API 的低延迟体验需要额外设计，例如预聚合表、物化视图、BI Engine 或将结果同步回 PostgreSQL/AlloyDB。</li>
+  <li>工程改造较大：数据同步、schema 分层、查询参数化、权限、监控、成本保护都需要重新设计。</li>
+  <li>如果没有 partition/cluster/materialize，BigQuery 也可能因为扫描量大而账单变高。</li>
+</ul>
+<p><b>适合我们的使用方式：</b>不建议第一阶段直接把所有在线看板 API 切到 BigQuery；更适合作为长期数仓，承载原始事实、长历史、跨客户分析和离线静态报告生成。在线 SaaS 可以读取 BigQuery 预聚合结果，或把结果回写到 PostgreSQL/AlloyDB 聚合表。</p>
+
+<h3>3.4 PG Buffer Cache 是否有固定失效时间</h3>
+<p>PostgreSQL 的 shared buffers、操作系统 page cache、Cloud SQL Data Cache 都不是“固定 TTL 到期失效”的缓存。它们通常根据内存压力、LRU/近似 LRU、查询访问模式、实例重启、数据页变更等因素被替换。也就是说：</p>
+<ul>
+  <li>没有一个可靠的“等 N 分钟缓存一定失效”的时间。</li>
+  <li>第一次查询慢、第二次查询快，可能来自数据页、索引页、执行计划、Data Cache 或 OS cache 被命中。</li>
+  <li>性能测试不要只看 warm cache 下的结果，应同时看冷启动、并发访问和索引命中率。</li>
+</ul>
+
+<h2>四、成本与压力粗估</h2>
+
+<h3>4.1 重要假设</h3>
+<p>以下估算是技术决策级粗估，不是账单承诺。最终费用需要以 GCP Billing、Cloud SQL Query Insights、BigQuery 实际 scanned bytes 和实际并发访问为准。</p>
+<ul>
+  <li>当前 Cloud SQL 位于 us-central1，Enterprise Plus，单区，2 vCPU / 16 GB / 100 GB SSD。</li>
+  <li>BigQuery on-demand 查询按扫描量计费：官方价格页显示美国多区域/部分区域标准分析价格约为每 TiB scanned 6.25 美元，并有每月 1 TiB 免费额度。存储按 active logical storage 计费，约 23.55 美元 / TiB-month。</li>
+  <li>AlloyDB 按 vCPU、Memory、Storage 小时计费。官方价格会随区域和配置变化，本文使用 us-central1 价格量级估算。</li>
+  <li>5 倍数据量 + 5 倍并发，如果没有预聚合，扫描压力近似可能达到 25 倍；10 倍数据量 + 10 倍并发，压力可能达到 100 倍。</li>
+  <li>如果做了 Analyzer 后预聚合，扫描压力更接近数据量线性增长，而不是“数据量 × 并发”的乘法爆炸。</li>
+</ul>
+
+<h3>4.2 Cloud SQL 粗估</h3>
+<table>
+  <thead>
+    <tr><th background-color="light-gray">规格</th><th background-color="light-gray">适用阶段</th><th background-color="light-gray">月成本粗估</th><th background-color="light-gray">说明</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>2 vCPU / 16 GB / 100 GB SSD</td><td>当前</td><td>约 170 - 190 美元 / 月</td><td>当前规格。对多并发 OLAP 查询偏紧。</td></tr>
+    <tr><td>4 vCPU / 32 GB / 100 GB SSD</td><td>短期建议升级档</td><td>约 300 - 340 美元 / 月</td><td>预计能明显缓解 CPU 满载，但不能替代 SQL 和聚合表优化。</td></tr>
+    <tr><td>8 vCPU / 64 GB / 100 GB SSD</td><td>增长或临时兜底</td><td>约 570 - 650 美元 / 月</td><td>如果不改查询形态，仍可能被多页面 fan-out 打满。</td></tr>
+  </tbody>
+</table>
+
+<h3>4.3 AlloyDB 粗估</h3>
+<table>
+  <thead>
+    <tr><th background-color="light-gray">数据/并发阶段</th><th background-color="light-gray">建议规格量级</th><th background-color="light-gray">月成本粗估</th><th background-color="light-gray">判断</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>当前数据量 / 当前并发</td><td>2 - 4 vCPU，16 - 32 GB</td><td>约 260 - 500 美元 / 月</td><td>比 Cloud SQL 贵，但迁移成本低于 BigQuery，适合做 POC。</td></tr>
+    <tr><td>5 倍数据量 / 5 倍并发</td><td>8 - 16 vCPU，64 - 128 GB</td><td>约 950 - 2,000 美元 / 月</td><td>需要配合聚合表，否则只是用更贵机器承接错误查询形态。</td></tr>
+    <tr><td>10 倍数据量 / 10 倍并发</td><td>16 - 32 vCPU，128 - 256 GB</td><td>约 1,900 - 3,800 美元 / 月</td><td>适合在线低延迟聚合层，但长历史和跨客户分析可能仍应交给 BigQuery。</td></tr>
+  </tbody>
+</table>
+
+<h3>4.4 BigQuery 粗估</h3>
+<p>BigQuery 的关键不是行数，而是每月扫描字节数。若查询没有 partition、cluster、pre-aggregation，5 倍数据量和 5 倍并发会把扫描量放大到约 25 倍；10 倍数据量和 10 倍并发会放大到约 100 倍。</p>
+
+<table>
+  <thead>
+    <tr><th background-color="light-gray">场景</th><th background-color="light-gray">未充分预聚合时月扫描量粗估</th><th background-color="light-gray">查询成本粗估</th><th background-color="light-gray">预聚合良好时成本方向</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>当前数据量 / 当前并发</td><td>约 1 - 6 TiB / 月</td><td>约 0 - 31 美元 / 月</td><td>如果大部分读聚合表，成本可能非常低。</td></tr>
+    <tr><td>5 倍数据量 / 5 倍并发</td><td>约 25 - 150 TiB / 月</td><td>约 150 - 930 美元 / 月</td><td>若查询预聚合结果，可能降到约 25 - 90 美元 / 月量级。</td></tr>
+    <tr><td>10 倍数据量 / 10 倍并发</td><td>约 100 - 600 TiB / 月</td><td>约 620 - 3,740 美元 / 月</td><td>若预聚合、分区和聚簇做得好，可能保持在约 60 - 180 美元 / 月量级。</td></tr>
+  </tbody>
+</table>
+
+<p>BigQuery 存储成本在当前数据规模下大概率不是主要问题。例如 active logical storage 每 TiB-month 约 23.55 美元；即使 10 倍增长，只要总数据仍是几十 GB 到几百 GB，存储费通常远低于查询扫描费。</p>
+
+<h3>4.5 工程改造成本对比</h3>
+<table>
+  <thead>
+    <tr><th background-color="light-gray">方向</th><th background-color="light-gray">改造成本</th><th background-color="light-gray">风险</th><th background-color="light-gray">收益</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Cloud SQL 升级 2 → 4 vCPU</td><td>低</td><td>成本上升，治标不治本</td><td>最快缓解 CPU 满载，适合短期稳定线上。</td></tr>
+    <tr><td>SQL / 索引 / 请求治理</td><td>中低</td><td>需要持续 review 查询计划</td><td>ROI 最高，必须继续做。</td></tr>
+    <tr><td>Analyzer 后写聚合表</td><td>中</td><td>需要设计口径、回填、增量更新</td><td>对 Dashboard 性能最关键，可显著减少实时扫表。</td></tr>
+    <tr><td>迁移 AlloyDB</td><td>中</td><td>迁移窗口、兼容性、成本</td><td>保持 PostgreSQL 兼容，提升在线查询能力。</td></tr>
+    <tr><td>引入 BigQuery 数仓</td><td>高</td><td>数据同步、权限、成本治理、延迟设计</td><td>长期分析能力最强，适合跨客户、长历史、离线报告。</td></tr>
+  </tbody>
+</table>
+
+<h2>五、建议实施路径</h2>
+
+<h3>5.1 第一阶段：立即稳定线上</h3>
+<ol>
+  <li seq="auto"><b>继续优化 SQL 下推：</b>所有 Dashboard 接口必须做到聚合 SQL 返回聚合结果，列表 SQL 返回分页短列表，避免全量拉回内存再截断。</li>
+  <li seq="auto"><b>Overview 专用轻聚合：</b>Overview 不应实时拼接多个 Visibility/Citation/Sentiment 重接口，而应有自己更轻的 SQL 聚合，且同一事实表尽量减少重复扫描。</li>
+  <li seq="auto"><b>限制请求 fan-out：</b>前端按卡片加载可以保留，但必须取消旧请求、防止重复请求、防止进入视口时反复请求。</li>
+  <li seq="auto"><b>保留 statement timeout：</b>所有取数接口设置合理超时。超时后前端展示“请求超时，请刷新或稍后重试”，不要暴露 HTTP 500 给普通用户。</li>
+  <li seq="auto"><b>控制连接池和 Cloud Run 扩容：</b>单实例 pool=8 是合理起点；如果升级数据库到 4 vCPU，可以观察后再评估是否提高到 10-12。更重要的是设置 Cloud Run max instances，避免 8X 连接无限膨胀。</li>
+  <li seq="auto"><b>短期升级 Cloud SQL 到 4 vCPU：</b>建议作为稳定性兜底。它不能替代 SQL 优化，但可以降低线上在两三个 Tab 下直接卡死的概率。</li>
+</ol>
+
+<h3>5.2 第二阶段：物化核心指标</h3>
+<p>当前每天本来就只在 GEO Analyzer 后更新一次数据，这非常适合做 Analyzer 后的派生聚合表，而不是每次用户打开页面实时扫原始事实表。</p>
+<ul>
+  <li><b>Visibility 聚合表：</b>按 client_id、local_date、topic、platform、country、brand 预聚合 response_count、total_response_count、visibility_pct、rank、avg_position、mention_count。</li>
+  <li><b>Citation 聚合表：</b>按 client_id、local_date、topic、platform、domain/page_url 预聚合 citation_count、share、rank、category、own_domain_flag。</li>
+  <li><b>Sentiment 聚合表：</b>按 client_id、local_date、topic、platform、brand 预聚合 positive/neutral/negative、polarity、topic sentiment。</li>
+  <li><b>Overview 聚合表：</b>保存 Overview 首屏所有 KPI、趋势摘要、关键变化事实、机会雷达、竞品快照和平台健康度的结构化结果。</li>
+</ul>
+
+<p>这样做后，在线查询会从“扫描原始事实表 + 聚合 + 排序”变成“读取已经算好的结果 + 小范围筛选/分页”，这才符合每天批处理一次的业务现实。</p>
+
+<h3>5.3 第三阶段：数据库架构演进</h3>
+<ol>
+  <li seq="auto"><b>短期：</b>Cloud SQL 4 vCPU + SQL 优化 + 聚合表。</li>
+  <li seq="auto"><b>中期：</b>如果 Cloud SQL 仍然因为在线分析压力不稳，优先 POC AlloyDB。理由是 PostgreSQL 兼容，迁移成本低，在线低延迟能力强。</li>
+  <li seq="auto"><b>长期：</b>引入 BigQuery 作为分析数仓，承载原始事实、长历史、跨客户分析、离线报表和大规模回溯。在线 SaaS API 读取 BigQuery 预聚合结果，或将结果同步回 PostgreSQL/AlloyDB。</li>
+</ol>
+
+<h2>六、最终形态建议</h2>
+
+<h3>6.1 推荐架构</h3>
+<p>最终更稳的形态不是“所有查询都打一个 PostgreSQL”，而是分层：</p>
+<ul>
+  <li><b>Cloud SQL / AlloyDB：</b>承载 SaaS 事务数据、配置、任务状态、用户权限、客户空间、以及在线 Dashboard 聚合结果。</li>
+  <li><b>BigQuery：</b>承载原始事实数据、长历史明细、跨客户分析、离线报告、成本归因、实验分析。</li>
+  <li><b>Analyzer / Batch Job：</b>每天数据跑完后，把原始事实聚合成 dashboard-ready tables，保证用户打开页面时不再重算大窗口。</li>
+  <li><b>Static Report：</b>保存 metadata、图表聚合结果和首屏列表，不保存全量 Source Rows；网页端分页实时请求，导出 HTML 只保留首屏。</li>
+</ul>
+
+<h3>6.2 开发原则</h3>
+<ul>
+  <li>Dashboard 接口默认不允许返回原始明细大列表，除非明确是分页明细接口。</li>
+  <li>任何 Top N 列表都必须在 SQL 层排序和 LIMIT；如果需要“我方品牌不在 Top N 也展示”，单独补一条 own brand/domain 查询。</li>
+  <li>COUNT DISTINCT 可以做，但要异步、可超时、可降级；不能阻塞首屏核心图表。</li>
+  <li>前端筛选切换必须取消旧请求，并用 request sequence 防止旧响应覆盖新状态。</li>
+  <li>Overview 这类综合页必须用专用轻聚合，不能把多个重 dashboard endpoint 组合成一个查询放大器。</li>
+  <li>静态报告生成不应为了导出 HTML 支持完整交互而牺牲线上稳定性。导出 HTML 的 trade-off 是可以接受的：首屏可见，不支持后续分页。</li>
+  <li>上线新数据接口前必须看 EXPLAIN、慢查询日志和返回行数；不能只看功能是否正确。</li>
+</ul>
+
+<h2>七、参考资料</h2>
+<ul>
+  <li>BigQuery Pricing：<a href="https://cloud.google.com/bigquery/pricing">https://cloud.google.com/bigquery/pricing</a></li>
+  <li>AlloyDB Pricing：<a href="https://cloud.google.com/alloydb/pricing">https://cloud.google.com/alloydb/pricing</a></li>
+  <li>AlloyDB Columnar Engine：<a href="https://docs.cloud.google.com/alloydb/docs/columnar-engine/about">https://docs.cloud.google.com/alloydb/docs/columnar-engine/about</a></li>
+  <li>Cloud SQL Pricing：<a href="https://cloud.google.com/sql/pricing">https://cloud.google.com/sql/pricing</a></li>
+  <li>本地性能原则文档：<code>docs/engineering/data-query-performance-principles.md</code></li>
+</ul>
+
+<h2>八、结论</h2>
+<p>当前最优路径是“先稳定、再物化、后演进”。马上把所有负载迁到 BigQuery 或 AlloyDB 都不是最优第一步；只升级数据库规格也不够。正确顺序是：</p>
+<ol>
+  <li seq="auto">继续压低实时查询复杂度，减少重复扫表、减少前端重复请求。</li>
+  <li seq="auto">Cloud SQL 2 vCPU 升到 4 vCPU，作为线上稳定性兜底。</li>
+  <li seq="auto">将 Analyzer 后的核心指标物化为 dashboard-ready 聚合表。</li>
+  <li seq="auto">当客户数、历史窗口和 prompt 组合继续增长时，优先 POC AlloyDB 承载在线分析负载。</li>
+  <li seq="auto">长期建设 BigQuery 数仓，服务长历史、跨客户、离线报告和大规模分析。</li>
+</ol>
+
+<p>最终目标不是让 PostgreSQL 硬扛所有 OLAP，而是让每一层做自己擅长的事：PostgreSQL/AlloyDB 做在线低延迟和聚合结果查询，BigQuery 做大规模历史分析，Analyzer 负责把每日批处理结果转成可直接读取的指标资产。</p>

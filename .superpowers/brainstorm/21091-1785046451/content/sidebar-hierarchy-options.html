@@ -1,0 +1,63 @@
+<h2>选择 SaaS Sidebar 的功能颗粒度</h2>
+<p class="subtitle">两种方案都保持所有用户看到完全相同的导航结构；这里先只确定模块与功能点边界，不讨论锁定样式。</p>
+
+<div class="split">
+  <div class="card" data-choice="sidebar-a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:20px;background:#f7f8fa">
+      <div style="width:250px;margin:auto;background:white;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(15,23,42,.06)">
+        <div style="font-weight:700;margin-bottom:20px">AnswerX GEO</div>
+        <div class="label" style="margin-bottom:8px">数据分析与监测</div>
+        <div style="display:grid;gap:5px;font-size:14px">
+          <div style="padding:8px 10px;background:#eef7f1;border-radius:7px">▦ 总览</div>
+          <div style="padding:8px 10px">◉ 可见度</div>
+          <div style="padding:8px 10px">⌁ 引用</div>
+          <div style="padding:8px 10px">☺ 情感</div>
+          <div style="padding:8px 10px">✦ Prompt</div>
+          <div style="padding:8px 10px">▤ 报告</div>
+          <div style="padding:8px 10px">⚙ 配置</div>
+        </div>
+        <div class="label" style="margin:22px 0 8px">Actions</div>
+        <div style="display:grid;gap:5px;font-size:14px">
+          <div style="padding:8px 10px">⌁ 分析</div>
+          <div style="padding:8px 10px">✎ 内容</div>
+          <div style="padding:8px 10px">◌ 对话 Anthony</div>
+          <div style="padding:8px 10px">◇ 训练 Anthony</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · 独立功能点（推荐）</h3>
+      <p>每个现有页面都是独立二级功能点。授权、锁定、使用统计和未来定价最灵活；Sidebar 项目较多。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="sidebar-b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:20px;background:#f7f8fa">
+      <div style="width:250px;margin:auto;background:white;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(15,23,42,.06)">
+        <div style="font-weight:700;margin-bottom:20px">AnswerX GEO</div>
+        <div class="label" style="margin-bottom:8px">数据分析与监测</div>
+        <div style="display:grid;gap:5px;font-size:14px">
+          <div style="padding:8px 10px;background:#eef7f1;border-radius:7px">▦ 总览</div>
+          <div style="padding:8px 10px">◉ 洞察中心</div>
+          <div style="padding:3px 10px 3px 28px;color:#6b7280;font-size:12px">可见度 · 引用 · 情感</div>
+          <div style="padding:8px 10px">✦ Prompt 与报告</div>
+          <div style="padding:3px 10px 3px 28px;color:#6b7280;font-size:12px">Prompt · Fanouts · 报告</div>
+          <div style="padding:8px 10px">⚙ 配置</div>
+        </div>
+        <div class="label" style="margin:22px 0 8px">Actions</div>
+        <div style="display:grid;gap:5px;font-size:14px">
+          <div style="padding:8px 10px">⌁ 分析</div>
+          <div style="padding:8px 10px">✎ 内容</div>
+          <div style="padding:8px 10px">◌ 对话 Anthony</div>
+          <div style="padding:8px 10px">◇ 训练 Anthony</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · 合并业务入口</h3>
+      <p>Sidebar 更短，但“可见度/引用/情感”和“Prompt/报告”只能整体授权；后续单项售卖或角色控制会受限。</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:20px">请点击你倾向的方案。你也可以在对话中说明想从两者中组合哪些部分。</p>
