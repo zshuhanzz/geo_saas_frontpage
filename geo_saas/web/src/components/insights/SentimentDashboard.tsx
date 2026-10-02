@@ -752,96 +752,12 @@ export default function SentimentDashboard({
                     <span className="text-sm text-muted-foreground">{t("sentiment.aiSentimentSubtitle")}</span>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-                    {/* Left Column: Trend Chart (col-span-8) */}
-                    <div className="lg:col-span-8 space-y-6 flex flex-col">
-                        <Card className="shadow-none flex-1 flex flex-col">
-                            {/* Header with big KPI + Chart Toggles */}
-                            <CardHeader className="pb-2 flex flex-row items-start justify-between border-b pb-4 mb-4">
-                                <div>
-                                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2 mb-2">
-                                        <Activity className="h-4 w-4" />
-                                        {t("sentiment.trend")}
-                                    </CardTitle>
-                                    <div className="flex items-baseline gap-3">
-                                        <div className="text-3xl font-bold gradient-text-static tracking-tight">
-                                            {summary.positive_pct ?? "—"}%
-                                        </div>
-                                        {summary.positive_pct_change != null && (
-                                            <div className={`text-sm flex items-center gap-0.5 font-medium ${summary.positive_pct_change >= 0 ? "text-emerald-500" : "text-red-400"}`}>
-                                                {summary.positive_pct_change >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                                                {summary.positive_pct_change >= 0 ? "+" : ""}{summary.positive_pct_change}% {t("sentiment.vsPrev")}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex flex-col items-end gap-3">
-                                    <div className="flex items-center gap-2 mr-1">
-                                        <Switch id="compare-mode" checked={comparePrev} onCheckedChange={setComparePrev} />
-                                        <Label htmlFor="compare-mode" className="text-xs cursor-pointer font-medium text-muted-foreground">{t("sentiment.comparePrevious")}</Label>
-                                    </div>
-                                    <div className="flex items-center bg-muted/50 p-1 rounded-md border border-border/50">
-                                        <button
-                                            onClick={() => setChartMode("line")}
-                                            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${chartMode === "line" ? "bg-background shadow-sm border border-border/50" : "hover:text-foreground text-muted-foreground"}`}
-                                        >
-                                            {t("sentiment.chartLine")}
-                                        </button>
-                                        <button
-                                            onClick={() => setChartMode("bar")}
-                                            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${chartMode === "bar" ? "bg-background shadow-sm border border-border/50" : "hover:text-foreground text-muted-foreground"}`}
-                                        >
-                                            {t("sentiment.chartBar")}
-                                        </button>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="flex-1 pb-2">
-                                {chartData.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height={360}>
-                                        {chartMode === "bar" ? (
-                                            <RechartsBarChart data={chartData} barGap={4} margin={{ top: 20, right: 12, left: 8, bottom: 0 }}>
-                                                <XAxis dataKey="date" stroke="#888" fontSize={11} tickLine={false} axisLine={false} tickFormatter={fmtDate} tickMargin={10} />
-                                                <YAxis stroke="#888" fontSize={11} tickLine={false} axisLine={false} unit="%" width={52} tickMargin={8} domain={[(dataMin: number) => Math.max(0, Math.floor(dataMin - 5)), (dataMax: number) => Math.min(100, Math.ceil(dataMax + 5))]} />
-                                                <RechartsTooltip
-                                                    content={<GlassTooltip />}
-                                                    formatter={(val: unknown, name?: string | number) => [fmtPercentValue(val), name === "positive_pct" ? t("sentiment.positiveCurrent") : t("sentiment.positivePrevious")]}
-                                                    labelFormatter={(v: unknown) => { const s = String(v); const d = s.includes("T") ? new Date(s) : new Date(s + "T00:00:00"); return d.toLocaleDateString(); }}
-                                                />
-                                                <Bar dataKey="positive_pct" radius={[4, 4, 0, 0]} maxBarSize={40} fill="#10b981" />
-                                                {comparePrev && (
-                                                    <Bar dataKey="prev_positive_pct" fill="#71717a" fillOpacity={0.2} radius={[4, 4, 0, 0]} maxBarSize={40} />
-                                                )}
-                                            </RechartsBarChart>
-                                        ) : (
-                                            <LineChart data={chartData} margin={{ top: 20, right: 12, left: 8, bottom: 0 }}>
-                                                <XAxis dataKey="date" stroke="#888" fontSize={11} tickLine={false} axisLine={false} tickFormatter={fmtDate} tickMargin={10} />
-                                                <YAxis stroke="#888" fontSize={11} tickLine={false} axisLine={false} unit="%" width={52} tickMargin={8} domain={[(dataMin: number) => Math.max(0, Math.floor(dataMin - 5)), (dataMax: number) => Math.min(100, Math.ceil(dataMax + 5))]} />
-                                                <RechartsTooltip
-                                                    content={<GlassTooltip />}
-                                                    formatter={(val: unknown, name?: string | number) => [fmtPercentValue(val), name === "positive_pct" ? t("sentiment.positiveCurrent") : t("sentiment.positivePrevious")]}
-                                                    labelFormatter={(v: unknown) => { const s = String(v); const d = s.includes("T") ? new Date(s) : new Date(s + "T00:00:00"); return d.toLocaleDateString(); }}
-                                                />
-                                                <Line type="monotone" dataKey="positive_pct" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} connectNulls={false} />
-                                                {comparePrev && (
-                                                    <Line type="monotone" dataKey="prev_positive_pct" stroke="#71717a" strokeWidth={1.5} strokeDasharray="5 5" opacity={0.35} dot={false} />
-                                                )}
-                                            </LineChart>
-                                        )}
-                                    </ResponsiveContainer>
-                                ) : (
-                                    <EmptyState message={t("sentiment.noTrendData")} />
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Right Column: Themes & Stacked Bar (col-span-4) */}
-                    <div className="lg:col-span-4 space-y-4 flex flex-col">
-
-                        {/* Summary Stacked Sentiment Ratio Bar */}
+                <div className="grid items-stretch gap-6 xl:grid-cols-[344px_minmax(0,1fr)]">
+                    {/* LEFT: Summary cards (344px) */}
+                    <div className="flex flex-col gap-3">
+                        {/* Overall Sentiment stacked bar card */}
                         {summary.total_count > 0 && (
-                            <Card className="shadow-sm border-border">
+                            <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
                                 <CardHeader className="pb-0 pt-4 px-5">
                                     <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{t("sentiment.overallSentiment")}</CardTitle>
                                 </CardHeader>
@@ -865,7 +781,7 @@ export default function SentimentDashboard({
                         )}
 
                         {/* Top Positive Themes */}
-                        <Card className="shadow-sm border-border flex-1">
+                        <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm flex-1">
                             <CardHeader className="pb-3 pt-4 px-5">
                                 <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wider flex items-center gap-1.5">
                                     <SmilePlus className="h-3.5 w-3.5 text-emerald-500" /> {t("sentiment.topPositiveThemes")}
@@ -887,7 +803,7 @@ export default function SentimentDashboard({
                         </Card>
 
                         {/* Top Negative Themes */}
-                        <Card className="shadow-sm border-border flex-1">
+                        <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm flex-1">
                             <CardHeader className="pb-3 pt-4 px-5">
                                 <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wider flex items-center gap-1.5">
                                     <Frown className="h-3.5 w-3.5 text-red-400" /> {t("sentiment.topNegativeThemes")}
@@ -908,6 +824,86 @@ export default function SentimentDashboard({
                             </CardContent>
                         </Card>
                     </div>
+
+                    {/* RIGHT: Trend chart (fill) */}
+                    <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm flex flex-col">
+                        <CardHeader className="pb-2 flex flex-row items-start justify-between border-b pb-4 mb-4">
+                            <div>
+                                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2 mb-2">
+                                    <Activity className="h-4 w-4" />
+                                    {t("sentiment.trend")}
+                                </CardTitle>
+                                <div className="flex items-baseline gap-3">
+                                    <div className="text-3xl font-bold gradient-text-static tracking-tight">
+                                        {summary.positive_pct ?? "—"}%
+                                    </div>
+                                    {summary.positive_pct_change != null && (
+                                        <div className={`text-sm flex items-center gap-0.5 font-medium ${summary.positive_pct_change >= 0 ? "text-emerald-500" : "text-red-400"}`}>
+                                            {summary.positive_pct_change >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                                            {summary.positive_pct_change >= 0 ? "+" : ""}{summary.positive_pct_change}% {t("sentiment.vsPrev")}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-3">
+                                <div className="flex items-center gap-2 mr-1">
+                                    <Switch id="compare-mode" checked={comparePrev} onCheckedChange={setComparePrev} />
+                                    <Label htmlFor="compare-mode" className="text-xs cursor-pointer font-medium text-muted-foreground">{t("sentiment.comparePrevious")}</Label>
+                                </div>
+                                <div className="flex items-center bg-muted/50 p-1 rounded-md border border-border/50">
+                                    <button
+                                        onClick={() => setChartMode("line")}
+                                        className={`px-3 py-1 rounded text-xs font-medium transition-colors ${chartMode === "line" ? "bg-background shadow-sm border border-border/50" : "hover:text-foreground text-muted-foreground"}`}
+                                    >
+                                        {t("sentiment.chartLine")}
+                                    </button>
+                                    <button
+                                        onClick={() => setChartMode("bar")}
+                                        className={`px-3 py-1 rounded text-xs font-medium transition-colors ${chartMode === "bar" ? "bg-background shadow-sm border border-border/50" : "hover:text-foreground text-muted-foreground"}`}
+                                    >
+                                        {t("sentiment.chartBar")}
+                                    </button>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="flex-1 pb-2">
+                            {chartData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height={360}>
+                                    {chartMode === "bar" ? (
+                                        <RechartsBarChart data={chartData} barGap={4} margin={{ top: 20, right: 12, left: 8, bottom: 0 }}>
+                                            <XAxis dataKey="date" stroke="#888" fontSize={11} tickLine={false} axisLine={false} tickFormatter={fmtDate} tickMargin={10} />
+                                            <YAxis stroke="#888" fontSize={11} tickLine={false} axisLine={false} unit="%" width={52} tickMargin={8} domain={[(dataMin: number) => Math.max(0, Math.floor(dataMin - 5)), (dataMax: number) => Math.min(100, Math.ceil(dataMax + 5))]} />
+                                            <RechartsTooltip
+                                                content={<GlassTooltip />}
+                                                formatter={(val: unknown, name?: string | number) => [fmtPercentValue(val), name === "positive_pct" ? t("sentiment.positiveCurrent") : t("sentiment.positivePrevious")]}
+                                                labelFormatter={(v: unknown) => { const s = String(v); const d = s.includes("T") ? new Date(s) : new Date(s + "T00:00:00"); return d.toLocaleDateString(); }}
+                                            />
+                                            <Bar dataKey="positive_pct" radius={[4, 4, 0, 0]} maxBarSize={40} fill="#10b981" />
+                                            {comparePrev && (
+                                                <Bar dataKey="prev_positive_pct" fill="#71717a" fillOpacity={0.2} radius={[4, 4, 0, 0]} maxBarSize={40} />
+                                            )}
+                                        </RechartsBarChart>
+                                    ) : (
+                                        <LineChart data={chartData} margin={{ top: 20, right: 12, left: 8, bottom: 0 }}>
+                                            <XAxis dataKey="date" stroke="#888" fontSize={11} tickLine={false} axisLine={false} tickFormatter={fmtDate} tickMargin={10} />
+                                            <YAxis stroke="#888" fontSize={11} tickLine={false} axisLine={false} unit="%" width={52} tickMargin={8} domain={[(dataMin: number) => Math.max(0, Math.floor(dataMin - 5)), (dataMax: number) => Math.min(100, Math.ceil(dataMax + 5))]} />
+                                            <RechartsTooltip
+                                                content={<GlassTooltip />}
+                                                formatter={(val: unknown, name?: string | number) => [fmtPercentValue(val), name === "positive_pct" ? t("sentiment.positiveCurrent") : t("sentiment.positivePrevious")]}
+                                                labelFormatter={(v: unknown) => { const s = String(v); const d = s.includes("T") ? new Date(s) : new Date(s + "T00:00:00"); return d.toLocaleDateString(); }}
+                                            />
+                                            <Line type="monotone" dataKey="positive_pct" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} connectNulls={false} />
+                                            {comparePrev && (
+                                                <Line type="monotone" dataKey="prev_positive_pct" stroke="#71717a" strokeWidth={1.5} strokeDasharray="5 5" opacity={0.35} dot={false} />
+                                            )}
+                                        </LineChart>
+                                    )}
+                                </ResponsiveContainer>
+                            ) : (
+                                <EmptyState message={t("sentiment.noTrendData")} />
+                            )}
+                        </CardContent>
+                    </Card>
                 </div>
             </section>
 
@@ -935,7 +931,7 @@ export default function SentimentDashboard({
                     </div>
                 </div>
 
-                <Card className="relative shadow-none">
+                <Card className="relative rounded-lg border-border/60 bg-background/85 shadow-sm">
                     {/* Table header */}
                     <div className="flex items-center gap-4 px-4 py-2 border-b border-border text-xs text-muted-foreground uppercase tracking-wider font-medium" data-sort-list="sentiment-themes">
                         <div className="flex-1">{t("sentiment.table.theme")}</div>
