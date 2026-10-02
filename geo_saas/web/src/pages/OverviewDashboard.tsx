@@ -502,9 +502,10 @@ export default function OverviewDashboard() {
           {errors.kpis && <p className="col-span-full text-sm text-destructive">{errors.kpis}</p>}
         </section>
 
-        <section className="grid items-stretch gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(380px,0.9fr)]">
-          <div className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(380px,0.9fr)]">
-            <Card className="flex h-full flex-col rounded-lg border-border/60 bg-background/85 shadow-sm">
+        <section className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+          {/* Left: Insights + Platform Health stacked */}
+          <div className="grid gap-6">
+            <Card className="flex flex-col rounded-lg border-border/60 bg-background/85 shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Sparkles className="h-4 w-4 text-primary" />
@@ -524,14 +525,14 @@ export default function OverviewDashboard() {
                       key={`${item.kind}-${item.metric}`}
                       type="button"
                       onClick={() => setSelectedInsight(item)}
-                      className={cn("min-h-[118px] rounded-lg border p-4 text-left transition hover:border-primary/45", insightTone(item.severity))}
+                      className={cn("min-h-[84px] rounded-lg border p-4 text-left transition hover:border-primary/45", insightTone(item.severity))}
                     >
-                      <div className="mb-2 flex items-center justify-between gap-3">
+                      <div className="mb-1.5 flex items-center justify-between gap-3">
                         <p className="min-w-0 truncate text-sm font-semibold text-foreground">{item.title}</p>
                         <DeltaPill value={item.delta} />
                       </div>
                       <div className="flex items-center justify-between gap-3">
-                        <p className="min-w-0 truncate text-xs leading-5 text-muted-foreground">{item.detail}</p>
+                        <p className="min-w-0 line-clamp-2 text-xs leading-5 text-muted-foreground">{item.detail}</p>
                         <span className="shrink-0 text-xs font-medium text-primary">{t("overview.insights.viewDetail")}</span>
                       </div>
                     </button>
@@ -582,10 +583,9 @@ export default function OverviewDashboard() {
               </CardContent>
             </Card>
           </div>
-        </section>
 
-        <section>
-          <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
+          {/* Right: Trend chart — tall, prominent */}
+          <Card className="flex h-full flex-col rounded-lg border-border/60 bg-background/85 shadow-sm">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="flex items-center gap-2 text-base">
@@ -599,11 +599,11 @@ export default function OverviewDashboard() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-1 flex-col">
               {loading.trends ? (
-                <LoadingBlock className="min-h-[340px]" />
+                <LoadingBlock className="min-h-[480px] flex-1" />
               ) : chartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={340}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={480}>
                   <AreaChart data={chartData} margin={{ top: 16, right: 20, bottom: 0, left: -18 }}>
                     <defs>
                       <linearGradient id="overviewVisibility" x1="0" y1="0" x2="0" y2="1">
