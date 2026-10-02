@@ -550,28 +550,96 @@ export default function CitationDashboard({
                     title={t("citations.sectionShare.title")}
                     subtitle={t("citations.sectionShare.subtitle")}
                 />
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <Card className="lg:col-span-2 shadow-none">
-                        <CardHeader className="pb-2">
-                            <div className="flex items-center gap-4">
-                                <div>
-                                    <div className="text-3xl font-bold flex items-center gap-2">
-                                        <span className="gradient-text-static">{summary.own_domain_share ?? "—"}%</span>
-                                        {summary.own_domain_share_change != null && summary.own_domain_share_change !== 0 && (
-                                            <span className={`text-sm font-medium flex items-center gap-0.5 ${summary.own_domain_share_change > 0 ? "text-emerald-500" : "text-red-400"}`}>
-                                                {summary.own_domain_share_change > 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
-                                                {summary.own_domain_share_change > 0 ? "+" : ""}{summary.own_domain_share_change}%
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                                        {t("citations.sectionShare.yourShare")}
-                                        <span className="relative group">
-                                            <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
-                                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 rounded-md bg-popover border text-popover-foreground text-[11px] leading-tight w-48 hidden group-hover:block shadow-md z-50">{t("citations.sectionShare.yourShareTooltip")}</span>
-                                        </span>
+                <div className="grid items-stretch gap-6 xl:grid-cols-[344px_minmax(0,1fr)]">
+                    {/* LEFT: KPI accent card + domain ranking */}
+                    <div className="flex flex-col gap-3">
+                        {/* KPI accent card — matches Figma #181:5 */}
+                        <div className="rounded-xl border border-[#6CB991] bg-[#CDEEDD] px-6 py-5 shadow-sm dark:border-emerald-700 dark:bg-emerald-950/40">
+                            <div className="text-3xl font-bold flex items-center gap-2 text-foreground">
+                                <span className="gradient-text-static">{summary.own_domain_share ?? "—"}%</span>
+                                {summary.own_domain_share_change != null && summary.own_domain_share_change !== 0 && (
+                                    <span className={`text-sm font-medium flex items-center gap-0.5 ${summary.own_domain_share_change > 0 ? "text-emerald-500" : "text-red-400"}`}>
+                                        {summary.own_domain_share_change > 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+                                        {summary.own_domain_share_change > 0 ? "+" : ""}{summary.own_domain_share_change}%
+                                    </span>
+                                )}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                                {t("citations.sectionShare.yourShare")}
+                                <span className="relative group">
+                                    <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
+                                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 rounded-md bg-popover border text-popover-foreground text-[11px] leading-tight w-48 hidden group-hover:block shadow-md z-50">{t("citations.sectionShare.yourShareTooltip")}</span>
+                                </span>
+                            </div>
+                        </div>
+                        {/* Domain ranking card */}
+                        <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm flex-1">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                    <Trophy className="h-4 w-4 text-amber-500" />
+                                    {t("citations.sectionShare.citationRank")}
+                                </CardTitle>
+                                <div className="text-2xl font-bold">
+                                    <span className="inline-flex items-center gap-2">
+                                        <span>{summary.own_rank ? `#${summary.own_rank}` : "—"}</span>
+                                        <RankChangeBadge change={summary.own_rank_change} />
+                                    </span>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-1.5">
+                                <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex justify-between">
+                                    <span>{t("citations.sectionShare.columnDomain")}</span>
+                                    <div className="flex items-center gap-1" data-sort-list="citation-domain-ranking">
+                                        <span>{t("citations.sectionDomains.columnHash")}</span>
+                                        <SortableMetricHeader
+                                            label={t("citations.sectionShare.columnShare")}
+                                            metricKey="share_pct"
+                                            sort={rankingSort}
+                                            onChange={setRankingSort}
+                                        />
                                     </div>
                                 </div>
+                                {rankingFailed ? (
+                                    <RetryableLoadError
+                                        message={t("citations.loadFailed")}
+                                        onRetry={() => setRankingRetryVersion((value) => value + 1)}
+                                        compact
+                                    />
+                                ) : rankingPending ? (
+                                    <div className="flex items-center justify-center py-10">
+                                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                                    </div>
+                                ) : domainRanking.slice(0, 5).map((r, i) => (
+                                    <div key={r.domain || i} className="flex items-center gap-2">
+                                        <span className="text-xs text-muted-foreground w-5">{r.rank}.</span>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className={`text-sm truncate ${r.is_own ? "font-semibold text-emerald-500" : ""}`}>
+                                                    {r.domain || "(unknown)"}
+                                                </span>
+                                                {r.is_own && <span className="text-[9px] bg-emerald-500/10 text-emerald-500 px-1 rounded">{t("citations.sectionShare.ownBadge")}</span>}
+                                            </div>
+                                        </div>
+                                        <span className={`text-xs font-medium ${r.is_own ? "text-emerald-500" : "text-foreground"}`}>
+                                            {r.share_pct}%
+                                        </span>
+                                    </div>
+                                ))}
+                                {!rankingPending && !rankingFailed && domainRanking.length === 0 && <EmptyState message={t("citations.sectionShare.emptyDomains")} />}
+                                {!rankingPending && !rankingFailed && domainRanking.length > 5 && (
+                                    <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={() => setExpandRanking(true)}>
+                                        <Expand className="h-3 w-3 mr-1" /> {t("citations.sectionShare.expand")}
+                                    </Button>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* RIGHT: Line chart */}
+                    <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
+                        <CardHeader className="pb-2">
+                            <div className="flex items-center justify-between">
+                                <div className="text-sm font-medium text-muted-foreground">{t("citations.sectionShare.title")}</div>
                                 <div className="ml-auto text-right">
                                     <div className="text-lg font-semibold">{summary.total_citations ?? 0}</div>
                                     <div className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
@@ -630,140 +698,75 @@ export default function CitationDashboard({
                             )}
                         </CardContent>
                     </Card>
-
-                    {/* Domain Ranking Sidebar */}
-                    <Card className="shadow-none">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                <Trophy className="h-4 w-4 text-amber-500" />
-                                {t("citations.sectionShare.citationRank")}
-                            </CardTitle>
-                            <div className="text-2xl font-bold">
-                                <span className="inline-flex items-center gap-2">
-                                    <span>
-                                        {summary.own_rank
-                                            ? `#${summary.own_rank}`
-                                            : "—"}
-                                    </span>
-                                    <RankChangeBadge change={summary.own_rank_change} />
-                                </span>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="space-y-1.5">
-                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex justify-between">
-                                <span>{t("citations.sectionShare.columnDomain")}</span>
-                                <div className="flex items-center gap-1" data-sort-list="citation-domain-ranking">
-                                    <span>{t("citations.sectionDomains.columnHash")}</span>
-                                    <SortableMetricHeader
-                                        label={t("citations.sectionShare.columnShare")}
-                                        metricKey="share_pct"
-                                        sort={rankingSort}
-                                        onChange={setRankingSort}
-                                    />
-                                </div>
-                            </div>
-                            {rankingFailed ? (
-                                <RetryableLoadError
-                                    message={t("citations.loadFailed")}
-                                    onRetry={() => setRankingRetryVersion((value) => value + 1)}
-                                    compact
-                                />
-                            ) : rankingPending ? (
-                                <div className="flex items-center justify-center py-10">
-                                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                                </div>
-                            ) : domainRanking.slice(0, 5).map((r, i) => (
-                                <div key={r.domain || i} className="flex items-center gap-2">
-                                    <span className="text-xs text-muted-foreground w-5">{r.rank}.</span>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className={`text-sm truncate ${r.is_own ? "font-semibold text-blue-500" : ""}`}>
-                                                {r.domain || "(unknown)"}
-                                            </span>
-                                            {r.is_own && <span className="text-[9px] bg-blue-500/10 text-blue-500 px-1 rounded">{t("citations.sectionShare.ownBadge")}</span>}
-                                        </div>
-                                        <div className="h-1 bg-muted rounded-full mt-0.5 overflow-hidden">
-                                            <div className={`h-full rounded-full ${r.is_own ? "bg-blue-500" : "bg-muted-foreground/30"}`} style={{ width: `${Math.min(r.share_pct * 3, 100)}%` }} />
-                                        </div>
-                                    </div>
-                                    <span className={`text-xs font-medium ${r.is_own ? "text-blue-500" : "text-muted-foreground"}`}>
-                                        {r.share_pct}%
-                                    </span>
-                                </div>
-                            ))}
-                            {!rankingPending && !rankingFailed && domainRanking.length === 0 && <EmptyState message={t("citations.sectionShare.emptyDomains")} />}
-                            {!rankingPending && !rankingFailed && domainRanking.length > 5 && (
-                                <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={() => setExpandRanking(true)}>
-                                    <Expand className="h-3 w-3 mr-1" /> {t("citations.sectionShare.expand")}
-                                </Button>
-                            )}
-                        </CardContent>
-                    </Card>
                 </div>
             </section>
 
             {/* ============== Section 2: Citation Categories ============== */}
             {(categoryPending || categoryFailed || categoryBreakdown.length > 0) && (
                 <section>
-                    <SectionHeader
-                        icon={<Link2 className="h-5 w-5 text-primary" />}
-                        title={t("citations.sectionCategories.title")}
-                        subtitle={t("citations.sectionCategories.subtitle")}
-                    />
-                    <Card className="shadow-none">
-                        <CardContent className="pt-6">
-                            {categoryFailed ? (
-                                <RetryableLoadError
-                                    message={t("citations.loadFailed")}
-                                    onRetry={() => setCategoryRetryVersion((value) => value + 1)}
-                                    compact
-                                />
-                            ) : categoryPending ? (
-                                <div className="flex h-20 items-center justify-center">
-                                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="mb-3 flex justify-end gap-2" data-sort-list="citation-category-breakdown">
-                                        <SortableMetricHeader
-                                            label={t("citations.sectionDomains.columnCitations")}
-                                            metricKey="count"
-                                            sort={categorySort}
-                                            onChange={setCategorySort}
-                                        />
-                                        <SortableMetricHeader
-                                            label={t("citations.sectionDomains.columnShare")}
-                                            metricKey="pct"
-                                            sort={categorySort}
-                                            onChange={setCategorySort}
-                                        />
+                    <div className="grid items-start gap-6 xl:grid-cols-[344px_minmax(0,1fr)]">
+                        {/* LEFT: section title only (Figma V3 / 引用分类说明) */}
+                        <div className="pt-6 pb-2 border-b border-border/60 xl:border-b-0">
+                            <h2 className="text-lg font-semibold flex items-center gap-2">
+                                <Link2 className="h-5 w-5 text-primary" />
+                                {t("citations.sectionCategories.title")}
+                            </h2>
+                            <p className="text-sm text-muted-foreground mt-1">{t("citations.sectionCategories.subtitle")}</p>
+                            <div className="mt-3 h-px bg-gradient-to-r from-primary/20 via-primary/5 to-transparent" />
+                        </div>
+                        {/* RIGHT: horizontal bar rows (Figma V3 / 引用分布分析) */}
+                        <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
+                            <CardContent className="pt-6">
+                                {categoryFailed ? (
+                                    <RetryableLoadError
+                                        message={t("citations.loadFailed")}
+                                        onRetry={() => setCategoryRetryVersion((value) => value + 1)}
+                                        compact
+                                    />
+                                ) : categoryPending ? (
+                                    <div className="flex h-20 items-center justify-center">
+                                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                                     </div>
-                                    {/* Stacked horizontal bar */}
-                                    <div className="flex h-8 rounded-md overflow-hidden mb-4 border">
-                                        {categoryBreakdown.map((cat) => (
-                                            <div
-                                                key={cat.label}
-                                                className="flex items-center justify-center text-xs font-medium text-white transition-all hover:opacity-80"
-                                                style={{ width: `${cat.pct}%`, backgroundColor: cat.color, minWidth: cat.pct > 2 ? undefined : "20px" }}
-                                                title={`${cat.label}: ${cat.pct}%`}
-                                            >
-                                                {cat.pct >= 5 ? `${cat.pct}%` : ""}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="flex flex-wrap gap-4 justify-center">
-                                        {categoryBreakdown.map(cat => (
-                                            <div key={cat.label} className="flex items-center gap-1.5 text-sm">
-                                                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
-                                                <span className="text-muted-foreground">{cat.label}</span>
-                                                <span className="font-medium">{cat.count} · {cat.pct}%</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </CardContent>
-                    </Card>
+                                ) : (
+                                    <>
+                                        {/* Column header row — matches Figma 列标题 */}
+                                        <div className="flex items-center gap-4 mb-3 opacity-75" data-sort-list="citation-category-breakdown">
+                                            <span className="shrink-0 text-sm text-foreground" style={{ width: 144 }}>{t("citations.sectionCategories.columnCategory", { defaultValue: "来源分类" })}</span>
+                                            <div className="flex-1" />
+                                            <span className="shrink-0 text-right text-sm text-foreground" style={{ width: 96 }}>
+                                                <SortableMetricHeader label={t("citations.sectionDomains.columnCitations")} metricKey="count" sort={categorySort} onChange={setCategorySort} />
+                                            </span>
+                                            <span className="shrink-0 text-right text-sm text-foreground" style={{ width: 88 }}>
+                                                <SortableMetricHeader label={t("citations.sectionDomains.columnShare")} metricKey="pct" sort={categorySort} onChange={setCategorySort} />
+                                            </span>
+                                        </div>
+                                        {/* Bar rows */}
+                                        <div className="flex flex-col gap-3">
+                                            {categoryBreakdown.map((cat, i) => {
+                                                const maxPct = Math.max(...categoryBreakdown.map((c) => c.pct));
+                                                const barWidth = maxPct > 0 ? (cat.pct / maxPct) * 100 : 0;
+                                                const barColors = ["#00E676", "#688C7C", "#88A394", "#A4B7AA", "#7D9487", "#B9C7B9"];
+                                                const barColor = barColors[i % barColors.length];
+                                                return (
+                                                    <div key={cat.label} className="flex items-center gap-4" style={{ height: 40 }}>
+                                                        <span className="shrink-0 truncate text-sm text-foreground" style={{ width: 144 }} title={cat.label}>{cat.label}</span>
+                                                        <div className="flex-1 rounded-sm bg-black/[0.05] dark:bg-white/[0.06]" style={{ height: 12 }}>
+                                                            <div
+                                                                className="h-full rounded-sm transition-all duration-500"
+                                                                style={{ width: `${barWidth}%`, backgroundColor: barColor }}
+                                                            />
+                                                        </div>
+                                                        <span className="shrink-0 text-right text-sm text-foreground tabular-nums" style={{ width: 96 }}>{cat.count}</span>
+                                                        <span className="shrink-0 text-right text-sm text-foreground tabular-nums" style={{ width: 88 }}>{cat.pct}%</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
                 </section>
             )}
 
