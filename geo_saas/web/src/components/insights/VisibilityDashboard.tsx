@@ -229,30 +229,66 @@ export default function VisibilityDashboard({ data, compact = false, dimension =
                     chartMode={staticMode ? undefined : visChartMode}
                     onChartModeChange={staticMode ? undefined : (v: string) => setVisChartMode(v as any)}
                 />
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <Card className="lg:col-span-2 shadow-none">
+                <div className="grid items-stretch gap-6 xl:grid-cols-[344px_minmax(0,1fr)]">
+                    {/* LEFT: KPI + Ranking */}
+                    <RankingCard
+                        title={t("visibility.sectionScore.rankTitle", { dim: dimLabel })}
+                        rank={summary.visibility_rank}
+                        rankChange={summary.visibility_rank_change}
+                        comparisonEnabled={comparisonEnabled}
+                        items={visibilityRanking}
+                        valueKey="visibility_pct"
+                        valueLabel={t("visibility.sectionScore.rankHeader")}
+                        changeKey="visibility_pct_change"
+                        valueSuffix="%"
+                        accentColor="emerald"
+                        loading={loadingSections?.visibilityRanking}
+                        onExpand={() => setExpandRanking("visibility")}
+                        sort={rankingSorts?.visibility || null}
+                        onSortChange={onRankingSortChange ? (next) => onRankingSortChange("visibility", next) : undefined}
+                        sortableMetrics={dimension === "brand" ? [
+                            { key: "visibility_pct", label: t("visibility.sectionScore.rankHeader") },
+                            { key: "visibility_pct_change", label: t("citations.sectionDomains.columnChange") },
+                        ] : [{
+                            key: dimension === "product" ? "visibility_pct" : "own_sov_pct",
+                            label: t("visibility.sectionScore.rankHeader"),
+                        }]}
+                        entityDimension={dimension}
+                        entityLabel={dimLabel}
+                        summaryValue={`${summary.visibility_score ?? "—"}%`}
+                        summaryChange={<MetricChangeBadge value={summary.visibility_score_change} improvement="higher" enabled={comparisonEnabled} />}
+                        summaryLabel={dimension === "product" ? t("visibility.sectionScore.scoreLabelProduct") : t("visibility.sectionScore.scoreLabel")}
+                        summaryTooltip={dimension === "product" ? t("visibility.sectionScore.scoreTooltipProduct") : t("visibility.sectionScore.scoreTooltip")}
+                    />
+                    {/* RIGHT: Chart */}
+                    <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
                         <CardHeader className="pb-2">
                             <div className="flex items-center justify-between">
-                                <div>
-                                    <div className="text-3xl font-bold flex items-center gap-2">
-                                        <span className="gradient-text-static">{summary.visibility_score ?? "—"}%</span>
-                                        <MetricChangeBadge value={summary.visibility_score_change} improvement="higher" enabled={comparisonEnabled} />
-                                    </div>
-                                    <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                                        {dimension === "product"
-                                            ? t("visibility.sectionScore.scoreLabelProduct")
-                                            : t("visibility.sectionScore.scoreLabel")}
-                                        <span className="relative group">
-                                            <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
-                                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 rounded-md bg-popover border text-popover-foreground text-[11px] leading-tight w-48 hidden group-hover:block shadow-md z-50">{dimension === "product" ? t("visibility.sectionScore.scoreTooltipProduct") : t("visibility.sectionScore.scoreTooltip")}</span>
-                                        </span>
-                                    </div>
+                                <div className="text-sm font-medium text-muted-foreground">
+                                    {t("visibility.sectionScore.title")}
                                 </div>
                                 {!staticMode && dimension === "brand" && (
-                                <div className="flex items-center gap-2 text-sm">
-                                    <span className="text-muted-foreground">{t("visibility.sectionScore.competitiveSwitch")}</span>
-                                    <Switch checked={showCompetitive} onCheckedChange={setShowCompetitive} />
-                                </div>
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span className="text-muted-foreground">{t("visibility.sectionScore.competitiveSwitch")}</span>
+                                        <Switch checked={showCompetitive} onCheckedChange={setShowCompetitive} />
+                                    </div>
+                                )}
+                                {!staticMode && (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+                                                <Settings2 className="h-3.5 w-3.5" />
+                                                {t("visibility.chartMode.button")}
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuRadioGroup value={visChartMode} onValueChange={(v) => setVisChartMode(v as any)}>
+                                                <DropdownMenuRadioItem value="line">{t("visibility.chartMode.line")}</DropdownMenuRadioItem>
+                                                <DropdownMenuRadioItem value="bar">{t("visibility.chartMode.bar")}</DropdownMenuRadioItem>
+                                                <DropdownMenuRadioItem value="table">{t("visibility.chartMode.table")}</DropdownMenuRadioItem>
+                                            </DropdownMenuRadioGroup>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 )}
                             </div>
                         </CardHeader>
@@ -338,32 +374,6 @@ export default function VisibilityDashboard({ data, compact = false, dimension =
                             )}
                         </CardContent>
                     </Card>
-
-                    <RankingCard
-                        title={t("visibility.sectionScore.rankTitle", { dim: dimLabel })}
-                        rank={summary.visibility_rank}
-                        rankChange={summary.visibility_rank_change}
-                        comparisonEnabled={comparisonEnabled}
-                        items={visibilityRanking}
-                        valueKey="visibility_pct"
-                        valueLabel={t("visibility.sectionScore.rankHeader")}
-                        changeKey="visibility_pct_change"
-                        valueSuffix="%"
-                        accentColor="emerald"
-                        loading={loadingSections?.visibilityRanking}
-                        onExpand={() => setExpandRanking("visibility")}
-                        sort={rankingSorts?.visibility || null}
-                        onSortChange={onRankingSortChange ? (next) => onRankingSortChange("visibility", next) : undefined}
-                        sortableMetrics={dimension === "brand" ? [
-                            { key: "visibility_pct", label: t("visibility.sectionScore.rankHeader") },
-                            { key: "visibility_pct_change", label: t("citations.sectionDomains.columnChange") },
-                        ] : [{
-                            key: dimension === "product" ? "visibility_pct" : "own_sov_pct",
-                            label: t("visibility.sectionScore.rankHeader"),
-                        }]}
-                        entityDimension={dimension}
-                        entityLabel={dimLabel}
-                    />
                 </div>
             </section>
 
@@ -380,46 +390,8 @@ export default function VisibilityDashboard({ data, compact = false, dimension =
                                 : t("visibility.sectionSov.subtitleTopic")
                     }
                 />
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <Card className="lg:col-span-2 shadow-none">
-                        <CardHeader className="pb-2">
-                            <div className="text-3xl font-bold flex items-center gap-2">
-                                <span className="gradient-text-static">{ownSovPct ?? "—"}%</span>
-                                <MetricChangeBadge value={summary.sov_pct_change} improvement="higher" enabled={comparisonEnabled} />
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                                {dimension === "product" ? t("visibility.sectionSov.leadingProductLabel") : t("visibility.sectionSov.sovLabel")}
-                                <span className="relative group">
-                                    <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
-                                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 rounded-md bg-popover border text-popover-foreground text-[11px] leading-tight w-48 hidden group-hover:block shadow-md z-50">{dimension === "product" ? t("visibility.sectionSov.leadingProductTooltip") : t("visibility.sectionSov.sovTooltip")}</span>
-                                </span>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            {loadingSections?.sov ? (
-                                <ChartLoadingBlock heightClassName="h-[280px]" />
-                            ) : donutData.length > 0 ? (
-                                <ResponsiveContainer width="100%" height={280}>
-                                    <PieChart>
-                                        <Pie data={donutData} cx="50%" cy="50%" innerRadius={70} outerRadius={110} paddingAngle={2} dataKey="value" nameKey="name">
-                                            {donutData.map((entry: any, index: number) => (
-                                                <Cell key={`cell-${index}`} fill={dimension === "product" ? PRODUCT_COLORS[index % PRODUCT_COLORS.length] : entry.isOwn ? "#10b981" : COLORS[(index + 1) % COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip
-                                            content={<GlassTooltip />}
-                                            labelFormatter={() => t("visibility.sectionSov.sovLabel")}
-                                            formatter={(val: any, name: any) => [`${Number(val).toFixed(1)}%`, String(name)]}
-                                        />
-                                        <Legend verticalAlign="bottom" formatter={(value: string) => <span className="text-xs text-muted-foreground">{value}</span>} />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <EmptyState message={t("visibility.sectionSov.emptyState")} />
-                            )}
-                        </CardContent>
-                    </Card>
-
+                <div className="grid items-stretch gap-6 xl:grid-cols-[344px_minmax(0,1fr)]">
+                    {/* LEFT: KPI + Ranking */}
                     <RankingCard
                         title={t("visibility.sectionSov.rankTitle", { dim: dimLabel })}
                         rank={summary.sov_rank}
@@ -440,7 +412,50 @@ export default function VisibilityDashboard({ data, compact = false, dimension =
                         ] : [{ key: "mention_count", label: t("visibility.sectionSov.rankHeader") }]}
                         entityDimension={dimension}
                         entityLabel={dimLabel}
+                        summaryValue={`${ownSovPct ?? "—"}%`}
+                        summaryChange={<MetricChangeBadge value={summary.sov_pct_change} improvement="higher" enabled={comparisonEnabled} />}
+                        summaryLabel={dimension === "product" ? t("visibility.sectionSov.leadingProductLabel") : t("visibility.sectionSov.sovLabel")}
+                        summaryTooltip={dimension === "product" ? t("visibility.sectionSov.leadingProductTooltip") : t("visibility.sectionSov.sovTooltip")}
                     />
+                    {/* RIGHT: Chart */}
+                    <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
+                        <CardHeader className="pb-2">
+                            <div className="text-sm font-medium text-muted-foreground">
+                                {t("visibility.sectionSov.title")}
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {loadingSections?.sov ? (
+                                <ChartLoadingBlock heightClassName="h-[280px]" />
+                            ) : sovRanking.length > 0 ? (
+                                <div className="flex flex-col gap-3 py-2">
+                                    {sovRanking.slice(0, 10).map((r: any, i: number) => {
+                                        const maxSov = Math.max(...sovRanking.map((x: any) => Number(x.sov_pct || 0)));
+                                        const pct = maxSov > 0 ? (Number(r.sov_pct || 0) / maxSov) * 100 : 0;
+                                        const name = r.brand_name ?? r.company_name ?? "";
+                                        const sovPctDisplay = `${Number(r.sov_pct ?? 0).toFixed(2)}%`;
+                                        // Own brand = green (#00E676), others get descending green-grey shades matching Figma
+                                        const barColors = ["#688C7C", "#88A394", "#A4B7AA", "#7D9487", "#B9C7B9", "#94A699", "#8FA89A", "#9EB5A7"];
+                                        const barColor = r.is_own ? "#00E676" : barColors[i % barColors.length];
+                                        return (
+                                            <div key={name} className="flex items-center gap-4" style={{ height: 40 }}>
+                                                <span className="shrink-0 truncate text-sm text-foreground" style={{ width: 112 }} title={name}>{name}</span>
+                                                <div className="flex-1 rounded-sm bg-black/[0.04] dark:bg-white/[0.06]" style={{ height: 12 }}>
+                                                    <div
+                                                        className="h-full rounded-sm transition-all duration-500"
+                                                        style={{ width: `${pct}%`, backgroundColor: barColor }}
+                                                    />
+                                                </div>
+                                                <span className="shrink-0 text-right text-sm text-foreground tabular-nums" style={{ width: 88 }}>{sovPctDisplay}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <EmptyState message={t("visibility.sectionSov.emptyState")} />
+                            )}
+                        </CardContent>
+                    </Card>
                 </div>
             </section>
 
@@ -452,22 +467,40 @@ export default function VisibilityDashboard({ data, compact = false, dimension =
                         title={t("visibility.sectionPosition.title")}
                         subtitle={t("visibility.sectionPosition.subtitle")}
                     />
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <Card className="lg:col-span-2 shadow-none">
+                    <div className="grid items-stretch gap-6 xl:grid-cols-[344px_minmax(0,1fr)]">
+                        {/* LEFT: KPI + Ranking */}
+                        <RankingCard
+                            title={t("visibility.sectionPosition.rankTitle")}
+                            rank={summary.avg_position_rank}
+                            rankChange={summary.avg_position_rank_change}
+                            comparisonEnabled={comparisonEnabled}
+                            items={positionRanking}
+                            valueKey="avg_position"
+                            valueLabel={t("visibility.sectionPosition.rankHeader")}
+                            valuePrefix="#"
+                            accentColor="emerald"
+                            loading={loadingSections?.positionRanking}
+                            onExpand={() => setExpandRanking("position")}
+                            sort={rankingSorts?.position || null}
+                            onSortChange={onRankingSortChange ? (next) => onRankingSortChange("position", next) : undefined}
+                            sortableMetrics={dimension === "brand" ? [
+                                { key: "avg_position", label: t("visibility.sectionPosition.rankHeader") },
+                            ] : dimension === "product" ? [{ key: "avg_position", label: t("visibility.sectionPosition.rankHeader") }] : []}
+                            entityDimension={dimension}
+                            entityLabel={dimLabel}
+                            summaryValue={summary.avg_position != null ? `#${summary.avg_position}` : "—"}
+                            summaryChange={<MetricChangeBadge value={summary.avg_position_change} improvement="lower" enabled={comparisonEnabled} unit="" />}
+                            summaryLabel={t("visibility.sectionPosition.positionLabel")}
+                            summaryTooltip={t("visibility.sectionPosition.positionTooltip")}
+                        />
+                        {/* RIGHT: Chart */}
+                        <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
                             <CardHeader className="pb-2">
-                                <div className="text-3xl font-bold flex items-center gap-2">
-                                    <span className="gradient-text-static">{summary.avg_position != null ? summary.avg_position : "—"}</span>
-                                    <MetricChangeBadge value={summary.avg_position_change} improvement="lower" enabled={comparisonEnabled} unit="" />
+                                <div className="text-sm font-medium text-muted-foreground">
+                                    {t("visibility.sectionPosition.title")}
                                 </div>
-                                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                    {t("visibility.sectionPosition.positionLabel")}
-                                    <span className="relative group">
-                                        <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
-                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 rounded-md bg-popover border text-popover-foreground text-[11px] leading-tight w-48 hidden group-hover:block shadow-md z-50">{t("visibility.sectionPosition.positionTooltip")}</span>
-                                    </span>
-                                </div>
-                        </CardHeader>
-                        <CardContent>
+                            </CardHeader>
+                            <CardContent>
                                 {loadingSections?.position ? (
                                     <ChartLoadingBlock heightClassName="h-[260px]" />
                                 ) : useStaticPositionMetrics ? (
@@ -507,27 +540,6 @@ export default function VisibilityDashboard({ data, compact = false, dimension =
                                 )}
                             </CardContent>
                         </Card>
-
-                        <RankingCard
-                            title={t("visibility.sectionPosition.rankTitle")}
-                            rank={summary.avg_position_rank}
-                            rankChange={summary.avg_position_rank_change}
-                            comparisonEnabled={comparisonEnabled}
-                            items={positionRanking}
-                            valueKey="avg_position"
-                            valueLabel={t("visibility.sectionPosition.rankHeader")}
-                            valuePrefix="#"
-                            accentColor="emerald"
-                            loading={loadingSections?.positionRanking}
-                            onExpand={() => setExpandRanking("position")}
-                            sort={rankingSorts?.position || null}
-                            onSortChange={onRankingSortChange ? (next) => onRankingSortChange("position", next) : undefined}
-                            sortableMetrics={dimension === "brand" ? [
-                                { key: "avg_position", label: t("visibility.sectionPosition.rankHeader") },
-                            ] : dimension === "product" ? [{ key: "avg_position", label: t("visibility.sectionPosition.rankHeader") }] : []}
-                            entityDimension={dimension}
-                            entityLabel={dimLabel}
-                        />
                     </div>
                 </section>
             )}
@@ -619,6 +631,7 @@ function SectionHeader({ icon, title, subtitle, chartMode, onChartModeChange }: 
 function RankingCard({
     title, rank, rankChange, items, valueKey, valueLabel, valueSuffix, valuePrefix, changeKey, accentColor, loading, onExpand,
     sort, onSortChange, sortableMetrics = [], comparisonEnabled = false, entityDimension = "brand", entityLabel,
+    summaryValue, summaryChange, summaryLabel, summaryTooltip,
 }: {
     title: string; rank: number | null; rankChange?: number | null; items: any[]; valueKey: string; valueLabel: string;
     valueSuffix?: string; valuePrefix?: string; changeKey?: string; accentColor: string; loading?: boolean; onExpand: () => void;
@@ -628,6 +641,10 @@ function RankingCard({
     comparisonEnabled?: boolean;
     entityDimension?: "brand" | "product" | "topic";
     entityLabel?: string;
+    summaryValue?: React.ReactNode;
+    summaryChange?: React.ReactNode;
+    summaryLabel?: string;
+    summaryTooltip?: string;
 }) {
     const { t } = useTranslation("insights");
     const accent = accentColor === "blue" ? "text-blue-500" : "text-emerald-500";
@@ -635,67 +652,90 @@ function RankingCard({
     const visibleItems = items.slice(0, 5);
 
     return (
-        <Card className="shadow-none">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Trophy className="h-4 w-4 text-amber-500" />
-                    {title}
-                </CardTitle>
-                <div className="text-2xl font-bold flex items-center gap-2">
-                    <span>{rank ? `#${rank}` : "—"}</span>
-                    <RankChangeBadge change={rankChange} enabled={comparisonEnabled} />
-                </div>
-            </CardHeader>
-            <CardContent className="space-y-1.5">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex justify-between">
-                    <span>{entityLabel || t("visibility.sectionScore.rankBrandLabel")}</span>
-                    {sort && onSortChange && sortableMetrics.length > 0 ? (
-                        <div className="flex max-w-[70%] flex-wrap justify-end gap-1" data-sort-list="visibility-ranking">
-                            {sortableMetrics.map((metric) => (
-                                <SortableMetricHeader key={metric.key} label={metric.label} metricKey={metric.key} sort={sort} onChange={onSortChange} />
-                            ))}
-                        </div>
-                    ) : <span>{valueLabel}</span>}
-                </div>
-                {loading && visibleItems.length === 0 ? (
-                    <ChartLoadingBlock heightClassName="h-40" />
-                ) : visibleItems.map((r: any, i: number) => (
-                    <div key={(r.brand_name ?? r.company_name)} className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground w-5">{r.rank ?? i + 1}.</span>
-                        {entityDimension === "product" ? (
-                            <Package className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        ) : (
-                            <img
-                                src={brandFaviconUrl((r.brand_name ?? r.company_name) || "")}
-                                alt="" className="w-4 h-4 rounded-sm flex-shrink-0"
-                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                            />
-                        )}
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                                <span className={`text-sm truncate ${r.is_own && entityDimension !== "product" ? `font-semibold ${accent}` : ""}`}>{(r.brand_name ?? r.company_name)}</span>
-                                {r.is_own && entityDimension !== "product" && <span className={`text-[9px] ${accentBadge} px-1 rounded`}>{t("visibility.sectionScore.rankOwnBadge")}</span>}
-                            </div>
-                        </div>
-                        <span className={`text-xs font-medium ${r.is_own && entityDimension !== "product" ? accent : "text-foreground"}`}>
-                            {r[valueKey] == null ? "—" : `${valuePrefix || ""}${r[valueKey]}${valueSuffix || ""}`}
-                        </span>
-                        {changeKey && (
-                            <MetricChangeBadge value={r[changeKey]} improvement="higher" enabled={comparisonEnabled} />
-                        )}
+        <div className="flex flex-col gap-3">
+            {/* KPI accent card — matches Figma #178:5 green accent header */}
+            {summaryValue !== undefined && (
+                <div className="rounded-xl border border-[#6CB991] bg-[#CDEEDD] px-6 py-5 shadow-sm dark:border-emerald-700 dark:bg-emerald-950/40">
+                    <div className="text-3xl font-bold flex items-center gap-2 text-foreground">
+                        {summaryValue}
+                        {summaryChange}
                     </div>
-                ))}
-                {loading && visibleItems.length > 0 && (
-                    <div className="flex items-center justify-center py-1 text-xs text-muted-foreground"><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />{t("visibility.topicRanking.loading")}</div>
-                )}
-                {!loading && items.length === 0 && <EmptyState message={t("visibility.sectionScore.emptyRanking")} />}
-                {items.length > 5 && (
-                    <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={onExpand}>
-                        <Expand className="h-3 w-3 mr-1" /> {t("visibility.sectionScore.expand")}
-                    </Button>
-                )}
-            </CardContent>
-        </Card>
+                    {summaryLabel && (
+                        <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                            {summaryLabel}
+                            {summaryTooltip && (
+                                <span className="relative group">
+                                    <Info className="h-3 w-3 text-muted-foreground/50 cursor-help" />
+                                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 rounded-md bg-popover border text-popover-foreground text-[11px] leading-tight w-48 hidden group-hover:block shadow-md z-50">{summaryTooltip}</span>
+                                </span>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+            {/* Ranking card */}
+            <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm flex-1">
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Trophy className="h-4 w-4 text-amber-500" />
+                        {title}
+                    </CardTitle>
+                    <div className="text-2xl font-bold flex items-center gap-2">
+                        <span>{rank ? `#${rank}` : "—"}</span>
+                        <RankChangeBadge change={rankChange} enabled={comparisonEnabled} />
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-1.5">
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex justify-between">
+                        <span>{entityLabel || t("visibility.sectionScore.rankBrandLabel")}</span>
+                        {sort && onSortChange && sortableMetrics.length > 0 ? (
+                            <div className="flex max-w-[70%] flex-wrap justify-end gap-1" data-sort-list="visibility-ranking">
+                                {sortableMetrics.map((metric) => (
+                                    <SortableMetricHeader key={metric.key} label={metric.label} metricKey={metric.key} sort={sort} onChange={onSortChange} />
+                                ))}
+                            </div>
+                        ) : <span>{valueLabel}</span>}
+                    </div>
+                    {loading && visibleItems.length === 0 ? (
+                        <ChartLoadingBlock heightClassName="h-40" />
+                    ) : visibleItems.map((r: any, i: number) => (
+                        <div key={(r.brand_name ?? r.company_name)} className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground w-5">{r.rank ?? i + 1}.</span>
+                            {entityDimension === "product" ? (
+                                <Package className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            ) : (
+                                <img
+                                    src={brandFaviconUrl((r.brand_name ?? r.company_name) || "")}
+                                    alt="" className="w-4 h-4 rounded-sm flex-shrink-0"
+                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                />
+                            )}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                    <span className={`text-sm truncate ${r.is_own && entityDimension !== "product" ? `font-semibold ${accent}` : ""}`}>{(r.brand_name ?? r.company_name)}</span>
+                                    {r.is_own && entityDimension !== "product" && <span className={`text-[9px] ${accentBadge} px-1 rounded`}>{t("visibility.sectionScore.rankOwnBadge")}</span>}
+                                </div>
+                            </div>
+                            <span className={`text-xs font-medium ${r.is_own && entityDimension !== "product" ? accent : "text-foreground"}`}>
+                                {r[valueKey] == null ? "—" : `${valuePrefix || ""}${r[valueKey]}${valueSuffix || ""}`}
+                            </span>
+                            {changeKey && (
+                                <MetricChangeBadge value={r[changeKey]} improvement="higher" enabled={comparisonEnabled} />
+                            )}
+                        </div>
+                    ))}
+                    {loading && visibleItems.length > 0 && (
+                        <div className="flex items-center justify-center py-1 text-xs text-muted-foreground"><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />{t("visibility.topicRanking.loading")}</div>
+                    )}
+                    {!loading && items.length === 0 && <EmptyState message={t("visibility.sectionScore.emptyRanking")} />}
+                    {items.length > 5 && (
+                        <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={onExpand}>
+                            <Expand className="h-3 w-3 mr-1" /> {t("visibility.sectionScore.expand")}
+                        </Button>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
     );
 }
 
