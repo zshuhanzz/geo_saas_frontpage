@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -448,291 +448,316 @@ export default function OverviewDashboard() {
           {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
         </section>
 
-        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricCard
-            loading={loading.kpis}
-            title={t("overview.metrics.visibility")}
-            value={summary ? formatPct(summary.visibility_score) : "—"}
-            delta={summary?.visibility_score_change}
-            description={t("overview.metrics.visibilityDescription", {
-              rank: summary ? formatRank(summary.visibility_rank) : "—",
-              count: summary ? formatNumber(summary.mentioned_responses) : "—",
-              total: summary ? formatNumber(summary.total_responses) : "—",
-            })}
-            icon={<Target className="h-5 w-5 text-emerald-700 dark:text-emerald-200" />}
-            accent="bg-emerald-500/15"
-          />
-          <MetricCard
-            loading={loading.kpis}
-            title={t("overview.metrics.citation")}
-            value={summary ? formatPct(summary.own_citation_share) : "—"}
-            delta={summary?.own_citation_share_change}
-            description={t("overview.metrics.citationDescription", {
-              rank: summary ? formatRank(summary.own_citation_rank) : "—",
-              count: summary ? formatNumber(summary.own_citation_count) : "—",
-              total: summary ? formatNumber(summary.total_citations) : "—",
-            })}
-            icon={<MessageSquareQuote className="h-5 w-5 text-sky-700 dark:text-sky-200" />}
-            accent="bg-sky-500/15"
-          />
-          <MetricCard
-            loading={loading.kpis}
-            title={t("overview.metrics.sentiment")}
-            value={summary ? formatPct(summary.positive_sentiment_pct) : "—"}
-            delta={summary?.positive_sentiment_pct_change}
-            description={t("overview.metrics.sentimentDescription", {
-              positive: summary ? formatNumber(summary.positive_count) : "—",
-              negative: summary ? formatNumber(summary.negative_count) : "—",
-            })}
-            icon={<SmilePlus className="h-5 w-5 text-amber-700 dark:text-amber-200" />}
-            accent="bg-amber-500/15"
-          />
-          <MetricCard
-            loading={loading.kpis}
-            title={t("overview.metrics.coverage")}
-            value={summary ? formatNumber(summary.total_responses) : "—"}
-            delta={undefined}
-            description={t("overview.metrics.coverageDescription", {
-              mentions: summary ? formatNumber(summary.own_mentions) : "—",
-              sov: summary ? formatPct(summary.sov_pct) : "—",
-            })}
-            icon={<Activity className="h-5 w-5 text-rose-700 dark:text-rose-200" />}
-            accent="bg-rose-500/15"
-          />
-          {errors.kpis && <p className="col-span-full text-sm text-destructive">{errors.kpis}</p>}
-        </section>
+        {/* ── Row 1: KPI cards (left, auto height) + Trend chart (right, same height) ── */}
+        <section className="grid items-stretch gap-6 xl:grid-cols-[344px_minmax(0,1fr)]">
 
-        <section className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
-          {/* Left: Insights + Platform Health stacked */}
-          <div className="grid gap-6">
-            <Card className="flex flex-col rounded-lg border-border/60 bg-background/85 shadow-sm">
+          {/* LEFT: 4 KPI cards stacked */}
+          <div className="grid content-start gap-3">
+            <section className="grid gap-3">
+              <MetricCard
+                loading={loading.kpis}
+                title={t("overview.metrics.visibility")}
+                value={summary ? formatPct(summary.visibility_score) : "—"}
+                delta={summary?.visibility_score_change}
+                description={t("overview.metrics.visibilityDescription", {
+                  rank: summary ? formatRank(summary.visibility_rank) : "—",
+                  count: summary ? formatNumber(summary.mentioned_responses) : "—",
+                  total: summary ? formatNumber(summary.total_responses) : "—",
+                })}
+                icon={<Target className="h-5 w-5 text-emerald-700 dark:text-emerald-200" />}
+                accent="bg-emerald-500/15"
+              />
+              <MetricCard
+                loading={loading.kpis}
+                title={t("overview.metrics.citation")}
+                value={summary ? formatPct(summary.own_citation_share) : "—"}
+                delta={summary?.own_citation_share_change}
+                description={t("overview.metrics.citationDescription", {
+                  rank: summary ? formatRank(summary.own_citation_rank) : "—",
+                  count: summary ? formatNumber(summary.own_citation_count) : "—",
+                  total: summary ? formatNumber(summary.total_citations) : "—",
+                })}
+                icon={<MessageSquareQuote className="h-5 w-5 text-sky-700 dark:text-sky-200" />}
+                accent="bg-sky-500/15"
+              />
+              <MetricCard
+                loading={loading.kpis}
+                title={t("overview.metrics.sentiment")}
+                value={summary ? formatPct(summary.positive_sentiment_pct) : "—"}
+                delta={summary?.positive_sentiment_pct_change}
+                description={t("overview.metrics.sentimentDescription", {
+                  positive: summary ? formatNumber(summary.positive_count) : "—",
+                  negative: summary ? formatNumber(summary.negative_count) : "—",
+                })}
+                icon={<SmilePlus className="h-5 w-5 text-amber-700 dark:text-amber-200" />}
+                accent="bg-amber-500/15"
+              />
+              <MetricCard
+                loading={loading.kpis}
+                title={t("overview.metrics.coverage")}
+                value={summary ? formatNumber(summary.total_responses) : "—"}
+                delta={undefined}
+                description={t("overview.metrics.coverageDescription", {
+                  mentions: summary ? formatNumber(summary.own_mentions) : "—",
+                  sov: summary ? formatPct(summary.sov_pct) : "—",
+                })}
+                icon={<Activity className="h-5 w-5 text-rose-700 dark:text-rose-200" />}
+                accent="bg-rose-500/15"
+              />
+              {errors.kpis && <p className="col-span-full text-sm text-destructive">{errors.kpis}</p>}
+            </section>
+
+          </div>{/* end LEFT: KPI cards */}
+
+          {/* RIGHT: Trend chart — h-full fills the grid row to match KPI column */}
+          <Card className="flex h-full flex-col rounded-lg border-border/60 bg-background/85 shadow-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between gap-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <BarChart3 className="h-4 w-4 text-primary" />
+                    {t("overview.momentum.title")}
+                  </CardTitle>
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-emerald-500" />{t("overview.momentum.series.visibility_score")}</span>
+                    <span className="inline-flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-sky-500" />{t("overview.momentum.series.own_citation_share")}</span>
+                    <span className="inline-flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-amber-500" />{t("overview.momentum.series.positive_sentiment_pct")}</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col">
+                {loading.trends ? (
+                  <LoadingBlock className="min-h-[360px] flex-1" />
+                ) : chartData.length > 0 ? (
+                  <div className="w-full flex-1" style={{ minHeight: 300 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData} margin={{ top: 16, right: 20, bottom: 0, left: -18 }}>
+                      <defs>
+                        <linearGradient id="overviewVisibility" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="overviewCitation" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.2} />
+                          <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="overviewSentiment" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
+                          <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.65} />
+                      <XAxis dataKey="label" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={48} tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
+                      <Tooltip
+                        contentStyle={{
+                          background: "hsl(var(--popover))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: 8,
+                          color: "hsl(var(--popover-foreground))",
+                        }}
+                        formatter={(value, name) => [
+                          typeof value === "number" ? formatPct(value) : "—",
+                          t(`overview.momentum.series.${String(name)}` as any),
+                        ]}
+                      />
+                      <Area type="monotone" dataKey="visibility_score" stroke="#10b981" fill="url(#overviewVisibility)" strokeWidth={2.5} />
+                      <Area type="monotone" dataKey="own_citation_share" stroke="#0ea5e9" fill="url(#overviewCitation)" strokeWidth={2} />
+                      <Area type="monotone" dataKey="positive_sentiment_pct" stroke="#f59e0b" fill="url(#overviewSentiment)" strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <EmptyState message={errors.trends || t("overview.empty")} />
+                )}
+              </CardContent>
+            </Card>
+        </section>{/* end Row 1 */}
+
+        {/* ── Row 2: Platform Health (left) + Key Insights & Topics (right) ── */}
+        <section className="grid items-start gap-6 xl:grid-cols-[344px_minmax(0,1fr)]">
+
+          {/* LEFT: Platform Health */}
+          <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Globe2 className="h-4 w-4 text-primary" />
+                {t("overview.platform.title")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {loading.platform ? (
+                <LoadingBlock className="min-h-[120px]" />
+              ) : platformHealth.length > 0 ? (
+                platformHealth.map((row) => (
+                  <div key={row.platform} className="rounded-lg border border-border/60 p-3">
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-sm font-semibold text-foreground">{formatPlatformLabel(row.platform)}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div>
+                        <p className="text-muted-foreground">{t("overview.platform.visibility")}</p>
+                        <p className="font-semibold text-emerald-700 dark:text-emerald-300">{formatPct(row.visibility_score)}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">{t("overview.platform.citation")}</p>
+                        <p className="font-semibold text-sky-700 dark:text-sky-300">{formatPct(row.own_citation_share)}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">{t("overview.platform.sentiment")}</p>
+                        <p className="font-semibold text-amber-700 dark:text-amber-300">{formatPct(row.positive_sentiment_pct)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <EmptyState message={errors.platform || t("overview.empty")} />
+              )}
+            </CardContent>
+          </Card>
+
+          {/* RIGHT: Key Insights + Topics stacked */}
+          <div className="flex min-w-0 flex-col gap-6">
+
+            {/* Key Insights — 3-card horizontal row */}
+            <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Sparkles className="h-4 w-4 text-primary" />
                   {t("overview.insights.title")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-1 flex-col space-y-3">
+              <CardContent>
                 {loading.insights ? (
-                  <>
-                    <LoadingBlock className="min-h-[84px]" />
-                    <LoadingBlock className="min-h-[84px]" />
-                    <LoadingBlock className="min-h-[84px]" />
-                  </>
-                ) : insights.length > 0 ? (
-                  insights.slice(0, 3).map((item) => (
-                    <button
-                      key={`${item.kind}-${item.metric}`}
-                      type="button"
-                      onClick={() => setSelectedInsight(item)}
-                      className={cn("min-h-[84px] rounded-lg border p-4 text-left transition hover:border-primary/45", insightTone(item.severity))}
-                    >
-                      <div className="mb-1.5 flex items-center justify-between gap-3">
-                        <p className="min-w-0 truncate text-sm font-semibold text-foreground">{item.title}</p>
-                        <DeltaPill value={item.delta} />
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="min-w-0 line-clamp-2 text-xs leading-5 text-muted-foreground">{item.detail}</p>
-                        <span className="shrink-0 text-xs font-medium text-primary">{t("overview.insights.viewDetail")}</span>
-                      </div>
-                    </button>
-                  ))
-                ) : (
-                  <div className="flex flex-1">
-                    <EmptyState message={errors.insights || t("overview.insights.empty")} />
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <LoadingBlock className="min-h-[100px]" />
+                    <LoadingBlock className="min-h-[100px]" />
+                    <LoadingBlock className="min-h-[100px]" />
                   </div>
+                ) : insights.length > 0 ? (
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {insights.slice(0, 3).map((item) => (
+                      <button
+                        key={`${item.kind}-${item.metric}`}
+                        type="button"
+                        onClick={() => setSelectedInsight(item)}
+                        className={cn("rounded-lg border p-4 text-left transition hover:border-primary/45", insightTone(item.severity))}
+                      >
+                        <div className="mb-2 flex items-start justify-between gap-2">
+                          <p className="min-w-0 text-sm font-semibold leading-snug text-foreground">{item.title}</p>
+                          <DeltaPill value={item.delta} />
+                        </div>
+                        <p className="line-clamp-3 text-xs leading-5 text-muted-foreground">{item.detail}</p>
+                        <p className="mt-2 text-xs font-medium text-primary">{t("overview.insights.viewDetail")}</p>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState message={errors.insights || t("overview.insights.empty")} />
                 )}
               </CardContent>
             </Card>
 
+            {/* Topics — horizontal scrollable card row */}
             <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Globe2 className="h-4 w-4 text-primary" />
-                  {t("overview.platform.title")}
+                  <Layers className="h-4 w-4 text-primary" />
+                  {t("overview.topics.title")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                {loading.platform ? (
-                  <LoadingBlock className="min-h-[120px]" />
-                ) : platformHealth.length > 0 ? (
-                  platformHealth.map((row) => (
-                    <div key={row.platform} className="rounded-lg border border-border/60 p-3">
-                      <div className="mb-2 flex items-center justify-between">
-                        <span className="text-sm font-semibold text-foreground">{formatPlatformLabel(row.platform)}</span>
+              <CardContent>
+                {loading.topics ? (
+                  <div className="flex gap-3 overflow-x-auto pb-1">
+                    <LoadingBlock className="min-h-[140px] min-w-[220px]" />
+                    <LoadingBlock className="min-h-[140px] min-w-[220px]" />
+                    <LoadingBlock className="min-h-[140px] min-w-[220px]" />
+                  </div>
+                ) : topics.length > 0 ? (
+                  <div className="flex gap-3 overflow-x-auto pb-1">
+                    {topics.slice(0, 6).map((topic) => (
+                      <div key={topic.topic_id} className="min-w-[220px] flex-shrink-0 rounded-lg border border-border/60 p-3">
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <p className="truncate text-sm font-semibold text-foreground">{topic.topic_name || t("overview.topics.unknown")}</p>
+                          <Badge variant="outline" className={cn("shrink-0 rounded-md text-xs", opportunityTone(topic.opportunity_label))}>
+                            {formatRank(topic.own_rank)}
+                          </Badge>
+                        </div>
+                        <div className="space-y-1.5 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">{t("overview.topics.visibility")}</span>
+                            <span className="font-semibold text-emerald-700 dark:text-emerald-300">{formatPct(topic.visibility_pct)}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">{t("overview.topics.citation")}</span>
+                            <span className="font-semibold text-sky-700 dark:text-sky-300">{formatPct(topic.citation_coverage)}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">{t("overview.topics.sentiment")}</span>
+                            <span className="font-semibold text-amber-700 dark:text-amber-300">{formatPct(topic.sentiment_polarity)}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div>
-                          <p className="text-muted-foreground">{t("overview.platform.visibility")}</p>
-                          <p className="font-semibold text-emerald-700 dark:text-emerald-300">{formatPct(row.visibility_score)}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">{t("overview.platform.citation")}</p>
-                          <p className="font-semibold text-sky-700 dark:text-sky-300">{formatPct(row.own_citation_share)}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">{t("overview.platform.sentiment")}</p>
-                          <p className="font-semibold text-amber-700 dark:text-amber-300">{formatPct(row.positive_sentiment_pct)}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 ) : (
-                  <EmptyState message={errors.platform || t("overview.empty")} />
+                  <EmptyState message={errors.topics || t("overview.empty")} />
                 )}
               </CardContent>
             </Card>
-          </div>
+          </div>{/* end Row 2 right */}
+        </section>{/* end Row 2 */}
 
-          {/* Right: Trend chart — tall, prominent */}
-          <Card className="flex h-full flex-col rounded-lg border-border/60 bg-background/85 shadow-sm">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between gap-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <BarChart3 className="h-4 w-4 text-primary" />
-                  {t("overview.momentum.title")}
-                </CardTitle>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-emerald-500" />{t("overview.momentum.series.visibility_score")}</span>
-                  <span className="inline-flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-sky-500" />{t("overview.momentum.series.own_citation_share")}</span>
-                  <span className="inline-flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-amber-500" />{t("overview.momentum.series.positive_sentiment_pct")}</span>
-                </div>
+        {/* ── Competitors Snapshot — full width ── */}
+        <Card className="rounded-lg border-border/60 bg-background/85 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ExternalLink className="h-4 w-4 text-primary" />
+              {t("overview.competitors.title")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {loading.competitors ? (
+              <LoadingBlock className="m-6 min-h-[200px]" />
+            ) : competitors.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border/60 text-xs text-muted-foreground">
+                      <th className="py-2.5 pl-6 pr-3 text-left font-medium">{t("overview.competitors.title")}</th>
+                      <th className="px-3 py-2.5 text-right font-medium">{t("overview.competitors.visibility")}</th>
+                      <th className="px-3 py-2.5 text-right font-medium">{t("overview.competitors.sov")}</th>
+                      <th className="px-3 py-2.5 text-right font-medium">{t("overview.competitors.mentions")}</th>
+                      <th className="px-3 py-2.5 text-right font-medium">{t("overview.competitors.position")}</th>
+                      <th className="py-2.5 pl-3 pr-6 text-right font-medium">Rank</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/40">
+                    {competitors.slice(0, 8).map((row) => (
+                      <tr
+                        key={`${row.rank}-${row.brand_name}`}
+                        className={cn("transition-colors hover:bg-muted/30", row.is_own && "bg-emerald-500/8")}
+                      >
+                        <td className="py-2.5 pl-6 pr-3 font-medium text-foreground">
+                          <span className="flex items-center gap-2">
+                            {row.brand_name || "—"}
+                            {row.is_own && <Badge variant="outline" className="rounded-md border-emerald-500/35 text-xs text-emerald-700 dark:text-emerald-300">{t("overview.competitors.ownBrand")}</Badge>}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2.5 text-right text-emerald-700 dark:text-emerald-300">{formatPct(row.visibility_pct)}</td>
+                        <td className="px-3 py-2.5 text-right text-sky-700 dark:text-sky-300">{formatPct(row.sov_pct)}</td>
+                        <td className="px-3 py-2.5 text-right text-foreground">{formatNumber(row.mention_count)}</td>
+                        <td className="px-3 py-2.5 text-right text-foreground">{row.avg_position?.toFixed(1) || "—"}</td>
+                        <td className="py-2.5 pl-3 pr-6 text-right font-semibold text-foreground">{formatRank(row.rank)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col">
-              {loading.trends ? (
-                <LoadingBlock className="min-h-[480px] flex-1" />
-              ) : chartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%" minHeight={480}>
-                  <AreaChart data={chartData} margin={{ top: 16, right: 20, bottom: 0, left: -18 }}>
-                    <defs>
-                      <linearGradient id="overviewVisibility" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.28} />
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.65} />
-                    <XAxis dataKey="label" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                    <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={48} tickFormatter={(value) => `${value}%`} />
-                    <Tooltip
-                      contentStyle={{
-                        background: "hsl(var(--popover))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: 8,
-                        color: "hsl(var(--popover-foreground))",
-                      }}
-                      formatter={(value, name) => [
-                        typeof value === "number" ? formatPct(value) : "—",
-                        t(`overview.momentum.series.${String(name)}` as any),
-                      ]}
-                    />
-                    <Area type="monotone" dataKey="visibility_score" stroke="#10b981" fill="url(#overviewVisibility)" strokeWidth={2.5} />
-                    <Line type="monotone" dataKey="own_citation_share" stroke="#0ea5e9" strokeWidth={2.5} dot={false} />
-                    <Line type="monotone" dataKey="positive_sentiment_pct" stroke="#f59e0b" strokeWidth={2.5} dot={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : (
-                <EmptyState message={errors.trends || t("overview.empty")} />
-              )}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section className="grid items-stretch gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <Card className="flex h-[650px] flex-col rounded-lg border-border/60 bg-background/85 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Layers className="h-4 w-4 text-primary" />
-                {t("overview.topics.title")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-2">
-              {loading.topics ? (
-                <LoadingBlock className="min-h-[280px]" />
-              ) : topics.length > 0 ? (
-                topics.map((topic) => (
-                  <div key={topic.topic_id} className="rounded-lg border border-border/60 p-3">
-                    <div className="min-w-0">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-foreground">{topic.topic_name || t("overview.topics.unknown")}</p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {t("overview.topics.leader", {
-                              brand: topic.leading_brand || "—",
-                              count: formatNumber(topic.leading_mentions),
-                            })}
-                          </p>
-                        </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          <Badge variant="outline" className={cn("rounded-md", opportunityTone(topic.opportunity_label))}>
-                            {t(`overview.topics.labels.${topic.opportunity_label}` as any)}
-                          </Badge>
-                          <span className="text-sm font-semibold text-foreground">{formatRank(topic.own_rank)}</span>
-                        </div>
-                      </div>
-                      <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2 2xl:grid-cols-3">
-                        <MetricTile label={t("overview.topics.visibility")} value={formatPct(topic.visibility_pct)} tone="green" />
-                        <MetricTile label={t("overview.topics.citation")} value={formatPct(topic.citation_coverage)} tone="blue" />
-                        <MetricTile label={t("overview.topics.sentiment")} value={formatPct(topic.sentiment_polarity)} tone="amber" />
-                        <MetricTile label={t("overview.topics.promptVolume")} value={formatNumber(topic.prompt_volume)} />
-                        <MetricTile
-                          label={t("overview.topics.mentionShare")}
-                          value={formatPct(topic.mention_share_pct)}
-                          detail={t("overview.topics.mentionShareDetail", { count: formatNumber(topic.own_mentions) })}
-                        />
-                        <MetricTile label={t("overview.topics.ownRank")} value={formatRank(topic.own_rank)} />
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <EmptyState message={errors.topics || t("overview.empty")} />
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="flex h-[650px] flex-col rounded-lg border-border/60 bg-background/85 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <ExternalLink className="h-4 w-4 text-primary" />
-                {t("overview.competitors.title")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="min-h-0 flex-1 overflow-y-auto pr-2 space-y-2">
-              {loading.competitors ? (
-                <LoadingBlock className="min-h-[280px]" />
-              ) : competitors.length > 0 ? (
-                <div className="space-y-2">
-                  {competitors.slice(0, 10).map((row) => (
-                    <div
-                      key={`${row.rank}-${row.brand_name}`}
-                      className={cn(
-                        "rounded-lg border border-border/60 p-3",
-                        row.is_own ? "border-emerald-500/35 bg-emerald-500/10" : "bg-background/40",
-                      )}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-foreground">{row.brand_name || "—"}</p>
-                          <p className="mt-1 text-xs text-muted-foreground">{formatRank(row.rank)}</p>
-                        </div>
-                        {row.is_own ? <Badge variant="outline" className="rounded-md border-emerald-500/35 text-emerald-700 dark:text-emerald-300">{t("overview.competitors.ownBrand")}</Badge> : null}
-                      </div>
-                      <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
-                        <MetricTile label={t("overview.competitors.visibility")} value={formatPct(row.visibility_pct)} tone="green" />
-                        <MetricTile label={t("overview.competitors.sov")} value={formatPct(row.sov_pct)} tone="blue" />
-                        <MetricTile label={t("overview.competitors.mentions")} value={formatNumber(row.mention_count)} />
-                        <MetricTile label={t("overview.competitors.position")} value={row.avg_position?.toFixed(1) || "—"} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState message={errors.competitors || t("overview.empty")} />
-              )}
-            </CardContent>
-          </Card>
-        </section>
+            ) : (
+              <EmptyState message={errors.competitors || t("overview.empty")} className="m-6" />
+            )}
+          </CardContent>
+        </Card>
 
         <Dialog open={!!selectedInsight} onOpenChange={(open) => { if (!open) setSelectedInsight(null); }}>
           <DialogContent className="max-w-lg">
@@ -755,3 +780,10 @@ export default function OverviewDashboard() {
     </div>
   );
 }
+
+
+
+
+
+
+
